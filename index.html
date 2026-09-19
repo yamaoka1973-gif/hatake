@@ -841,7 +841,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 <div class="game" id="game">
   <div class="head">
     <h1>えりとしゃだはるの ちいさな畑</h1>
-    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.13.0</span></span>
+    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.13.1</span></span>
   </div>
 
   <div class="hud">
@@ -1131,7 +1131,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
       <div class="rowEnd"><button class="btn small" id="homeSkip" type="button">とばす</button><button class="btn primary" id="sleepBtn" type="button" disabled>おやすみ（次の日へ）</button></div>
     </div>
     <div class="btns" id="mainBtns">
-      <button class="btn" id="restBtn" type="button">ひとやすみ（2時間）</button>
+      <button class="btn" id="restBtn" type="button">ひとやすみ（1時間）</button>
       <button class="btn primary" id="endBtn" type="button">1日を終える</button>
       <button class="btn" id="diaryBtn" type="button">にっき</button>
     </div>
@@ -1148,7 +1148,8 @@ const FX=332, FY=186, PS=62, G=8;          // 畑の左上、マスの大きさ�
 const GHX=1152, GHY=262, GS=60, GHGAP=12;  // 温室のマス
 const TOK=46;                              // 顔コマの大きさ
 const DAY_START=360, DAY_END=1080;         // 朝6時〜夕方6時（分）
-const ACT=30, REST=120, NIGHT_BONUS=180;   // 行動1回=30分、ひとやすみ=2時間、夜のあいだに育つぶん
+const ACT=30, REST=60, NIGHT_BONUS=180;   // 行動1回=30分、ひとやすみ=1時間（v1.13.1。前は2時間）、夜のあいだに育つぶん
+const REST_LABEL=REST%60===0 ? (REST/60)+'時間' : REST+'分';   // ボタンと、できごと欄の文に使う
 const SEASON_DAYS=2;                       // 1つの季節の長さ（日）。1年＝この4倍
 const FROST_MELT=540;                      // 冬の朝の霜がとける時刻（9時）
 const BUG_RATE=[.07,.10,.03,0];            // 30分あたり、野菜に虫がつく確率（春・夏・秋・冬）
@@ -2657,7 +2658,7 @@ async function restAtHome(){
   fx('i-cup',{x:(SPOT.doorHomare.x+e.x)/2,y:e.y-34},'pop',1300);
   addNagomi(1,{x:(SPOT.doorHomare.x+e.x)/2,y:e.y-16});
   await pause(900);
-  log('おうちの前でひとやすみして、ほまれくんと話しました。2時間たちました。');
+  log('おうちの前でひとやすみして、ほまれくんと話しました。'+REST_LABEL+'たちました。');
   await advance(REST);
   S.sinceEvent+=2;
   await afterAction(true);
@@ -2719,7 +2720,7 @@ async function rest(){
   if(bench) addNagomi(1,{x:(e.x+s.x)/2,y:e.y-14});
   await pause(450);
   if(snack){ snack.style.opacity='0'; setTimeout(()=>snack.remove(),320); }
-  log(sc.log+'2時間たちました。');
+  log(sc.log+REST_LABEL+'たちました。');
   await advance(REST);
   S.sinceEvent+=2;
   await afterAction(true);
@@ -3913,7 +3914,7 @@ async function nextMorning(){
 function rollWeather(){
   const sn=season(), r=rnd(), half=n=>Math.floor(rnd()*n)*30;
   let w=null;
-  if(sn===1){ if(r<.4){ const from=780+half(5); w={kind:'storm',from,to:Math.min(DAY_END,from+120+half(3))}; } }
+  if(sn===1){ if(r<.4){ const from=720+half(5); w={kind:'storm',from,to:Math.min(DAY_END,from+120+half(3))}; }   /* 夕立は12:00〜14:00に始まる（v1.13.1。前は13:00〜15:00） */ }
   else if(sn===3){ if(r<.5){ const from=540+half(7); w={kind:'snow',from,to:rnd()<.35?DAY_END+60:from+180+half(5)}; } }
   else if(r<.22){ const from=540+half(8); w={kind:'rain',from,to:rnd()<.3?DAY_END+60:from+120+half(5)}; }
   else if(r<.72){ const from=450+half(10); w={kind:sn===0?'breeze':'leaves',from,to:from+120+half(3)}; }
@@ -4163,6 +4164,7 @@ if(location.hash.indexOf('sound')>=0){
   });
 }
 restBtn.addEventListener('click',rest);
+restBtn.textContent='ひとやすみ（'+REST_LABEL+'）';
 endBtn.addEventListener('click',async()=>{ if(busy||modal) return; busy=true; renderButtons(); queued=null; await endDay(); busy=false; renderButtons(); });
 diaryBtn.addEventListener('click',()=>{ if(modal && sheetKind==='diary'){ closeSheet(); return; } if(!modal) openDiary(); });
 $('#heldChange').addEventListener('click',()=>openSeeds(null));
