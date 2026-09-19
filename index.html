@@ -38,6 +38,14 @@ button{font:inherit;color:inherit}
 .head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
 h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 .ver{font-size:12px;color:var(--muted)}
+.headR{display:inline-flex;align-items:center;gap:8px}
+/* 音のボタン（右上）。off＝音なし */
+.sndBtn{width:34px;height:34px;padding:0;border-radius:50%;border:1px solid var(--border);background:#fff;color:#7d8f5b;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.sndBtn svg{width:20px;height:20px;display:block}
+.sndBtn .slash{display:none}
+.sndBtn.off{color:#b8ae9f}
+.sndBtn.off .waves{display:none}
+.sndBtn.off .slash{display:inline}
 
 /* 上の情報バー */
 .game[data-season="0"]{--seasonBg:#fde8ee;--seasonLine:#f3b7c6;--seasonInk:#d9607f}
@@ -736,7 +744,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 <div class="game" id="game">
   <div class="head">
     <h1>えりとしゃだはるの ちいさな畑</h1>
-    <span class="ver">v1.7.2</span>
+    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M15 9.2q2 2.8 0 5.6"/><path d="M17.7 7q3.6 5 0 10"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.8.0</span></span>
   </div>
 
   <div class="hud">
@@ -1170,6 +1178,173 @@ const tint=$('#tint'), weatherEl=$('#weather'), peek=$('#peek'), sheet=$('#sheet
 const logText=$('#logText'), restBtn=$('#restBtn'), endBtn=$('#endBtn'), diaryBtn=$('#diaryBtn');
 const basketFront=$('#basketFront');
 
+/* ================= 音（効果音） =================
+   音声ファイルは使わず、Web Audio でその場で音を合成する（1ファイル・オフラインのまま）。
+   SFX の1つ1つは (c,out,t) を受けとる「レシピ」：c＝AudioContext、out＝つなぐ先、t＝鳴らしはじめる時刻。
+   音を足す・直すときは SFX をいじる（vol＝その音の大きさ、f＝高さHz、dur＝長さ秒）。全体の大きさは MASTER_VOL。
+   スマホのスピーカーは低い音が出にくいので、低音だけの音は作らない（およそ250Hzより上を使う）。
+   iPhoneは、さいしょに画面をタップするまで鳴らない。消音（マナーモード）のあいだは鳴らない。 */
+const MASTER_VOL=1.2;   /* 全体の音量。大きい・小さいと言われたら、まずここ（0.8〜1.6くらい） */
+const NOTE={E4:329.63,G4:392,A4:440,C5:523.25,D5:587.33,E5:659.25,G5:783.99,A5:880,C6:1046.5,D6:1174.66,E6:1318.51,G6:1567.98,A6:1760,C7:2093};
+const Snd=(()=>{
+  const AC=window.AudioContext||window.webkitAudioContext;
+  let ctx=null, master=null, nbuf=null, amb=null, ambKind='';
+  const last={}, counts={};
+  const enabled=()=>!!S && S.sound!=='off';
+  function noiseBuf(c){
+    if(c===ctx && nbuf) return nbuf;
+    const b=c.createBuffer(1,Math.floor(c.sampleRate*2),c.sampleRate), d=b.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+    if(c===ctx) nbuf=b;
+    return b;
+  }
+  /* 音のかたち：すっと立ち上がって、なめらかに消える */
+  function env(c,out,t,dur,vol,attack){
+    const g=c.createGain(), a=Math.min(attack||.008,dur*.5);
+    g.gain.value=.0001;   /* はじめから絞っておく（鳴りはじめの一瞬に「プチッ」と大きな音がもれるのをふせぐ） */
+    g.gain.setValueAtTime(.0001,t);
+    g.gain.exponentialRampToValueAtTime(Math.max(.0002,vol),t+a);
+    g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    g.connect(out); return g;
+  }
+  /* 高さのある音（f→f2 へ、なめらかに変わる） */
+  function tone(c,out,t,o){
+    const osc=c.createOscillator(); osc.type=o.type||'sine';
+    osc.frequency.setValueAtTime(o.f,t);
+    if(o.f2) osc.frequency.exponentialRampToValueAtTime(o.f2,t+(o.glide||o.dur));
+    osc.connect(env(c,out,t,o.dur,o.vol,o.attack)); osc.start(t); osc.stop(t+o.dur+.04);
+  }
+  /* ざわざわした音（雑音をフィルターに通す） */
+  function hiss(c,out,t,o){
+    const src=c.createBufferSource(); src.buffer=noiseBuf(c); src.loop=true;
+    const f=c.createBiquadFilter(); f.type=o.type||'bandpass'; f.Q.value=o.q||1;
+    f.frequency.setValueAtTime(o.freq,t);
+    if(o.freq2) f.frequency.exponentialRampToValueAtTime(o.freq2,t+o.dur);
+    src.connect(f); f.connect(env(c,out,t,o.dur,o.vol,o.attack));
+    src.start(t,Math.random()*1.5); src.stop(t+o.dur+.04);
+  }
+  const notes=(c,out,t,list,step,o)=>list.forEach((f,i)=>tone(c,out,t+i*step,Object.assign({},o,{f},i===list.length-1&&o.lastDur?{dur:o.lastDur}:{})));
+  const SFX={
+    pick:(c,o,t)=>tone(c,o,t,{f:880,f2:740,dur:.07,vol:.09}),
+    dig:(c,o,t)=>{ hiss(c,o,t,{type:'lowpass',freq:1200,freq2:400,dur:.16,vol:.2}); tone(c,o,t,{f:300,f2:190,dur:.12,vol:.14}); },
+    plant:(c,o,t)=>{ tone(c,o,t,{f:380,f2:230,dur:.13,vol:.2}); hiss(c,o,t,{type:'lowpass',freq:1400,dur:.09,vol:.09}); },
+    water:(c,o,t)=>{ hiss(c,o,t,{freq:2400,freq2:1200,q:.8,dur:.4,vol:.11,attack:.04});
+      tone(c,o,t+.02,{f:720,f2:1350,dur:.07,vol:.1}); tone(c,o,t+.13,{f:840,f2:1550,dur:.07,vol:.09}); tone(c,o,t+.26,{f:660,f2:1250,dur:.08,vol:.08}); },
+    harvest:(c,o,t)=>{ tone(c,o,t,{f:340,f2:700,dur:.1,vol:.2}); tone(c,o,t+.09,{f:NOTE.E6,type:'triangle',dur:.16,vol:.08}); tone(c,o,t+.17,{f:NOTE.A6,type:'triangle',dur:.24,vol:.08}); },
+    basket:(c,o,t)=>{ tone(c,o,t,{f:330,f2:260,type:'triangle',dur:.07,vol:.16}); hiss(c,o,t,{freq:1600,q:2,dur:.03,vol:.08}); tone(c,o,t+.07,{f:270,type:'triangle',dur:.08,vol:.09}); },
+    shoo:(c,o,t)=>tone(c,o,t,{f:620,f2:1500,type:'triangle',dur:.28,vol:.09,attack:.02}),
+    frost:(c,o,t)=>{ hiss(c,o,t,{type:'highpass',freq:2800,dur:.07,vol:.15}); hiss(c,o,t+.13,{type:'highpass',freq:3400,dur:.06,vol:.12}); },
+    pet:(c,o,t)=>{ tone(c,o,t,{f:NOTE.E5,dur:.1,vol:.12}); tone(c,o,t+.09,{f:NOTE.A5,dur:.18,vol:.12}); },
+    bau:(c,o,t)=>{ tone(c,o,t,{f:520,f2:440,type:'triangle',dur:.08,vol:.11}); tone(c,o,t+.085,{f:400,f2:320,type:'triangle',dur:.13,vol:.11}); },
+    unlock:(c,o,t)=>notes(c,o,t,[NOTE.C5,NOTE.E5,NOTE.G5,NOTE.C6],.1,{type:'triangle',dur:.22,vol:.12,lastDur:.55}),
+    spark:(c,o,t)=>{ tone(c,o,t,{f:NOTE.A5,dur:.1,vol:.08}); tone(c,o,t+.08,{f:NOTE.E6,dur:.22,vol:.08}); },
+    heart:(c,o,t)=>{ tone(c,o,t,{f:NOTE.A5,dur:.14,vol:.05}); tone(c,o,t+.05,{f:NOTE.E6,dur:.16,vol:.035}); },
+    frog:(c,o,t)=>{ tone(c,o,t,{f:440,f2:370,type:'triangle',dur:.07,vol:.12}); tone(c,o,t+.1,{f:440,f2:350,type:'triangle',dur:.1,vol:.12}); },
+    slip:(c,o,t)=>tone(c,o,t,{f:1300,f2:420,dur:.32,vol:.09}),
+    thunder:(c,o,t)=>{ hiss(c,o,t,{type:'lowpass',freq:1100,freq2:220,dur:1.7,vol:.3,attack:.06}); hiss(c,o,t+.45,{type:'lowpass',freq:700,freq2:180,dur:1.5,vol:.2,attack:.25}); },
+    rainbow:(c,o,t)=>notes(c,o,t,[NOTE.C6,NOTE.D6,NOTE.E6,NOTE.G6,NOTE.A6,NOTE.C7],.075,{dur:.26,vol:.06,lastDur:.5}),
+    wind:(c,o,t)=>hiss(c,o,t,{freq:500,freq2:1100,q:.7,dur:1.3,vol:.1,attack:.45}),
+    morning:(c,o,t)=>{ notes(c,o,t,[NOTE.G5,NOTE.C6,NOTE.E6],.16,{dur:.5,vol:.09});
+      [.75,.84,.93,1.3,1.39].forEach(d=>tone(c,o,t+d,{f:2800,f2:3900,dur:.05,vol:.04})); },
+    season:(c,o,t)=>notes(c,o,t,[NOTE.C5,NOTE.E5,NOTE.G5,NOTE.E5,NOTE.C6],.14,{type:'triangle',dur:.3,vol:.1,lastDur:.6}),
+    night:(c,o,t)=>[NOTE.E5,NOTE.C5,NOTE.G4,NOTE.C5].forEach((f,i)=>{ tone(c,o,t+i*.26,{f,dur:i===3?.9:.6,vol:.1}); tone(c,o,t+i*.26,{f:f*2,dur:.3,vol:.035}); }),
+    fridge:(c,o,t)=>{ hiss(c,o,t,{freq:900,q:1.5,dur:.04,vol:.1}); tone(c,o,t,{f:320,f2:260,dur:.08,vol:.08}); },
+    chop:(c,o,t)=>[0,.16,.32,.48].forEach(d=>{ tone(c,o,t+d,{f:420,f2:300,type:'triangle',dur:.045,vol:.13}); hiss(c,o,t+d,{freq:2000,dur:.02,vol:.05}); }),
+    simmer:(c,o,t)=>[0,.17,.31,.52,.7,.88,1.1].forEach((d,i)=>{ const f=300+((i*97)%180); tone(c,o,t+d,{f,f2:f+90,dur:.06,vol:.1}); }),
+    sizzle:(c,o,t)=>{ hiss(c,o,t,{type:'highpass',freq:3500,dur:1.3,vol:.045,attack:.12}); [.1,.27,.5,.66,.9,1.05].forEach(d=>hiss(c,o,t+d,{type:'highpass',freq:5000,dur:.02,vol:.06})); },
+    camera:(c,o,t)=>{ hiss(c,o,t,{type:'highpass',freq:2500,dur:.025,vol:.18}); hiss(c,o,t+.07,{freq:1800,q:1,dur:.05,vol:.14}); },
+    eat:(c,o,t)=>[0,.15,.3,.45].forEach(d=>hiss(c,o,t+d,{type:'lowpass',freq:900,dur:.07,vol:.32})),
+    yum:(c,o,t)=>{ tone(c,o,t,{f:NOTE.C6,dur:.14,vol:.08}); tone(c,o,t+.1,{f:NOTE.G6,dur:.32,vol:.08}); },
+    hop:(c,o,t)=>tone(c,o,t,{f:420,f2:760,dur:.09,vol:.08}),
+    rest:(c,o,t)=>{ tone(c,o,t,{f:NOTE.E5,dur:.28,vol:.09}); tone(c,o,t+.2,{f:NOTE.C5,dur:.45,vol:.09}); },
+    ice:(c,o,t)=>{ tone(c,o,t,{f:2300,dur:.05,vol:.05}); tone(c,o,t+.07,{f:2900,dur:.09,vol:.045}); }
+  };
+  function build(){
+    if(ctx || !AC) return;
+    try{
+      ctx=new AC();
+      master=ctx.createGain(); master.gain.value=MASTER_VOL;
+      const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=9000;
+      const comp=ctx.createDynamicsCompressor(); comp.threshold.value=-14; comp.ratio.value=8; comp.attack.value=.004; comp.release.value=.2;
+      master.connect(lp); lp.connect(comp); comp.connect(ctx.destination);
+    }catch(e){ ctx=null; }
+  }
+  /* さいしょのタップで音の準備をする（ブラウザのきまり）。止まっていたら、タップのたびに動かしなおす */
+  function unlock(){
+    if(!enabled()) return;
+    build();
+    if(ctx && ctx.state!=='running'){ try{ const p=ctx.resume(); if(p&&p.then) p.then(ambient,()=>{}); }catch(e){} }
+  }
+  function play(name,delay){
+    if(!enabled() || !SFX[name]) return;
+    counts[name]=(counts[name]||0)+1;
+    if(name==='pet'||name==='bau') voiceAt=performance.now();
+    if(!ctx || ctx.state!=='running') return;
+    const now=ctx.currentTime;
+    if(!delay && last[name]!=null && now-last[name]<.05) return;
+    last[name]=now;
+    try{ SFX[name](ctx,master,now+.015+(delay||0)); }catch(e){}
+  }
+  /* しゃだはる君の声（ころんとした短い音）。毎回だと うるさいので、ときどき（半分くらい。1.6秒はあける。なでた直後は鳴らさない） */
+  let voiceAt=-9999;
+  function bau(){
+    if(!enabled() || performance.now()-voiceAt<1600 || Math.random()>.5) return;
+    play('bau');
+  }
+  /* 雨の音（ふっているあいだ、小さく流しつづける）。おうちの中では、こもった音にする */
+  function ambient(){
+    const raining=enabled() && !!S && S.raining && !(S.wx && S.wx.kind==='snow') && season()!==3;
+    const indoor=home.classList.contains('on');
+    const kind=!raining?'':(indoor?'in':(S.wx&&S.wx.kind==='storm'?'storm':'rain'));
+    if(kind===ambKind) return;
+    ambKind=kind;
+    if(!ctx || ctx.state!=='running'){ ambKind=''; return; }
+    const now=ctx.currentTime;
+    if(!kind){ if(amb){ const a=amb; amb=null; a.g.gain.setTargetAtTime(.0001,now,.4); setTimeout(()=>{ try{ a.src.stop(); }catch(e){} },2500); } return; }
+    if(!amb){
+      const src=ctx.createBufferSource(); src.buffer=noiseBuf(ctx); src.loop=true;
+      const bp=ctx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=1500; bp.Q.value=.45;
+      const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=6000;
+      const g=ctx.createGain(); g.gain.value=.0001;
+      src.connect(bp); bp.connect(lp); lp.connect(g); g.connect(master); src.start();
+      amb={src,lp,g};
+    }
+    amb.g.gain.setTargetAtTime({rain:.035,storm:.055,in:.022}[kind],now,.6);
+    amb.lp.frequency.setTargetAtTime(kind==='in'?650:6000,now,.3);
+  }
+  function refreshBtn(){
+    const b=document.getElementById('sndBtn'); if(!b) return;
+    const off=!enabled();
+    b.classList.toggle('off',off);
+    b.setAttribute('aria-label',off?'音：なし（タップで音を出す）':'音：あり（タップで音を消す）');
+    b.setAttribute('aria-pressed',off?'false':'true');
+  }
+  function toggle(){
+    if(!S) return;
+    S.sound=enabled()?'off':'all';
+    refreshBtn(); saveSoon();
+    if(enabled()){ unlock(); play('pick'); }
+    ambient();
+    logText.textContent=enabled()?'音を出します。（iPhoneは、消音モードのあいだは鳴りません）':'音を消しました。';
+  }
+  /* しらべる用：1つの音を、音の出ない場所で作って、大きさなどを数字で返す */
+  async function render(name,sec){
+    const OC=window.OfflineAudioContext||window.webkitOfflineAudioContext, sr=44100;
+    const oc=new OC(1,Math.floor(sr*(sec||2.6)),sr);
+    SFX[name](oc,oc.destination,.01);
+    const buf=await oc.startRendering(), d=buf.getChannelData(0);
+    let peak=0,at=0,end=0,bad=0;
+    for(let i=0;i<d.length;i++){ const v=Math.abs(d[i]); if(!(v>=0)) bad++; if(v>peak){ peak=v; at=i; } if(v>.003) end=i; }
+    /* いちばん強い0.1秒ぶんの大きさ（耳で感じる「大きさ」に近い） */
+    let loud=0; const w=Math.floor(sr*.1);
+    for(let i=0;i+w<=d.length;i+=Math.floor(w/2)){ let s2=0; for(let k=i;k<i+w;k++) s2+=d[k]*d[k]; loud=Math.max(loud,Math.sqrt(s2/w)); }
+    return {name,peak:+peak.toFixed(3),at:+(at/sr).toFixed(3),loud:+loud.toFixed(3),sec:+(end/sr).toFixed(2),bad};
+  }
+  return {play,bau,unlock,ambient,toggle,refreshBtn,render,counts,names:()=>Object.keys(SFX),state:()=>ctx?ctx.state:'none'};
+})();
+['pointerup','touchend','click','keydown'].forEach(ev=>document.addEventListener(ev,()=>Snd.unlock(),{capture:true,passive:true}));
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') Snd.unlock(); });
+
 /* ================= セーブ（遊ぶ場所に合わせて、使える保存先を順にためす） ================= */
 let saveOK=null, saveTimer=null;
 const Store={
@@ -1213,7 +1388,7 @@ function newGame(){
     plots, shadaPlot:{phase:'none',crop:null,growth:0,appearDay:0},
     totals:{}, total:0, today:{}, pantry:{}, recipes:{}, nagomi:0, stones:0, acorns:0, frogs:0, snowman:false,
     unlocked:{}, decor:{}, request:null, photo:null, newToday:[], basketToday:[], held:null, lastSeed:null,
-    eventsToday:0, sinceEvent:0, petsToday:0, log:[], intro:false
+    eventsToday:0, sinceEvent:0, petsToday:0, log:[], intro:false, sound:'all'
   };
 }
 const season=()=>Math.floor((S.day-1)/SEASON_DAYS)%4;
@@ -1314,6 +1489,7 @@ function renderSky(){
   vp.classList.toggle('windy',!!S.windy);
   vp.classList.toggle('snowcover',!!S.snowCover && season()===3);
   vp.classList.toggle('rainbowOn',!!S.rainbow && !S.raining);
+  Snd.ambient();
 }
 const decoSeen={};
 let pendingStones=0, pendingAcorns=0;   // しゃだはる君が運んでいる途中のもの（家の前に置くまでは飾りに出さない）
@@ -1457,7 +1633,7 @@ function shadaMode(m){
   const c=A.shada.el.classList;
   c.toggle('sleeping',m==='nap'); c.toggle('watching',m==='watch'); c.toggle('carrying',m==='errand'); c.toggle('scared',m==='hide');
 }
-function addNagomi(n,pos){ S.nagomi+=n; if(pos) fx('i-heart',{x:pos.x,y:pos.y-28}); }
+function addNagomi(n,pos){ S.nagomi+=n; if(pos){ fx('i-heart',{x:pos.x,y:pos.y-28}); Snd.play('heart'); } }
 function place(a,x,y,ms){
   a.x=x; a.y=y;
   a.el.style.transitionDuration=(ms||0)+'ms';
@@ -1492,6 +1668,7 @@ const half=m=>rnd()<.5?m:null;
 function say(who,text,ms,mood){
   const a=A[who], o=A[who==='eri'?'shada':'eri'], b=a.bub;
   clearTimeout(a.bubT);
+  if(who==='shada') Snd.bau();
   if(mood) setMood(who,mood,Math.min(ms || (1900+text.length*95), MOOD_MS[mood]||1700));
   b.innerHTML=bubbleHTML(text);
   let dir=who==='eri'?'toL':'toR';
@@ -1555,15 +1732,17 @@ async function work(a,i,iconId){
   a.el.style.setProperty('--side', a.x<=centerOf(i).x ? 1 : -1);
   poke(i);
   if(iconId) fx(iconId,centerOf(i));
+  if(iconId==='i-drop') Snd.play('water');
   if(reduceMotion) return;
   a.el.classList.add('working');
   await sleep(440);
   a.el.classList.remove('working');
 }
 async function flyToBasket(key,from){
-  if(reduceMotion) return;
+  if(reduceMotion){ Snd.play('basket'); return; }
   await flyIcon('c-'+key,from,{x:290,y:232+11});
   basketFront.classList.remove('bump'); void basketFront.getBoundingClientRect(); basketFront.classList.add('bump');
+  Snd.play('basket');
 }
 async function flyIcon(id,from,to){
   if(reduceMotion) return;
@@ -1708,7 +1887,7 @@ async function weatherScenes(){
       if(A.shada.mode==='hide') await stormReturn();
       if(k!=='snow' && S.clock<=DAY_END-60 && rnd()<(k==='storm'?.65:.4)) await rainbowScene();
     }else if(ev==='windStart'){
-      log(k==='leaves'?'風がふいて、落ち葉が舞っています。':'そよ風がふいてきました。花びらが、畑の上を流れていきます。');
+      log(k==='leaves'?'風がふいて、落ち葉が舞っています。':'そよ風がふいてきました。花びらが、畑の上を流れていきます。'); Snd.play('wind');
       if(follow){
         if(k==='leaves'){ setMood('shada','happy',1600); say('shada','はっぱ、ひらひらばう！'); }
         else{ say('shada','いいかぜばう。'); if(rnd()<.6) setTimeout(()=>say('eri','そよ風、気持ちいいね。',0,'smile'),800); }
@@ -1723,7 +1902,7 @@ async function thunderScene(){
   const mid=scroller.scrollLeft+scroller.clientWidth/2;
   flashBolt(); fxText('ピカッ',{x:mid+46,y:98},'thunder');
   await pause(700);
-  fxText('ゴロゴロ……',{x:mid-36,y:124},'thunder');
+  fxText('ゴロゴロ……',{x:mid-36,y:124},'thunder'); Snd.play('thunder');
   await pause(600);
   if(A.shada.mode==='nap') wakeShada(false);
   stopWatch(); cancelErrand();
@@ -1764,7 +1943,7 @@ async function stormReturn(){
   await pause(1500);
 }
 async function rainbowScene(){
-  S.rainbow=true; renderSky();
+  S.rainbow=true; renderSky(); Snd.play('rainbow',.5);
   await pause(900);
   const follow=A.shada.mode==='follow';
   if(follow){
@@ -1797,7 +1976,7 @@ async function carryStone(kind){
   if(id!==errandId) return;
   pendingStones=0; pendingAcorns=0; renderWorld();
   shadaMode('follow');
-  fx('i-spark',{x:80,y:244});
+  fx('i-spark',{x:80,y:244}); Snd.play('spark');
   say('shada','ここにかざるばう。');
   peekEnd();
 }
@@ -1840,6 +2019,7 @@ async function checkUnlocks(){
     if(look){ focusRange(look[0],look[1]); await pause(750); }
     renderAll();
     await pause(400);
+    Snd.play('unlock');
     say('eri',u.eri,0,'happy');
     setTimeout(()=>{ if(A.shada.mode==='follow') say('shada','ばう！'); },450);
     log(u.log);
@@ -1904,11 +2084,13 @@ async function playerAction(kind,i,seed){
   const chatty=rnd()<.6, shadaNear=A.shada.mode==='follow';
 
   if(kind==='till'){
+    Snd.play('dig');
     await work(A.eri,i);
     p.tilled=true;
     say('eri','ここも畑にしよう。',0,half('smile'));
     log('草地をたがやして、あたらしいマスができました。');
   }else if(kind==='plant'){
+    Snd.play('plant');
     await work(A.eri,i);
     p.crop=seed; p.growth=0; p.watered=!!S.raining; p.dry=false; p.soggy=false;
     S.lastSeed=seed;
@@ -1938,7 +2120,7 @@ async function playerAction(kind,i,seed){
   }else if(kind==='thaw'){
     /* 冬の朝：ふたりで霜柱をふんで、こおった土をほぐす */
     await follow;
-    fxText('ざくざく',{x:c0.x,y:c0.y-18},'ice');
+    fxText('ざくざく',{x:c0.x,y:c0.y-18},'ice'); Snd.play('frost'); Snd.play('frost',.46);
     await Promise.all([work(A.eri,i), shadaNear?work(A.shada,i):Promise.resolve()]);
     await Promise.all([work(A.eri,i), shadaNear?work(A.shada,i):Promise.resolve()]);
     p.frost=false;
@@ -1949,7 +2131,7 @@ async function playerAction(kind,i,seed){
   }else if(kind==='shoo'){
     await work(A.eri,i);
     p.bug=false; renderPlots();
-    fx('i-bug',{x:c0.x+16,y:c0.y-4},'away',820);
+    fx('i-bug',{x:c0.x+16,y:c0.y-4},'away',820); Snd.play('shoo');
     p.growth=Math.min(totalOf(p),p.growth+60);
     say('eri',pick(LINES.shooE),0,half('smile'));
     if(shadaNear && rnd()<.5) setTimeout(()=>say('shada','ばいばいばう。'),420);
@@ -1958,6 +2140,7 @@ async function playerAction(kind,i,seed){
     const key=p.crop, c=CROPS[key];
     await work(A.eri,i);
     S.plots[i]=Object.assign(p,{crop:null,growth:0,watered:false,dry:false,soggy:false,bug:false,frost:false});
+    Snd.play('harvest');
     say('eri',pick(LINES.harvE),0,'happy');
     if(shadaNear) setTimeout(()=>say('shada',pick(LINES.harvS)),420);
     if(shadaNear) setMood('shada','happy',1600);
@@ -2004,7 +2187,7 @@ function plotInfo(p){
 }
 function tapFrog(i){
   const p=S.plots[i]; p.frog=false; S.frogs+=1; addNagomi(2,{x:centerOf(i).x,y:centerOf(i).y+6});
-  fxText('ケロッ',centerOf(i));
+  fxText('ケロッ',centerOf(i)); Snd.play('frog');
   setMood('eri','smile',1400);
   log('カエルが「ケロッ」とないて、ぴょんと帰っていきました。');
   renderPlots(); saveSoon();
@@ -2078,6 +2261,7 @@ async function restAtHome(){
   }
   hush();
   setMood('eri','smile',1600);
+  Snd.play('rest');
   fx('i-cup',{x:(SPOT.doorHomare.x+e.x)/2,y:e.y-34},'pop',1300);
   addNagomi(1,{x:(SPOT.doorHomare.x+e.x)/2,y:e.y-16});
   await pause(900);
@@ -2099,7 +2283,7 @@ const REST_SCENES=[
       shada:()=>setMood('shada','sleepy',2600)} ],
   [ {icon:'i-mugicha', log:'つめたい麦茶を飲んで、ひとやすみしました。',
       lines:[['eri','麦茶、つめたくておいしいね。','smile'],['shada','こおり、ちょうだいばう！']],
-      shada:s=>{ fxText('カラン',{x:s.x-26,y:s.y-40},'ice'); setMood('shada','happy',1700); }},
+      shada:s=>{ fxText('カラン',{x:s.x-26,y:s.y-40},'ice'); Snd.play('ice'); setMood('shada','happy',1700); }},
     {icon:'i-suika', log:'すいかを食べました。しゃだはる君は、たねを遠くまでとばしました。',
       lines:[['eri','すいか、切ってきたよ。','happy'],['shada','たね、とばすばう！ぷっ！']],
       shada:s=>{ setTimeout(()=>flyIcon('s-seed',{x:s.x+14,y:s.y-2},{x:s.x+118,y:s.y+34}),500); }} ],
@@ -2133,6 +2317,7 @@ async function rest(){
   const sc=pick(REST_SCENES[season()]), withS=A.shada.mode==='follow';
   const snack=fx(sc.icon,{x:(e.x+s.x)/2,y:e.y+31},'snack',0);
   if(snack) snack.style.zIndex=400;   /* ふたりの顔より手前に置く */
+  Snd.play('rest');
   if(sc.amb) sc.amb(e,s);
   for(const [who,text,mood] of sc.lines){
     if(who==='shada'){ if(!withS) continue; if(sc.shada) sc.shada(s); }
@@ -2155,6 +2340,7 @@ function pet(){
   if(A.shada.mode==='errand'){ say('shada','いま運んでるばう。'); return; }
   if(A.shada.mode==='hide'){ say('shada','かみなり、こわいばう……'); return; }
   setMood('shada','happy',1500); setMood('eri','smile',1500);
+  Snd.play('pet');
   say('shada',pick(LINES.petS));
   fx('i-heart',{x:A.shada.x,y:A.shada.y-26});
   if(S.petsToday<3){ S.petsToday+=1; S.nagomi+=1; saveSoon(); }
@@ -2224,6 +2410,7 @@ function hsay(a,text,opt){
   const o=(opt && typeof opt==='object') ? opt : {ms:opt};
   const b=a.bub, dur=o.ms || (2000+text.length*95), now=Date.now();
   clearTimeout(a.bubT);
+  if(HA && a===HA.shada) Snd.bau();
   /* ほかの人の吹き出しは、もう読めたころ（1.2秒たったもの）なら先にしまう。3人が同時に言うセリフ（いただきます）は残る */
   Object.values(HA).forEach(x=>{ if(x!==a && x.bub.classList.contains('on') && now-(x.bubAt||0)>=1200) hbubOff(x); });
   a.bubAt=now;
@@ -2419,7 +2606,7 @@ function chooseMenu(cands){
     });
     html+='</div>';
     openSheet(html,{center:true,locked:true,kind:'menu'});
-    sheetCard.querySelectorAll('[data-dish]').forEach(b=>b.addEventListener('click',()=>{ const r=cands[+b.dataset.dish]; menuResolve=null; closeSheet(); res(r); }));
+    sheetCard.querySelectorAll('[data-dish]').forEach(b=>b.addEventListener('click',()=>{ Snd.play('pick'); const r=cands[+b.dataset.dish]; menuResolve=null; closeSheet(); res(r); }));
   });
 }
 /* ほまれくんの「あしたのリクエスト」。とれなくても何も起きない、ゆるい目標 */
@@ -2442,6 +2629,7 @@ async function homeEvening(cands){
   sleepBtn.disabled=true; homeSkipBtn.style.display='';
   panelEl.classList.add('atHome'); eveningBar.classList.add('on');
   home.classList.add('on'); void home.offsetWidth; home.classList.add('show');
+  Snd.ambient();
   const skipHandler=()=>{ homeSkip=true; hhush(); if(menuResolve) menuResolve(); };
   homeSkipBtn.addEventListener('click',skipHandler);
   await hp(600);
@@ -2521,7 +2709,7 @@ async function homeEvening(cands){
     if(fItem){
       /* ほまれくんが冷蔵庫から出して、えりちゃんのところまで持っていき、手わたす（投げない） */
       await hmove(H,HSPOT.fridgeH);
-      openFridge(true);
+      openFridge(true); if(!homeSkip) Snd.play('fridge');
       await hp(650);
       const inFridge=$('#hFridgeItems').children[(S.fridge||[]).indexOf(dish.fridge)];
       if(inFridge) inFridge.style.visibility='hidden';
@@ -2551,6 +2739,7 @@ async function homeEvening(cands){
       $('#g-setting').style.display='';
     })();
     $('#hSteam').classList.add('on');
+    if(!homeSkip) Snd.play({grill:'sizzle',hot:'simmer'}[dish.tag]||'chop');
     for(let j=0;j<Math.min(2,dish.need.length);j++){
       const it=$('#hBasketItems').children[0]; if(it) it.remove();
       await hfly('c-'+dish.need[j],{x:30,y:178},{x:80,y:170});
@@ -2580,7 +2769,7 @@ async function homeEvening(cands){
       hsay(H,'はじめてのメニューだ。写真とっとこう。');
       await hp(1300);
       if(!reduceMotion&&!homeSkip){ const f=$('#hFlash'); f.classList.remove('on'); void f.offsetWidth; f.classList.add('on'); }
-      hfxText('パシャ',{x:H.x,y:H.y-36});
+      hfxText('パシャ',{x:H.x,y:H.y-36}); if(!homeSkip) Snd.play('camera');
       S.photo={need:dish.need.slice(0,2),icons:dishIcons(dish),name:dish.name};
       updatePhoto(true);
       await hp(900);
@@ -2589,12 +2778,12 @@ async function homeEvening(cands){
     hsay(E,'いただきます。',{mood:'smile'}); hsay(H,'いただきます。'); hsay(D,'いただきますばう。');
     await hp(1500);
     hhush();
-    await Promise.all([hwork(E),hwork(H),hwork(D)]); hfxText('もぐもぐ',{x:D.x,y:D.y-34}); await Promise.all([hwork(E),hwork(H),hwork(D)]);
+    await Promise.all([hwork(E),hwork(H),hwork(D)]); hfxText('もぐもぐ',{x:D.x,y:D.y-34}); if(!homeSkip) Snd.play('eat'); await Promise.all([hwork(E),hwork(H),hwork(D)]);
     $('#hDish').classList.add('eaten');
     /* 食べたときのひとことは、日によって2とおり */
     yumH=pick(['美味しい！','美味しいなぁ！']); yumD=pick(['おいしいばう！','おいしすぎるばう！']);
     hmood(H,'happy',2800);
-    hsay(H,yumH);
+    hsay(H,yumH); if(!homeSkip) Snd.play('yum');
     hmood(E,'happy',3000);
     await hp(700);
     hmood(D,'happy',2800);
@@ -2603,7 +2792,7 @@ async function homeEvening(cands){
     /* よろこびかたは日によって2とおり：ぴょんぴょん はねる／しっぽを ふりふり */
     if(!reduceMotion && !homeSkip){
       if(rnd()<.5){
-        D.el.style.setProperty('--lean','0deg'); D.el.classList.add('jumping');
+        D.el.style.setProperty('--lean','0deg'); D.el.classList.add('jumping'); [.12,.42,.72].forEach(d=>Snd.play('hop',d));
         hfxText('ぴょん ぴょん',{x:D.x-4,y:D.y+54});
         setTimeout(()=>{ D.el.classList.remove('jumping'); hfx('i-heart',{x:D.x+12,y:D.y-34}); },920);
       }else{
@@ -2646,7 +2835,7 @@ async function homeEvening(cands){
     S.decor[d.key]=true; newDecor=d;
     hsay(E,'そうだ。'+d.eri,{mood:'smile'});
     await hp(1300);
-    const g=document.getElementById(d.g); g.style.display=''; if(!reduceMotion&&!homeSkip) g.classList.add('popIn');
+    const g=document.getElementById(d.g); g.style.display=''; if(!reduceMotion&&!homeSkip) g.classList.add('popIn'); if(!homeSkip) Snd.play('spark');
     await hp(900);
     hmood(D,'happy',2000); hmood(E,'happy',2000);
     hsay(D,d.shada);
@@ -2720,12 +2909,13 @@ async function homeEvening(cands){
   if(newDecor) log('おうちに、'+newDecor.name+'がふえました。');
   await saveNow();
   await new Promise(res=>sleepBtn.addEventListener('click',res,{once:true}));
-  sleepBtn.disabled=true;
+  sleepBtn.disabled=true; Snd.play('night');
   hhush();
   home.classList.remove('show');
   await pause(450);
   home.classList.remove('on');
   eveningBar.classList.remove('on'); panelEl.classList.remove('atHome');
+  Snd.ambient();
 }
 
 /* 料理を待つあいだ（または、ごはんのない夜）の出来事。E＝えりちゃん、D＝しゃだはる君、H＝ほまれくん */
@@ -2878,7 +3068,7 @@ const EVENTS=[
       say('shada','むし、いるばう！');
       await work(A.shada,i); await work(A.shada,i);
       p.bug=false; renderPlots();
-      fx('i-bug',{x:c.x+16,y:c.y-4},'away',820);
+      fx('i-bug',{x:c.x+16,y:c.y-4},'away',820); Snd.play('shoo');
       p.growth=Math.min(totalOf(p),p.growth+60);
       renderPlots();
       log('しゃだはる君が虫を追いはらってくれました。'+CROPS[p.crop].name+'が元気になりました。');
@@ -2889,7 +3079,7 @@ const EVENTS=[
       const spot={x:FX+30+Math.floor(rnd()*230),y:FY+3*(PS+G)+2};
       await moveTo(A.shada,spot);
       await pause(400);
-      fx('i-stone',{x:spot.x,y:spot.y-34},'pop',900);
+      fx('i-stone',{x:spot.x,y:spot.y-34},'pop',900); Snd.play('spark');
       setMood('shada','happy',1600);
       say('shada','なんかあったばう！');
       S.stones+=1; pendingStones+=1; addNagomi(1,A.shada);
@@ -2916,6 +3106,7 @@ const EVENTS=[
       await work(A.shada,i); await work(A.shada,i);
       const home={x:A.shada.x,y:A.shada.y}, dirX=A.shada.x>=c0.x?1:-1;
       if(!reduceMotion){ A.shada.el.classList.add('tumble'); }
+      Snd.play('slip');
       A.shada.el.style.setProperty('--side',-dirX);
       await moveTo(A.shada,{x:home.x+38*dirX,y:home.y+6},{slide:true,ms:640});
       A.shada.el.classList.remove('tumble');
@@ -2929,6 +3120,7 @@ const EVENTS=[
       Object.assign(p,{crop:null,growth:0,watered:false,dry:false,soggy:false});
       renderPlots();
       setMood('shada','happy',1800); setMood('eri','happy',1800);
+      Snd.play('harvest');
       say('shada','ぬけたばう！');
       await flyToBasket(key,c0);
       addHarvest(key,1); addNagomi(1,A.shada); renderHUD();
@@ -2992,7 +3184,7 @@ EVENTS.push(
       const spot={x:FX+20+Math.floor(rnd()*240),y:FY-6};
       await moveTo(A.shada,spot);
       await pause(400);
-      fx('i-acorn',{x:spot.x,y:spot.y-34},'pop',900);
+      fx('i-acorn',{x:spot.x,y:spot.y-34},'pop',900); Snd.play('spark');
       setMood('shada','happy',1600);
       say('shada','どんぐり、あったばう！');
       S.acorns=(S.acorns||0)+1; pendingAcorns+=1; addNagomi(1,A.shada);
@@ -3029,7 +3221,7 @@ EVENTS.push(
       await pause(900);
       if(!reduceMotion) A.shada.el.classList.add('tumble');
       A.shada.el.style.setProperty('--side',-1);
-      fxText('つるっ',{x:A.shada.x+10,y:A.shada.y-34},'ice');
+      fxText('つるっ',{x:A.shada.x+10,y:A.shada.y-34},'ice'); Snd.play('slip');
       await moveTo(A.shada,{x:from.x+124,y:y+2},{slide:true,ms:720});
       A.shada.el.classList.remove('tumble');
       say('shada','すべったばう……');
@@ -3184,10 +3376,10 @@ async function morning(info){
     $('#seasonCardIcon').setAttribute('href','#'+SEASON_ICON[season()]);
     $('#seasonCardTitle').textContent=SEASONS[season()]+'になりました';
     $('#seasonCardSub').textContent='まける種：'+names;
-    const card=$('#seasonCard'); card.classList.add('on');
+    const card=$('#seasonCard'); card.classList.add('on'); Snd.play('season');
     await pause(2400);
     card.classList.remove('on');
-  }else log('朝になりました。'+(S.weather==='rain'?'空がすこし暗いようです。':'今日もいい天気です。'));
+  }else{ log('朝になりました。'+(S.weather==='rain'?'空がすこし暗いようです。':'今日もいい天気です。')); Snd.play('morning'); }
   await pause(400);
   if(!info.first){
     /* おうちの前で、お見送り */
@@ -3293,7 +3485,7 @@ function openSeeds(i){
   });
   html+='</div>';
   openSheet(html,{kind:'seeds'});
-  sheetCard.querySelectorAll('[data-seed]').forEach(b=>b.addEventListener('click',()=>{
+  sheetCard.querySelectorAll('[data-seed]').forEach(b=>b.addEventListener('click',()=>{ Snd.play('pick');
     const k=b.dataset.seed;
     if(!gh) S.held=k;
     closeSheet(); renderHeld();
@@ -3371,6 +3563,20 @@ A.shada.el.addEventListener('click',e=>{ e.stopPropagation(); pet(); });
 A.shada.el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); pet(); } });
 $('#benchBtn').addEventListener('click',e=>{ e.stopPropagation(); rest(); });
 $('#stones').addEventListener('click',e=>{ e.stopPropagation(); fxText('きれいな石 '+S.stones+'こ'+((S.acorns||0)?'・どんぐり '+S.acorns+'こ':''),{x:96,y:232}); });
+$('#sndBtn').addEventListener('click',e=>{ e.stopPropagation(); Snd.toggle(); });
+/* 音をためす：アドレスの最後に #sound をつけて開くと、右上に「音をためす」が出て、効果音を1つずつ聴ける（音の調整用。ふだんは出ない） */
+const SFX_LABEL={pick:'えらぶ',dig:'たがやす',plant:'種まき',water:'水やり',harvest:'収穫',basket:'かごに入る',shoo:'虫を追いはらう',frost:'霜柱',pet:'なでる',bau:'しゃだはる君の声',unlock:'できたものが増えた',spark:'きらっ',heart:'ハート',frog:'カエル',slip:'つるっ',thunder:'雷',rainbow:'虹',wind:'風',morning:'朝',season:'季節が変わった',night:'おやすみ',fridge:'冷蔵庫',chop:'料理（とんとん）',simmer:'料理（ことこと）',sizzle:'料理（じゅー）',camera:'写真',eat:'もぐもぐ',yum:'美味しい！',hop:'ぴょん',rest:'ひとやすみ',ice:'氷（カラン）'};
+if(location.hash.indexOf('sound')>=0){
+  const tb=document.createElement('button'); tb.type='button'; tb.className='btn small'; tb.id='sndTest'; tb.textContent='音をためす';
+  $('.headR').insertBefore(tb,$('#sndBtn'));
+  tb.addEventListener('click',e=>{
+    e.stopPropagation(); if(modal) return;
+    let html=sheetHead('音をためす')+'<p class="sub">押すと、その音が鳴ります。気になる音は、名前で教えてください。</p><div class="seeds">';
+    Snd.names().forEach((n,i)=>{ html+='<button class="seed" type="button" data-snd="'+n+'"><span><b>'+(i+1)+'. '+esc(SFX_LABEL[n]||n)+'</b></span></button>'; });
+    openSheet(html+'</div>',{kind:'sound'});
+    sheetCard.querySelectorAll('[data-snd]').forEach(b=>b.addEventListener('click',()=>{ if(S.sound==='off') Snd.toggle(); Snd.unlock(); Snd.play(b.dataset.snd); }));
+  });
+}
 restBtn.addEventListener('click',rest);
 endBtn.addEventListener('click',async()=>{ if(busy||modal) return; busy=true; renderButtons(); queued=null; await endDay(); busy=false; renderButtons(); });
 diaryBtn.addEventListener('click',()=>{ if(modal && sheetKind==='diary'){ closeSheet(); return; } if(!modal) openDiary(); });
@@ -3399,11 +3605,12 @@ async function boot(){
     S.plots.forEach(p=>{ p.bug=false; });
     fixup();
   }else S=newGame();
+  Snd.refreshBtn();
   if(!S.intro) await intro(); else await welcomeBack();
 }
 /* しらべる用：アドレスの最後に #debug をつけたときだけ使える */
 if(location.hash.indexOf('debug')>=0){
-  window.__hatake={ get S(){return S;}, get busy(){return busy;}, A, homeEvening, pickPre, dishCandidates, makeRequest, get HA(){return HA;}, advance, maybeEvent, renderAll, addHarvest, checkUnlocks, nextMorning, Store, CROPS, RECIPES, UNLOCKS, EVENTS, FRIDGE, rollFridge, rollWeather, placeFrost, weatherScenes, importSave, exportSave, normalize,
+  window.__hatake={ get S(){return S;}, get busy(){return busy;}, A, homeEvening, pickPre, dishCandidates, makeRequest, get HA(){return HA;}, advance, maybeEvent, renderAll, addHarvest, checkUnlocks, nextMorning, Store, CROPS, RECIPES, UNLOCKS, EVENTS, FRIDGE, rollFridge, rollWeather, placeFrost, weatherScenes, importSave, exportSave, normalize, Snd,
     force:async id=>{ if(busy) return false; busy=true; renderButtons(); S.sinceEvent=9; const r=await maybeEvent(false,id); await checkUnlocks(); busy=false; renderButtons(); return r; } };
 }
 boot();
