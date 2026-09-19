@@ -432,6 +432,12 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 .hBlanket.on{display:block;animation:popIn .5s ease-out}
 .hFlash{position:absolute;left:-400px;right:-400px;top:-100px;bottom:0;background:#fff;opacity:0;pointer-events:none;z-index:600}
 .hFlash.on{animation:flash .5s ease-out}
+/* 朝のおうち（v1.13.0）：ちゃぶ台をかたづけて、ふとんを3つ。窓の外は朝の空。あかりは消えている */
+.roomArt.futonBack{z-index:205;pointer-events:none}
+.roomArt.futonFront{z-index:420;pointer-events:none}
+.home .actor.inFuton .hbody,.home .actor.inFuton .shadow{display:none}
+.home.morning #hGlow{opacity:0}
+.home.morning #hBulb{fill:#efe6cf}
 /* 電気をけしたあとの部屋（v1.12.0）。窓のガラスのところだけ あけた 暗い色を、部屋ぜんたいにかぶせる。月あかりが床にさす */
 .hNight{z-index:560;opacity:0;transition:opacity .9s ease;pointer-events:none}
 .home.dark .hNight{opacity:1}
@@ -693,6 +699,11 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
     <circle cx="34.5" cy="59" r="3.3" fill="#302724"/>
     <circle cx="65.5" cy="59" r="3.3" fill="#302724"/>
   </g>
+  <!-- ねむい顔（v1.13.0）：目をとじる。朝のふとんと、電気をけしたあとに使う -->
+  <g class="sleepy" fill="none" stroke="#302724" stroke-width="3" stroke-linecap="round">
+    <path d="M29.5 58.5 Q34.5 63.2 39.5 58.5"/>
+    <path d="M60.5 58.5 Q65.5 63.2 70.5 58.5"/>
+  </g>
   <g class="smile happy" fill="#f3aa9c" opacity=".5">
     <ellipse cx="34.5" cy="75.5" rx="5.2" ry="3.6"/>
     <ellipse cx="65.5" cy="75.5" rx="5.2" ry="3.6"/>
@@ -709,6 +720,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
   <path d="M22.5 55 L17 52.5 M77.5 55 L83 52.5" fill="none" stroke="#6c3033" stroke-width="3.6" stroke-linecap="round"/>
   <path d="M47.5 68 Q50 70.5 52.5 68" fill="none" stroke="#cfa08a" stroke-width="2.2" stroke-linecap="round"/>
   <path class="normal" d="M40.5 75.5 Q50 84 59.5 75.5" fill="none" stroke="#a8645c" stroke-width="3" stroke-linecap="round"/>
+  <path class="sleepy" d="M44.5 77 Q50 80.5 55.5 77" fill="none" stroke="#a8645c" stroke-width="2.6" stroke-linecap="round"/>
   <path class="smile" d="M38.5 74.5 Q50 87.5 61.5 74.5" fill="none" stroke="#a8645c" stroke-width="3.2" stroke-linecap="round"/>
   <path class="happy" d="M39.5 74.5 Q50 89 60.5 74.5Z" fill="#b85f5a" stroke="#a8645c" stroke-width="2" stroke-linejoin="round"/>
   <!-- 夏：小さな麦わら帽子（頭のてっぺんに、ちょこんとのせる。つばは髪の上までで、顔にはかからない） -->
@@ -829,7 +841,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 <div class="game" id="game">
   <div class="head">
     <h1>えりとしゃだはるの ちいさな畑</h1>
-    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.12.0</span></span>
+    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.13.0</span></span>
   </div>
 
   <div class="hud">
@@ -969,12 +981,14 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
           <rect x="196" y="38" width="124" height="116" rx="8" fill="#ffffff" stroke="#cbb994" stroke-width="4"/>
           <rect id="hSky" x="204" y="46" width="108" height="100" fill="#3d4a73"/>
           <circle id="hMoon" cx="288" cy="68" r="9" fill="#fff4cf"/>
+          <g id="hSun" style="display:none"><circle cx="234" cy="116" r="17" fill="#fff3c9" opacity=".7"/><circle cx="234" cy="116" r="10.5" fill="#ffe08a"/></g>
           <g id="hStars" fill="#fff4cf"><circle cx="222" cy="62" r="1.4"/><circle cx="246" cy="84" r="1.2"/><circle cx="270" cy="108" r="1.3"/><circle cx="232" cy="120" r="1.1"/><circle cx="298" cy="100" r="1.2"/></g>
           <g id="hRain" stroke="#a9cbe8" stroke-width="2" stroke-linecap="round" style="display:none"><path d="M216 56 l-4 12 M236 70 l-4 12 M258 54 l-4 12 M280 74 l-4 12 M300 58 l-4 12 M224 96 l-4 12 M248 110 l-4 12 M270 96 l-4 12 M292 112 l-4 12 M306 90 l-4 12 M232 128 l-4 12 M284 130 l-4 12"/></g>
           <g id="hSnow" fill="#ffffff" style="display:none"><circle cx="216" cy="60" r="2.4"/><circle cx="240" cy="78" r="2"/><circle cx="262" cy="58" r="2.4"/><circle cx="284" cy="84" r="2"/><circle cx="302" cy="62" r="2.2"/><circle cx="226" cy="104" r="2.2"/><circle cx="250" cy="122" r="2"/><circle cx="274" cy="104" r="2.4"/><circle cx="296" cy="124" r="2"/><circle cx="236" cy="136" r="2.2"/></g>
           <path d="M258 46 V146 M204 96 H312" stroke="#ffffff" stroke-width="5"/>
           <path d="M198 40 h24 q-3 56 -24 78Z M318 40 h-24 q3 56 24 78Z" fill="#f2c9a0"/>
           <rect x="190" y="152" width="136" height="8" rx="3" fill="#cbb994"/>
+          <path id="hMornBeam" d="M206 160 H310 L318 344 H120Z" fill="#fff0bd" fill-opacity=".42" style="display:none"/>
           <!-- 花びん（なごみ25） -->
           <g id="g-vase" style="display:none">
             <g stroke="#5f9a4a" stroke-width="2" stroke-linecap="round"><path d="M226 140 V124 M232 140 V118 M238 140 V126"/></g>
@@ -1043,6 +1057,12 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
         </svg>
         <div class="hTreasures" id="hTreasures"></div>
         <div class="hFridgeItems" id="hFridgeItems" aria-hidden="true"></div>
+        <svg class="roomArt futonBack" id="futonBack" viewBox="0 0 360 440" aria-hidden="true" style="display:none">
+          <g stroke="#e0d6c2" stroke-width="1.6">
+            <rect x="139" y="316" width="66" height="106" rx="10" fill="#fbf6ea"/><rect x="209" y="316" width="66" height="106" rx="10" fill="#fbf6ea"/><rect x="281" y="328" width="56" height="92" rx="10" fill="#fbf6ea"/>
+            <rect x="145" y="320" width="54" height="24" rx="9" fill="#ffffff"/><rect x="215" y="320" width="54" height="24" rx="9" fill="#ffffff"/><rect x="287" y="332" width="44" height="20" rx="8" fill="#ffffff"/>
+          </g>
+        </svg>
         <div id="homeActors"></div>
         <svg class="roomArt table" id="roomTable" viewBox="0 0 360 440" aria-hidden="true">
           <rect x="214" y="344" width="9" height="28" rx="3" fill="#a87c4e"/><rect x="301" y="344" width="9" height="28" rx="3" fill="#a87c4e"/>
@@ -1069,6 +1089,20 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
         <div class="hBasketItems" id="hBasketItems" aria-hidden="true"></div>
         <div class="hDish" id="hDish" aria-hidden="true"></div>
         <div class="hBlanket" id="hBlanket" aria-hidden="true"></div>
+        <svg class="roomArt futonFront" id="futonFront" viewBox="0 0 360 440" aria-hidden="true" style="display:none">
+          <!-- えりちゃん：えんじ系のうすいピンク -->
+          <path d="M137 366 Q172 358 207 366 L207 414 Q207 424 197 424 L147 424 Q137 424 137 414Z" fill="#eebfc5" stroke="#d99aa3" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M137 366 Q172 358 207 366 L207 379 Q172 371 137 379Z" fill="#fbe6e8" stroke="#d99aa3" stroke-width="1.2" stroke-linejoin="round"/>
+          <g fill="#fbe6e8"><circle cx="152" cy="396" r="2.2"/><circle cx="172" cy="404" r="2.2"/><circle cx="192" cy="396" r="2.2"/><circle cx="162" cy="414" r="2.2"/><circle cx="184" cy="414" r="2.2"/></g>
+          <!-- ほまれくん：うすい青 -->
+          <path d="M207 366 Q242 358 277 366 L277 414 Q277 424 267 424 L217 424 Q207 424 207 414Z" fill="#bccfe6" stroke="#97b0cf" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M207 366 Q242 358 277 366 L277 379 Q242 371 207 379Z" fill="#e6eef8" stroke="#97b0cf" stroke-width="1.2" stroke-linejoin="round"/>
+          <g stroke="#e6eef8" stroke-width="2" stroke-linecap="round"><path d="M222 390 V418 M242 386 V420 M262 390 V418"/></g>
+          <!-- しゃだはる君：小さな黄色いふとん -->
+          <path d="M279 370 Q309 363 339 370 L339 412 Q339 422 329 422 L289 422 Q279 422 279 412Z" fill="#f5dfa0" stroke="#dcc074" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M279 370 Q309 363 339 370 L339 382 Q309 375 279 382Z" fill="#fdf3cf" stroke="#dcc074" stroke-width="1.2" stroke-linejoin="round"/>
+          <g fill="#fdf3cf"><circle cx="296" cy="398" r="3"/><circle cx="291.5" cy="393.5" r="1.4"/><circle cx="296" cy="392" r="1.4"/><circle cx="300.5" cy="393.5" r="1.4"/><circle cx="322" cy="408" r="3"/><circle cx="317.5" cy="403.5" r="1.4"/><circle cx="322" cy="402" r="1.4"/><circle cx="326.5" cy="403.5" r="1.4"/></g>
+        </svg>
         <svg class="roomArt hNight" id="hNight" viewBox="0 0 360 440" aria-hidden="true">
           <path fill-rule="evenodd" d="M-400 -300 H760 V440 H-400Z M204 46 H312 V146 H204Z" fill="#182040" fill-opacity=".66"/>
           <path d="M204 46 h18 q-3 50 -18 70Z M312 46 h-18 q3 50 18 70Z" fill="#182040" fill-opacity=".5"/>
@@ -2394,7 +2428,9 @@ const LINES={
   petS:['ばう♪','もっとなでるばう。','えへへばう。'],
   shooE:['むしさん、あっちいってね。','はい、おひっこしだよ。'],
   morningS:['おはようばう。今日は何するばう？','きょうも育てるばう。','いい朝ばう。','えりちゃん、おはようばう！'],
-  morningReply:['まかせるばう！','よろしくばう！']
+  morningReply:['まかせるばう！','よろしくばう！'],
+  /* おうちで「おはよう。」を言ったあとの、畑でのひとこと（v1.13.0。「おはよう」を2回言わないように） */
+  morningS2:['今日は何するばう？','きょうも育てるばう。','いい朝ばう。']
 };
 function setQueued(i){ queued=i; renderPlots(); }
 function runQueued(){
@@ -2938,7 +2974,9 @@ function setupRoom(){
   DECOR.forEach(d=>{ const g=document.getElementById(d.g); g.style.display=S.decor&&S.decor[d.key]?'':'none'; g.classList.remove('popIn'); });
   updatePhoto(false);
   $('#g-setting').style.display='none'; setPortions(null);
-  home.classList.remove('dark'); $('#hBeam').style.display=S.raining?'none':'';
+  home.classList.remove('dark','morning'); $('#hBeam').style.display=S.raining?'none':'';
+  $('#roomTable').style.display=''; $('#futonBack').style.display='none'; $('#futonFront').style.display='none'; $('#hSun').style.display='none'; $('#hMornBeam').style.display='none';
+  Object.values(HA).forEach(a=>a.el.classList.remove('inFuton'));
   $('#hBlanket').classList.remove('on');
   /* たなの上：しゃだはる君のたからもの */
   let t=''; const ns=Math.min(S.stones,5), na=Math.min(S.acorns||0,5-ns);
@@ -3143,10 +3181,21 @@ async function homeEvening(cands){
     /* ③ えりちゃんが料理。ほまれくんは食卓の準備。声のかけかたは、日によって2とおり */
     const askPlates=rnd()<.5;
     const setting=(async()=>{
-      if(askPlates){ hsay(E,'ほまれくん、お皿おねがい。',{mood:'smile'}); await hp(1300); }
-      await hmove(H,HSPOT.counterEnd);
-      hsay(H,'お皿、ならべとくね。');
-      await hp(900);
+      if(askPlates){
+        /* たのまれた日は、ほまれくんが まず返事をしてから、お皿をとりに行って並べる（v1.12.1。依頼者の希望） */
+        hsay(E,'ほまれくん、お皿おねがい。',{mood:'smile'});
+        await hp(1300);
+        hmood(H,'happy',1400);
+        hsay(H,'うん、まかせて。');
+        await hp(1400);
+        hbubOff(H);   /* 返事を言いおわってから、お皿をとりに歩きだす */
+        await hmove(H,HSPOT.counterEnd);
+        await hp(450);
+      }else{
+        await hmove(H,HSPOT.counterEnd);
+        hsay(H,'お皿、ならべとくね。');
+        await hp(900);
+      }
       await hmove(H,HSPOT.tableHomare);
       $('#g-setting').style.display='';
     })();
@@ -3322,7 +3371,7 @@ async function homeEvening(cands){
     const t=document.createElement('div'); t.className='fx text'; t.style.zIndex=570; t.innerHTML='<span style="color:#fff4cf"></span>'; t.firstChild.textContent='パチン';
     t.style.transform='translate(150px,104px)'; if(!reduceMotion){ homeStage.appendChild(t); setTimeout(()=>t.remove(),950); }
     home.classList.add('dark');
-    [D,H].forEach(a=>{ if(!a.el.classList.contains('sleeping')) hmood(a,'sleepy'); });
+    [D,H,E].forEach(a=>{ if(!a.el.classList.contains('sleeping')) hmood(a,'sleepy'); });
     await hp(1500);
   }
 
@@ -3369,6 +3418,45 @@ async function homeEvening(cands){
   home.classList.remove('on');
   eveningBar.classList.remove('on'); panelEl.classList.remove('atHome');
   Snd.ambient();
+}
+
+/* 朝のおうち（v1.13.0。依頼者の希望）：ふとんで目をさまして「おはよう。」→ すぐ外へ（お見送りの場面）。おうちの中なので「。」 */
+const FUTON={eri:{x:172,y:348}, homare:{x:242,y:348}, shada:{x:309,y:354}};
+async function homeMorning(){
+  homeSkip=false;
+  setupRoom();
+  const E=HA.eri, D=HA.shada, H=HA.homare, dull=S.weather==='rain';
+  /* ちゃぶ台をかたづけて、ふとんを3つ。窓の外は朝の空（雨や雪になる日は、少しくもっている） */
+  home.classList.add('morning','dark');
+  $('#roomTable').style.display='none'; $('#futonBack').style.display=''; $('#futonFront').style.display='';
+  $('#hSky').setAttribute('fill',dull?'#cdd5dc':['#cfe6f5','#bfe3fb','#f7dfc4','#dde8f2'][season()]);
+  ['#hMoon','#hStars','#hRain','#hSnow'].forEach(q=>{ $(q).style.display='none'; });
+  $('#hSun').style.display=dull?'none':''; $('#hMornBeam').style.display=dull?'none':''; $('#hBeam').style.display='none';
+  [[E,FUTON.eri],[H,FUTON.homare],[D,FUTON.shada]].forEach(([a,q])=>{ place(a,q.x,q.y,0); a.el.classList.add('inFuton'); hmood(a,'sleepy'); });
+  home.classList.add('on'); void home.offsetWidth; home.classList.add('show');
+  Snd.hush(10000);
+  await pause(900);
+  /* 朝の光がさしこんで、チャイムと小鳥 */
+  home.classList.remove('dark'); Snd.play('morning');
+  await pause(1500);
+  /* えりちゃんから、じゅんばんに起きあがる */
+  const wake=a=>{ a.el.classList.remove('inFuton'); hmood(a,'normal'); place(a,a.x,a.y-10,reduceMotion?0:260); };
+  wake(E); await pause(350);
+  hsay(E,'おはよう。',{mood:'smile'});
+  await pause(1150);
+  wake(H); await pause(350);
+  hsay(H,'おはよう。');
+  await pause(1150);
+  wake(D); await pause(300);
+  hmood(D,'happy',1900); hsay(D,'おはようばう。');
+  if(!reduceMotion){ D.el.style.setProperty('--lean','0deg'); D.el.classList.add('jumping'); setTimeout(()=>D.el.classList.remove('jumping'),920); }
+  await pause(1800);
+  hhush();
+  home.classList.remove('show');
+  await pause(450);
+  home.classList.remove('on','morning','dark');
+  $('#roomTable').style.display=''; $('#futonBack').style.display='none'; $('#futonFront').style.display='none'; $('#hSun').style.display='none'; $('#hMornBeam').style.display='none';
+  Object.values(HA).forEach(a=>{ a.el.classList.remove('inFuton','jumping'); hmood(a,'normal'); });
 }
 
 /* 料理を待つあいだ（または、ごはんのない夜）の出来事。E＝えりちゃん、D＝しゃだはる君、H＝ほまれくん */
@@ -3851,6 +3939,12 @@ async function morning(info){
   A.oji.el.classList.remove('on','carrying'); A.eri.el.classList.remove('carrying');
   renderAll();
   if(info.first) focus(446,true); else focus(200,true);
+  /* まず、おうちの中で「おはよう。」（v1.13.0）。朝のチャイムは、その中で鳴らす。しゃだはる君は、ひとあし先に畑へ走っていく */
+  if(!info.first){
+    log('朝になりました。'+(S.weather==='rain'?'空がすこし暗いようです。':'今日もいい天気です。'));
+    place(A.shada,SPOT.homeShada.x,SPOT.homeShada.y,0);
+    await homeMorning();
+  }
   if(info.changed){
     const names=Object.keys(CROPS).filter(k=>CROPS[k].season===season()).map(k=>CROPS[k].name).join('、');
     log(SEASONS[season()]+'になりました。'+names+'の種がまけます。'+(info.melted?'雪だるまは、とけてしまいました。':''));
@@ -3860,7 +3954,8 @@ async function morning(info){
     const card=$('#seasonCard'); card.classList.add('on'); Snd.hush(2600); Snd.play('season');
     await pause(2400);
     card.classList.remove('on');
-  }else{ log('朝になりました。'+(S.weather==='rain'?'空がすこし暗いようです。':'今日もいい天気です。')); Snd.hush(2300); Snd.play('morning'); }
+  }else if(info.first){ log('朝になりました。'+(S.weather==='rain'?'空がすこし暗いようです。':'今日もいい天気です。')); Snd.hush(2300); Snd.play('morning'); }
+  else Snd.hush(1300);
   await pause(400);
   if(!info.first){
     /* おうちの前で、お見送り */
@@ -3868,6 +3963,7 @@ async function morning(info){
     await pause(1200);
     A.homare.bub.classList.remove('on');
     say('eri','いってきます！',0,'happy');
+    moveTo(A.shada,SPOT.morningShada);   /* しゃだはる君は、先に畑へ */
     await pause(900);
     focus(446);
     await moveTo(A.eri,SPOT.morningEri);
@@ -3884,10 +3980,10 @@ async function morning(info){
     await moveTo(A.shada,spotOf(info.droopy,'R'));
     say('shada','元気ないばう……');
     log(CROPS[S.plots[info.droopy].crop].name+'が少し元気がないみたい。お水をあげれば、また育ちます。');
-  }else say('shada',pick(LINES.morningS));
+  }else say('shada',pick(info.first?LINES.morningS:LINES.morningS2));
   await pause(700);
   if(info.first) await moveTo(A.eri,SPOT.morningEri);
-  say('eri',info.changed?SEASONS[season()]+'だね。今日もよろしくね。':'おはよう、しゃだはる。今日もよろしくね。',0,'smile');
+  say('eri',info.changed?SEASONS[season()]+'だね。今日もよろしくね。':(info.first?'おはよう、しゃだはる。今日もよろしくね。':'しゃだはる、今日もよろしくね。'),0,'smile');
   /* しゃだはる君のお返事（日によって2とおり。ねむい日は、あくびまじり） */
   await pause(1500);
   if(S.mood==='sleepy'){ setMood('shada','sleepy',2000); say('shada','ふわぁ……がんばるばう。'); }
