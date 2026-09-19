@@ -42,7 +42,9 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 /* 音のボタン（右上）。off＝音なし */
 .sndBtn{width:34px;height:34px;padding:0;border-radius:50%;border:1px solid var(--border);background:#fff;color:#7d8f5b;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .sndBtn svg{width:20px;height:20px;display:block}
-.sndBtn .slash{display:none}
+.sndBtn .slash,.sndBtn .note{display:none}
+.sndBtn.all .note{display:inline}
+.sndBtn.all .w2{display:none}
 .sndBtn.off{color:#b8ae9f}
 .sndBtn.off .waves{display:none}
 .sndBtn.off .slash{display:inline}
@@ -744,7 +746,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 <div class="game" id="game">
   <div class="head">
     <h1>えりとしゃだはるの ちいさな畑</h1>
-    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M15 9.2q2 2.8 0 5.6"/><path d="M17.7 7q3.6 5 0 10"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.8.0</span></span>
+    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.9.0</span></span>
   </div>
 
   <div class="hud">
@@ -1267,6 +1269,7 @@ const Snd=(()=>{
       const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=9000;
       const comp=ctx.createDynamicsCompressor(); comp.threshold.value=-14; comp.ratio.value=8; comp.attack.value=.004; comp.release.value=.2;
       master.connect(lp); lp.connect(comp); comp.connect(ctx.destination);
+      mbus=ctx.createGain(); mbus.gain.value=.0001; mbus.connect(master);
     }catch(e){ ctx=null; }
   }
   /* さいしょのタップで音の準備をする（ブラウザのきまり）。止まっていたら、タップのたびに動かしなおす */
@@ -1274,6 +1277,7 @@ const Snd=(()=>{
     if(!enabled()) return;
     build();
     if(ctx && ctx.state!=='running'){ try{ const p=ctx.resume(); if(p&&p.then) p.then(ambient,()=>{}); }catch(e){} }
+    else if(ctx) music();
   }
   function play(name,delay){
     if(!enabled() || !SFX[name]) return;
@@ -1296,6 +1300,7 @@ const Snd=(()=>{
     const raining=enabled() && !!S && S.raining && !(S.wx && S.wx.kind==='snow') && season()!==3;
     const indoor=home.classList.contains('on');
     const kind=!raining?'':(indoor?'in':(S.wx&&S.wx.kind==='storm'?'storm':'rain'));
+    music();
     if(kind===ambKind) return;
     ambKind=kind;
     if(!ctx || ctx.state!=='running'){ ambKind=''; return; }
@@ -1312,20 +1317,88 @@ const Snd=(()=>{
     amb.g.gain.setTargetAtTime({rain:.035,storm:.055,in:.022}[kind],now,.6);
     amb.lp.frequency.setTargetAtTime(kind==='in'?650:6000,now,.3);
   }
+  /* ---------- 音楽（v1.9.0）：畑の曲と、おうちの曲。オルゴールと木琴のような音で、小さめの音量でくり返す ----------
+     曲は、このゲームのために作ったもの。TUNES の mel が1小節ずつのメロディ（1つの区切り＝8分音符。「-」は のばす・やすむ）、chords が和音。
+     曲を直すときは TUNES を、音量は MUSIC_VOL を、音色は mbox（オルゴール）と marimba（木琴）をいじる。 */
+  const MUSIC_VOL=1.3;   /* 音楽の音量。大きい・小さいと言われたら、まずここ（0.8〜1.8くらい） */
+  const TUNES={
+    field:{ bpm:100, slots:8, gap:2, melVol:.055, accVol:.026,
+      mel:['E5 - G5 - C6 - G5 -','A5 - G5 - E5 - - G5','A5 - C6 - A5 - F5 -','G5 - B5 - D6 - - -',
+           'E5 - G5 - C6 - E6 -','E6 - C6 - A5 - - C6','A5 - F5 - G5 - B5 -','C6 - - - G5 - E5 -',
+           'F5 - A5 - C6 - A5 -','G5 - C6 - E6 - C6 -','D6 - A5 - F5 - A5 -','G5 - B5 - D6 - B5 G5',
+           'E5 - G5 - C6 - G5 -','A5 - C6 - E6 - C6 -','C6 - A5 - B5 - G5 -','C6 - - - - - - -'],
+      chords:['C','Am','F','G','C','Am','F G','C','F','C','Dm','G','C','Am','F G','C'] },
+    home:{ bpm:84, slots:6, gap:2, melVol:.055, accVol:.026,
+      mel:['A5 - - - C6 -','D6 - - - C6 -','Bb5 - - - A5 -','G5 - - - - -',
+           'A5 - - - C6 -','D6 - - - F6 -','E6 - D6 - Bb5 -','A5 - - - - -',
+           'D6 - Bb5 - D6 -','C6 - A5 - C6 -','Bb5 - G5 - Bb5 -','G5 - C6 - E6 -',
+           'F6 - - - C6 -','D6 - - - A5 -','Bb5 - G5 - E5 -','F5 - - - - -'],
+      chords:['F','Bb','Gm','C','F','Bb','C','F','Bb','F','Gm','C','F','Dm','C','F'] }
+  };
+  const CHORD={C:['C4','E4','G4'],Am:['A3','E4','C5'],F:['F4','A4','C5'],G:['G4','B4','D5'],Dm:['D4','F4','A4'],Bb:['Bb3','F4','D5'],Gm:['G4','Bb4','D5']};
+  const SEMI={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+  const hz=n=>{ const m=/^([A-G])(b|#)?(\d)$/.exec(n); return m ? 440*Math.pow(2,((+m[3]+1)*12+SEMI[m[1]]+(m[2]==='b'?-1:m[2]==='#'?1:0)-69)/12) : 0; };
+  function mbox(c,out,t,f,vol,long){ tone(c,out,t,{f,dur:long?2.4:1.5,vol,attack:.004}); tone(c,out,t,{f:f*2,dur:.7,vol:vol*.3,attack:.004}); tone(c,out,t,{f:f*3,dur:.25,vol:vol*.1,attack:.003}); }
+  function marimba(c,out,t,f,vol){ tone(c,out,t,{f,dur:.6,vol,attack:.004}); tone(c,out,t,{f:f*4,dur:.12,vol:vol*.2,attack:.003}); }
+  /* step＝曲のはじめから数えた区切りの番号。その区切りで鳴る音を、時刻 t に予約する */
+  function playSlot(c,out,T,step,t){
+    const bar=Math.floor(step/T.slots), k=step%T.slots;
+    if(bar>=T.mel.length) return;                       /* くり返しの前の、ひと休み */
+    const tok=T.mel[bar].split(' ')[k];
+    if(tok && tok!=='-'){ const rest=T.mel[bar].split(' ').slice(k+1).every(x=>x==='-'); mbox(c,out,t,hz(tok),T.melVol,rest&&k<=T.slots/2); }
+    if(k%2===0){
+      const beat=k/2, ch=T.chords[bar].split(' '), half=T.slots/4;
+      const name=ch.length>1 ? ch[beat<half?0:1] : ch[0], i=ch.length>1 ? (beat<half?beat:beat-half) : beat;
+      const tones=CHORD[name]; if(tones) marimba(c,out,t,hz(tones[[0,1,2,1][i%4]]),T.accVol*(beat===0?1.25:1));
+    }
+  }
+  let mbus=null, mus=null, musT=null, forced='', quietUntil=0;
+  const musicOn=()=>!!S && (S.sound==null || S.sound==='all');
+  function musicWant(){ if(!ctx || ctx.state!=='running' || !musicOn() || performance.now()<quietUntil) return ''; return forced || (home.classList.contains('on')?'home':'field'); }
+  function tick(){
+    if(!mus || !ctx || ctx.state!=='running') return;
+    const T=TUNES[mus.name], slot=60/T.bpm/2, total=(T.mel.length+T.gap)*T.slots;
+    if(mus.nextT<ctx.currentTime-.05) mus.nextT=ctx.currentTime+.12;      /* 画面をとじていた等で おくれたら、いまから続ける */
+    while(mus.nextT<ctx.currentTime+.5){ try{ playSlot(ctx,mbus,T,mus.step,mus.nextT); }catch(e){} mus.step=(mus.step+1)%total; mus.nextT+=slot; }
+  }
+  function fadeOut(){ if(mus){ clearInterval(mus.timer); mus=null; } if(ctx&&mbus){ mbus.gain.cancelScheduledValues(ctx.currentTime); mbus.gain.setTargetAtTime(.0001,ctx.currentTime,.3); } }
+  function musicLevel(){ if(!mus||!ctx) return; mbus.gain.cancelScheduledValues(ctx.currentTime); mbus.gain.setTargetAtTime(MUSIC_VOL*(S&&S.raining?.6:1),ctx.currentTime,.6); }
+  /* いま流すべき曲（畑／おうち／なし）にあわせる。場面が変わるたびに呼ぶ */
+  function music(){
+    const want=musicWant(), cur=mus?mus.name:'';
+    if(want===cur){ musicLevel(); return; }
+    fadeOut(); clearTimeout(musT);
+    if(want) musT=setTimeout(()=>{ if(mus || musicWant()!==want) return; mus={name:want,step:0,nextT:ctx.currentTime+.15}; mus.timer=setInterval(tick,120); tick(); musicLevel(); }, cur?1200:350);
+  }
+  /* しばらく音楽を止める（おやすみ → 朝のチャイムのあとで、また流れる） */
+  function musicHush(ms){ quietUntil=performance.now()+ms; music(); setTimeout(music,ms+60); }
+  function musicTest(name){ forced=name||''; quietUntil=0; if(mus && mus.name!==forced) fadeOut(); music(); }
   function refreshBtn(){
     const b=document.getElementById('sndBtn'); if(!b) return;
-    const off=!enabled();
-    b.classList.toggle('off',off);
-    b.setAttribute('aria-label',off?'音：なし（タップで音を出す）':'音：あり（タップで音を消す）');
-    b.setAttribute('aria-pressed',off?'false':'true');
+    const st=!enabled()?'off':(musicOn()?'all':'sfx');
+    b.classList.toggle('off',st==='off'); b.classList.toggle('all',st==='all');
+    b.setAttribute('aria-label',{all:'音：音楽と効果音（タップで効果音だけに）',sfx:'音：効果音だけ（タップで音なしに）',off:'音：なし（タップで音を出す）'}[st]);
   }
+  /* 音あり（音楽＋効果音）→ 効果音だけ → 音なし → 音あり… */
   function toggle(){
     if(!S) return;
-    S.sound=enabled()?'off':'all';
+    S.sound=!enabled()?'all':(musicOn()?'sfx':'off');
     refreshBtn(); saveSoon();
     if(enabled()){ unlock(); play('pick'); }
     ambient();
-    logText.textContent=enabled()?'音を出します。（iPhoneは、消音モードのあいだは鳴りません）':'音を消しました。';
+    logText.textContent={all:'音楽と効果音を出します。（iPhoneは、消音モードのあいだは鳴りません）',sfx:'効果音だけにします。',off:'音を消しました。'}[S.sound];
+  }
+  /* しらべる用：曲を、音の出ない場所で sec 秒ぶん作って、大きさを数字で返す */
+  async function renderTune(name,sec){
+    const OC=window.OfflineAudioContext||window.webkitOfflineAudioContext, sr=44100, T=TUNES[name];
+    const oc=new OC(1,Math.floor(sr*sec),sr), bus=oc.createGain(); bus.gain.value=MUSIC_VOL; bus.connect(oc.destination);
+    const slot=60/T.bpm/2, total=(T.mel.length+T.gap)*T.slots; let n=0;
+    for(let st=0,t=.05; t<sec-.1; st++,t+=slot){ playSlot(oc,bus,T,st%total,t); n++; }
+    const d=(await oc.startRendering()).getChannelData(0);
+    let peak=0,sum=0,bad=0; const per=[];
+    for(let i=0;i<d.length;i++){ const v=Math.abs(d[i]); if(!(v>=0)) bad++; if(v>peak) peak=v; sum+=v*v; }
+    for(let i=0;i+sr<=d.length;i+=sr){ let s2=0; for(let k=i;k<i+sr;k++) s2+=d[k]*d[k]; per.push(Math.sqrt(s2/sr)); }
+    return {name,slots:n,peak:+peak.toFixed(3),rms:+Math.sqrt(sum/d.length).toFixed(4),rmsMax:+Math.max(...per).toFixed(4),bad,loopSec:+(total*slot).toFixed(1)};
   }
   /* しらべる用：1つの音を、音の出ない場所で作って、大きさなどを数字で返す */
   async function render(name,sec){
@@ -1340,10 +1413,13 @@ const Snd=(()=>{
     for(let i=0;i+w<=d.length;i+=Math.floor(w/2)){ let s2=0; for(let k=i;k<i+w;k++) s2+=d[k]*d[k]; loud=Math.max(loud,Math.sqrt(s2/w)); }
     return {name,peak:+peak.toFixed(3),at:+(at/sr).toFixed(3),loud:+loud.toFixed(3),sec:+(end/sr).toFixed(2),bad};
   }
-  return {play,bau,unlock,ambient,toggle,refreshBtn,render,counts,names:()=>Object.keys(SFX),state:()=>ctx?ctx.state:'none'};
+  function snooze(){ if(ctx && ctx.state==='running'){ try{ ctx.suspend(); }catch(e){} } }
+  return {play,bau,unlock,ambient,toggle,refreshBtn,render,counts,names:()=>Object.keys(SFX),state:()=>ctx?ctx.state:'none',
+    music,hush:musicHush,musicTest,renderTune,sleep:snooze,tune:()=>mus?mus.name:'',TUNES,CHORD,hz};
 })();
 ['pointerup','touchend','click','keydown'].forEach(ev=>document.addEventListener(ev,()=>Snd.unlock(),{capture:true,passive:true}));
-document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') Snd.unlock(); });
+/* 画面をとじているあいだは、音を止める（音楽が鳴りつづけないように）。もどったら、また動かす */
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') Snd.unlock(); else Snd.sleep(); });
 
 /* ================= セーブ（遊ぶ場所に合わせて、使える保存先を順にためす） ================= */
 let saveOK=null, saveTimer=null;
@@ -2909,7 +2985,7 @@ async function homeEvening(cands){
   if(newDecor) log('おうちに、'+newDecor.name+'がふえました。');
   await saveNow();
   await new Promise(res=>sleepBtn.addEventListener('click',res,{once:true}));
-  sleepBtn.disabled=true; Snd.play('night');
+  sleepBtn.disabled=true; Snd.hush(4200); Snd.play('night',.5);
   hhush();
   home.classList.remove('show');
   await pause(450);
@@ -3376,10 +3452,10 @@ async function morning(info){
     $('#seasonCardIcon').setAttribute('href','#'+SEASON_ICON[season()]);
     $('#seasonCardTitle').textContent=SEASONS[season()]+'になりました';
     $('#seasonCardSub').textContent='まける種：'+names;
-    const card=$('#seasonCard'); card.classList.add('on'); Snd.play('season');
+    const card=$('#seasonCard'); card.classList.add('on'); Snd.hush(2600); Snd.play('season');
     await pause(2400);
     card.classList.remove('on');
-  }else{ log('朝になりました。'+(S.weather==='rain'?'空がすこし暗いようです。':'今日もいい天気です。')); Snd.play('morning'); }
+  }else{ log('朝になりました。'+(S.weather==='rain'?'空がすこし暗いようです。':'今日もいい天気です。')); Snd.hush(2300); Snd.play('morning'); }
   await pause(400);
   if(!info.first){
     /* おうちの前で、お見送り */
@@ -3573,7 +3649,9 @@ if(location.hash.indexOf('sound')>=0){
     e.stopPropagation(); if(modal) return;
     let html=sheetHead('音をためす')+'<p class="sub">押すと、その音が鳴ります。気になる音は、名前で教えてください。</p><div class="seeds">';
     Snd.names().forEach((n,i)=>{ html+='<button class="seed" type="button" data-snd="'+n+'"><span><b>'+(i+1)+'. '+esc(SFX_LABEL[n]||n)+'</b></span></button>'; });
+    html+='</div><p class="sub" style="margin-top:10px">音楽（押すと流れつづけます。とじても止まらないので、「とめる」を押してください）</p><div class="seeds"><button class="seed" type="button" data-tune="field"><span><b>A. 畑の曲</b></span></button><button class="seed" type="button" data-tune="home"><span><b>B. おうちの曲</b></span></button><button class="seed" type="button" data-tune=""><span><b>とめる（ふつうにもどす）</b></span></button>';
     openSheet(html+'</div>',{kind:'sound'});
+    sheetCard.querySelectorAll('[data-tune]').forEach(b=>b.addEventListener('click',()=>{ if(S.sound!=='all'){ S.sound='all'; Snd.refreshBtn(); saveSoon(); } Snd.unlock(); Snd.musicTest(b.dataset.tune); }));
     sheetCard.querySelectorAll('[data-snd]').forEach(b=>b.addEventListener('click',()=>{ if(S.sound==='off') Snd.toggle(); Snd.unlock(); Snd.play(b.dataset.snd); }));
   });
 }
