@@ -360,6 +360,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 .seeds.menu{grid-template-columns:1fr}
 .seed .icons{display:flex;flex:none}
 .seed .icons svg{width:30px;height:30px}
+.seed .icons svg.dishArt{width:46px;height:46px;margin:-5px 0 -3px;overflow:visible}   /* メニューの、できあがった料理の絵（v1.19.0） */
 .seed em{font-style:normal;font-size:11px;border-radius:7px;padding:1px 6px;margin-left:2px;white-space:nowrap}
 .seed em.tagNew{background:#fdf0c4;color:#7a5a12}
 .seed em.tagReq{background:#e4f2fb;color:#2d6a94}
@@ -437,6 +438,8 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 .hDish.on{display:block;animation:popIn .5s ease-out}
 .hDish svg{width:100%;height:100%;display:block;overflow:visible}
 .hDish.eaten svg use{opacity:.25}
+.hDish .food{transition:opacity .45s}
+.hDish.eaten .food{opacity:0}   /* 食べおわったら、器だけ残る（v1.19.0） */
 .hBlanket{position:absolute;left:166px;top:396px;width:124px;height:34px;border-radius:14px 14px 10px 10px;background:#b9cbe0;border:2px solid #9bb2cc;z-index:460;display:none;
   background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.35) 0 8px,rgba(255,255,255,0) 8px 16px)}
 .hBlanket.on{display:block;animation:popIn .5s ease-out}
@@ -474,7 +477,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 .home .actor.shada .creamDot{display:none;position:absolute;left:50%;top:55%;width:11px;height:8px;margin-left:-5.5px;border-radius:55% 55% 50% 50%;background:#fff1cf;border:1.5px solid #e0b27c;z-index:3}
 .home .actor.shada.cream .creamDot{display:block}   /* 顔は SVG なので ::after が使えない。小さな部品を .bob の中に置く */
 .hDish.eating svg use{opacity:1}
-#hPortions use{transform-box:fill-box;transform-origin:center;animation:popIn .45s ease-out}
+#hPortions use,#hPortions .por{transform-box:fill-box;transform-origin:center;animation:popIn .45s ease-out}
 .evening{display:none;border:1px solid var(--border);border-radius:16px;background:#fff;padding:10px 12px}
 .evening.on{display:block}
 .eveInfo{font-size:14px}
@@ -525,7 +528,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
   .chip{padding:6px 10px;font-size:13px}
 }
 @media (prefers-reduced-motion:reduce){
-  .actor,.actor *,.actor::before,.actor::after,.fx,.fx *,.plot,.plot *,.basketFront,.deco,.weather,.bubble,.seasonFx,.windFx,.windFx i,.bolt,.ground::after,.rainbow,.seasonCard,.snowball,.home,.hSteam i,.fanBlades,.hDish,.hBlanket,.hFlash,.hNight,.hBlack,.hReward,.furinStrip,.ngauge,.ngauge *,#actors .actor.homare.on{animation:none!important;transition:none!important}
+  .actor,.actor *,.actor::before,.actor::after,.fx,.fx *,.plot,.plot *,.basketFront,.deco,.weather,.bubble,.seasonFx,.windFx,.windFx i,.bolt,.ground::after,.rainbow,.seasonCard,.snowball,.home,.hSteam i,.fanBlades,.hDish,.hDish .food,.hBlanket,.hFlash,.hNight,.hBlack,.hReward,.furinStrip,.ngauge,.ngauge *,#actors .actor.homare.on{animation:none!important;transition:none!important}
 }
 </style>
 </head>
@@ -877,7 +880,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 <div class="game" id="game">
   <div class="head">
     <h1>えりとしゃだはるの ちいさな畑</h1>
-    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.18.0</span></span>
+    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.19.1</span></span>
   </div>
 
   <div class="hud">
@@ -3202,6 +3205,12 @@ function dishIcons(r){
 const PORTION_AT=[[209,334],[315,335],[262,328]];   /* 取り皿の場所（#g-setting の3枚と同じ。えり・しゃだはる・ほまれ の前） */
 function setPortions(ids){
   const g=$('#hPortions'); if(!g) return;
+  if(ids && ids.need){   /* 料理（レシピ）を渡されたとき（v1.19.0）：その料理の色で、ひとりぶんの小さな山をよそう */
+    const c=DISH.portion(ids);
+    if(!c){ g.innerHTML=''; return; }
+    g.innerHTML=PORTION_AT.map(([x,y])=>'<g class="por"><ellipse cx="'+x+'" cy="'+(y-2.4)+'" rx="6.4" ry="3.3" fill="'+c[0]+'"/><ellipse cx="'+(x-2)+'" cy="'+(y-3.7)+'" rx="2.9" ry="1.7" fill="'+c[1]+'"/><ellipse cx="'+(x+2.5)+'" cy="'+(y-2.3)+'" rx="2.4" ry="1.5" fill="'+c[2]+'"/></g>').join('');
+    return;
+  }
   if(!ids || !ids.length){ g.innerHTML=''; return; }
   g.innerHTML=PORTION_AT.map(([x,y])=> ids.length>1
     ? '<use href="#'+ids[0]+'" x="'+(x-10.5)+'" y="'+(y-11.5)+'" width="11.5" height="11.5"/><use href="#'+ids[1]+'" x="'+(x-.5)+'" y="'+(y-10.5)+'" width="11.5" height="11.5"/>'
@@ -3213,6 +3222,14 @@ function updatePhoto(pop){
   $('#photoDefault').style.display=has?'none':'';
   const g=$('#photoDish');
   if(!has){ g.innerHTML=''; return; }
+  /* 料理の名前がレシピにあれば、できあがった料理の絵（v1.19.0。前からのセーブの写真も、名前から描きなおす） */
+  const rec=ph.name ? RECIPES.find(r=>r.name===ph.name) : null;
+  if(rec){
+    const a=DISH.art(rec);
+    g.innerHTML='<rect x="108" y="84" width="28" height="24" fill="#fdf3dc"/><svg x="110" y="83.5" width="24" height="24" viewBox="0 0 40 40">'+a.v+a.f+(a.t||'')+'</svg>';
+    if(pop && !reduceMotion && !homeSkip){ const f=$('#g-photo'); f.classList.remove('popIn'); void f.getBoundingClientRect(); f.classList.add('popIn'); }
+    return;
+  }
   const n=ids.length;
   let h='<rect x="108" y="84" width="28" height="24" fill="#fdf3dc"/><ellipse cx="122" cy="102" rx="11" ry="3.6" fill="#ffffff" stroke="#d9d0c3" stroke-width="1"/>';
   ids.forEach((id,j)=>{ h+='<use href="#'+id+'" x="'+(n===1?114:(j?122:107))+'" y="85" width="16" height="16"/>'; });
@@ -3300,7 +3317,7 @@ function chooseMenu(cands){
       +'<div class="fridgeNow">きょうの冷蔵庫'+(S.fridge||[]).map(k=>'<span>'+icon(FRIDGE[k].icon)+esc(FRIDGE[k].name)+'</span>').join('')+'</div><div class="seeds menu">';
     cands.forEach((r,i)=>{
       const f=r.fridge?FRIDGE[r.fridge]:null;
-      html+='<button class="seed" type="button" data-dish="'+i+'"><span class="icons">'+r.need.map(k=>icon('c-'+k)).join('')+(f?icon(f.icon):'')+'</span><span><b>'+esc(r.name)+'</b><span>'+r.need.map(vegName).concat(f?[f.name]:[]).join('＋')
+      html+='<button class="seed" type="button" data-dish="'+i+'"><span class="icons">'+DISH.icon(r)+'</span><span><b>'+esc(r.name)+'</b><span>'+r.need.map(vegName).concat(f?[f.name]:[]).join('＋')
         +(S.recipes[r.name]?'':'<em class="tagNew">はじめて</em>')+(S.request&&r.need.indexOf(S.request.crop)>=0?'<em class="tagReq">リクエスト</em>':'')+'</span></span></button>';
     });
     html+='</div>';
@@ -3695,7 +3712,7 @@ async function homeEvening(cands){
     isNew=!S.recipes[dish.name]; S.recipes[dish.name]=true;
     const fItem=dish.fridge?FRIDGE[dish.fridge]:null;
     $('#hBasketItems').innerHTML=dish.need.slice(0,2).map((k,j)=>'<svg style="left:'+(4+j*15)+'px;top:'+(6-j*3)+'px" aria-hidden="true"><use href="#c-'+k+'"/></svg>').join('');
-    $('#hDish').innerHTML=plateSVG(dishIcons(dish));
+    $('#hDish').innerHTML=DISH.table(dish);   /* v1.19.0：素材のしるしではなく、できあがった料理の絵（器ごと） */
     const main=vegName(dish.need[0]);
     hsay(E,dish.eri||(fItem ? '冷蔵庫に'+fItem.name+'があるから、'+dish.name+'にしよっか。' : '今日の'+main+'、'+dish.name+'にしてみよっか。'),{mood:'smile'});
     await hp(fItem?1800:1400);
@@ -3783,7 +3800,7 @@ async function homeEvening(cands){
     hhush();
     await Promise.all([hwork(E),hwork(H),hwork(D)]); hfxText('もぐもぐ',{x:D.x,y:D.y-34}); if(!homeSkip) Snd.play('eat'); await Promise.all([hwork(E),hwork(H),hwork(D)]);
     /* 料理は、食べているあいだも見せたままにする（v1.12.0。前は、ここで すぐ うすくしていた）。3人の取り皿にも、少しずつ よそう */
-    $('#hDish').classList.add('eating'); setPortions(dishIcons(dish));
+    $('#hDish').classList.add('eating'); setPortions(dish);
     /* 食べたときのひとことは、日によって2とおり */
     yumH=pick(['美味しい！','美味しいなぁ！']); yumD=pick(['おいしいばう！','おいしすぎるばう！']);
     hmood(H,'happy',2800);
@@ -4500,6 +4517,139 @@ function tallyHTML(obj,all){
 function talkHTML(who,text){ return '<div class="talk"><span class="mini" data-face="'+who+'" data-mood="happy"></span><div>'+esc(text)+'</div></div>'; }
 function fillMinis(root){ root.querySelectorAll('.mini[data-face]').forEach(m=>{ if(!m.firstChild) m.appendChild(makeFace(m.dataset.face)); }); }
 
+/* ================= 料理の絵（v1.19.0） =================
+   依頼者の希望：「お料理の絵をお料理らしく。今はどの料理も、大皿に素材がそのまま乗っている。メニュー選択画面と合わせて、完成後のお料理の絵が欲しい」。
+   見本（12の型）を見てもらって了解ずみ：器と盛りつけの「型」を料理の名前から決め（DISH.typeOf）、具の色は 野菜・冷蔵庫のものから決める（VC）。
+   おやつと、形の決まっている料理は、個別の絵（SP）。絵は viewBox 0 0 40 40。v＝器（食べおわっても残る）、f＝料理（食べおわると消える）、t＝その上にかさねる部品（あれば。びんのラベルなど。残る）。
+   料理を足すとき：名前のことばで型が決まる。ちがう型にしたいときは RECIPES の1行に art:'nabe' などを書く。新しい野菜は VC に色を足す。 */
+const DISH=(()=>{
+  const OUT='#d9d0c3';
+  /* 具の色：[こい色, あかるい色, うすい色なので輪郭をつける] */
+  const VC={ ichigo:['#e0524f','#f4907c'], soramame:['#9ccc7a','#c8e6a8'], jagaimo:['#f2d98e','#fbeec0'], tamanegi:['#f1e2b8','#fffaf0',1], kyuri:['#5d9c50','#d9eec0'], tomato:['#e5533d','#f4907c'],
+    nasu:['#7b5ea7','#a48fd0'], corn:['#f4c945','#f9e08b'], ninjin:['#f0954e','#f8bd8c'], satsumaimo:['#f1c453','#f9e08b'], satoimo:['#ebe3d3','#fffaf0',1], kabocha:['#f0a63c','#f8cf85'],
+    horenso:['#4f9a4a','#8cc272'], hakusai:['#d5e7ad','#fffdf8'], negi:['#8fc26f','#e9f4d6'], daikon:['#f6f2e6','#ffffff',1], takenoko:['#ecd9a0','#f7ecc4'], piman:['#4fa04a','#8cd07a'],
+    shiitake:['#a9784f','#d9b58c'], renkon:['#f3ead8','#fffaf0',1], chicken:['#e6c08e','#f6e2c0'], pork:['#d99f7c','#efc5a8'], fish:['#f2a58a','#f9cbb8'], egg:['#f7d25c','#fbe79c'] };
+  const DEF=['#c9b28a','#e6d6b8'];
+  const cols=r=>{ const V=(r.need||[]).map(k=>VC[k]||DEF), m=r.fridge&&VC[r.fridge]?VC[r.fridge]:null; return {v0:V[0]||DEF, v1:V[1]||V[0]||DEF, two:V.length>1, m}; };
+  /* 部品 */
+  const steam='<g class="steam" fill="none" stroke="#d9cfc1" stroke-width="1.6" stroke-linecap="round"><path d="M15 9.5 q-2.4 -2.6 0 -5.2"/><path d="M25 9.5 q2.4 -2.6 0 -5.2"/></g>';
+  const plate=(cy,rx,ry)=>'<ellipse cx="20" cy="'+(cy+2)+'" rx="'+rx+'" ry="'+ry+'" fill="#e9dfcd"/><ellipse cx="20" cy="'+cy+'" rx="'+rx+'" ry="'+ry+'" fill="#fffdf8" stroke="'+OUT+'" stroke-width="1"/><ellipse cx="20" cy="'+cy+'" rx="'+(rx-5)+'" ry="'+(ry-2.2)+'" fill="#f6efe2"/>';
+  const rectPlate='<path d="M4.6 24 H35.4 L38.6 33 H1.4Z" fill="#55626b"/><path d="M4.6 24 H35.4 L36.4 26.6 H3.6Z" fill="#6f7f8a"/><path d="M1.4 33 H38.6 V34.6 Q20 36 1.4 34.6Z" fill="#3f4a52"/>';
+  const ol=c=>c[2]?' stroke="'+OUT+'" stroke-width=".7"':'';
+  const chunk=(x,y,s,c)=>'<g transform="translate('+x+' '+y+') scale('+s+')"><path d="M-4.4 .4 q.2 -5 5 -4.8 q4.2 .6 3.8 4.6 q-.8 3.2 -4.8 3 q-3.6 -.2 -4 -2.8Z" fill="'+c[0]+'"'+ol(c)+'/><path d="M-2.2 -1.6 q1.4 -1.7 3.4 -1.5" fill="none" stroke="'+c[1]+'" stroke-width="1.2" stroke-linecap="round"/></g>';
+  const bit=(x,y,rot,c,s)=>'<path transform="translate('+x+' '+y+') rotate('+rot+') scale('+(s||1)+')" d="M-2.6 -1.6 L2.4 -2 L2.8 1.4 L-2.2 2Z" fill="'+c[0]+'"'+ol(c)+'/>';
+  const oval=(x,y,rx,ry,c)=>'<ellipse cx="'+x+'" cy="'+y+'" rx="'+rx+'" ry="'+ry+'" fill="'+c[0]+'"'+ol(c)+'/><path d="M'+(x-rx*.6)+' '+(y-ry*.2)+' q'+(rx*.6)+' -'+(ry*.7)+' '+(rx*1.2)+' 0" fill="none" stroke="'+c[1]+'" stroke-width="1" stroke-linecap="round"/>';
+  const strip=(x,y,rot,len,col,w)=>'<path transform="translate('+x+' '+y+') rotate('+rot+')" d="M'+(-len/2)+' 0 q'+(len/2)+' -'+(len*.3)+' '+len+' 0" fill="none" stroke="'+col+'" stroke-width="'+(w||2)+'" stroke-linecap="round"/>';
+  const dot=(x,y,r,col)=>'<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+col+'"/>';
+  const GREEN='#6fae62';
+  /* 型 */
+  const T={
+    nabe(c,n){ const mizore=/みぞれ/.test(n);
+      return {v:'<rect x="1" y="19.4" width="5.4" height="4.8" rx="2.2" fill="#5f4e42"/><rect x="33.6" y="19.4" width="5.4" height="4.8" rx="2.2" fill="#5f4e42"/><path d="M4 20 C4 30.5 9.5 35.5 20 35.5 C30.5 35.5 36 30.5 36 20Z" fill="#7a6556"/><path d="M7.6 25.5 q1.6 5.4 7 7.2" fill="none" stroke="#9c8574" stroke-width="1.6" stroke-linecap="round"/><ellipse cx="20" cy="20" rx="16" ry="6.8" fill="#8d7767"/><ellipse cx="20" cy="20" rx="14" ry="5.4" fill="#6a5548"/>',
+        f:steam+'<ellipse cx="20" cy="20" rx="14" ry="5.4" fill="'+(mizore?'#f7f1df':'#f4e6bf')+'"/>'+chunk(11.8,19.6,.95,c.v0)+oval(20.5,17.6,4.5,2.4,c.m||c.v1)+chunk(28.2,19.4,.95,c.v1)+oval(17,22.6,4.3,2.1,c.m||c.v0)
+          +(mizore?oval(24.6,22.4,3.6,1.9,['#ffffff','#ffffff',1]):'<rect x="21.6" y="21" width="5.6" height="3" rx="1.5" fill="#fffdf8" stroke="'+OUT+'" stroke-width=".7"/>')+dot(28.6,22.4,1.2,'#8fc26f')+dot(13.4,23.2,1.1,'#8fc26f')}; },
+    soup(c,n){ const miso=/みそ汁|豚汁|けんちん/.test(n), pot=/ポタージュ|ほくほく/.test(n);
+      if(miso) return {v:'<rect x="15" y="33" width="10" height="3.4" rx="1.4" fill="#8e3d2f"/><path d="M6 20 C6 30 12 34.5 20 34.5 C28 34.5 34 30 34 20Z" fill="#b5523f"/><path d="M9.4 25 q1.6 4.8 6 6.6" fill="none" stroke="#cf7a67" stroke-width="1.6" stroke-linecap="round"/><ellipse cx="20" cy="20" rx="14" ry="5.6" fill="#8e3d2f"/><ellipse cx="20" cy="20" rx="12.4" ry="4.4" fill="#6f2f25"/>',
+        f:steam+'<ellipse cx="20" cy="20" rx="12.4" ry="4.4" fill="'+(/けんちん/.test(n)?'#dcbb7c':'#d3a262')+'"/><path d="M11.6 20.6 a3 2 0 0 1 6 0Z" fill="'+c.v0[0]+'"'+ol(c.v0)+'/><path d="M21.6 18.8 a3 2 0 0 1 6 0Z" fill="'+c.v1[0]+'"'+ol(c.v1)+'/>'+oval(18.8,17.6,2.6,1.6,c.two?c.v0:['#fffdf8','#ffffff',1])+oval(24.6,21.9,2.8,1.6,c.m||c.v1)+dot(15.4,22.6,1.1,'#8fc26f')+dot(28.6,20.8,1.1,'#8fc26f')+dot(20.6,22.9,1,'#8fc26f')};
+      const bowl='<rect x="15" y="33" width="10" height="3" rx="1.3" fill="#d9d0c3"/><path d="M5 20 C5 30 11.6 34.4 20 34.4 C28.4 34.4 35 30 35 20Z" fill="#fffdf8" stroke="'+OUT+'" stroke-width="1"/><path d="M8.6 25 q1.8 4.8 6.4 6.6" fill="none" stroke="#efe7d8" stroke-width="1.6" stroke-linecap="round"/><ellipse cx="20" cy="20" rx="15" ry="5.8" fill="#fffdf8" stroke="'+OUT+'" stroke-width="1"/><ellipse cx="20" cy="20" rx="12.8" ry="4.5" fill="#ece3d3"/>';
+      if(pot) return {v:bowl, f:steam+'<ellipse cx="20" cy="20" rx="12.8" ry="4.5" fill="'+c.v0[0]+'"/><ellipse cx="20" cy="20" rx="12.8" ry="4.5" fill="#fffdf8" opacity=".38"/><path d="M13.6 20.4 q3 -2.6 6.4 -.6 q3 1.8 6 -.4" fill="none" stroke="#fffdf8" stroke-width="1.5" stroke-linecap="round"/>'+dot(22.4,22,1,GREEN)+dot(18.6,18.2,.9,GREEN)+(c.two?dot(26.4,19,1.3,c.v1[0]):'')};
+      return {v:bowl, f:steam+'<ellipse cx="20" cy="20" rx="12.8" ry="4.5" fill="#ecd9a4"/>'+(c.m&&c.m===VC.egg?'<path d="M10.6 20 q2.4 -1.6 4.6 0 q2.2 1.6 4.4 0 M20.6 22.4 q2.4 -1.6 4.8 0 q2 1.2 3.6 .2 M17 17.8 q2.4 -1.2 4.6 .2" fill="none" stroke="#f7d25c" stroke-width="1.7" stroke-linecap="round"/>':oval(24.8,21.6,2.7,1.5,c.m||c.v1))
+          +strip(14.6,21.6,-12,5.6,c.v0[2]?'#e3d2a4':c.v0[0],1.8)+strip(24.6,18.2,10,5.6,c.v0[2]?'#e3d2a4':c.v0[0],1.8)+(c.two?strip(19,19.6,-6,5,c.v1[2]?'#e3d2a4':c.v1[0],1.8):'')+dot(17.6,22.8,1,'#8fc26f')+dot(28.4,20.4,1,'#8fc26f')}; },
+    nimono(c,n){ const br=/トマト煮|ラタトゥイユ/.test(n)?'#e2694b':/クリーム/.test(n)?'#fbf1d9':/アクアパッツァ/.test(n)?'#f3dfa6':'#e6c48a';
+      return {v:'<path d="M3 21 C4 29.5 10 34 20 34 C30 34 36 29.5 37 21Z" fill="#8fa9b8"/><path d="M6.6 25.4 q2 4.4 7 6.2" fill="none" stroke="#b9ccd6" stroke-width="1.6" stroke-linecap="round"/><ellipse cx="20" cy="21" rx="17" ry="6.2" fill="#7b97a7"/><ellipse cx="20" cy="21" rx="15.2" ry="5" fill="#69869a"/>',
+        f:steam+'<ellipse cx="20" cy="21" rx="15.2" ry="5" fill="'+br+'"/>'+chunk(13.4,19.8,1.2,c.v0)+chunk(24.4,17.8,1.12,c.m&&!c.two?c.m:c.v1)+bit(20.4,22.2,-18,c.two?c.v1:c.v0,1.15)+bit(29.4,21.8,-24,c.v0,1)+(c.m?oval(14.6,24.4,2.8,1.4,c.m)+oval(25,24.8,2.5,1.3,c.m):'')
+          +(/ふろふき/.test(n)?'<path d="M10.6 17.4 q3 -2 5.6 0 q-.6 1.8 -2.8 1.8 q-2.2 0 -2.8 -1.8Z" fill="#c98f3e"/>':'')+strip(19.6,14.8,0,6.4,GREEN,2)}; },
+    itame(c,n){ const thin=/きんぴら|しりしり|チンジャオ|おかか/.test(n), base=c.m?c.m[0]:'#d9b27a';
+      let f=steam+'<path d="M7.6 28 q1 -8 8 -10.6 q8 -3 14 3 q3.6 4 2.6 7.6 q-5 3.6 -12.6 3.4 q-8 -.2 -12 -3.4Z" fill="'+base+'"/>';
+      if(thin){ const a=c.v0[2]?'#e6d4a6':c.v0[0], b=c.two?(c.v1[2]?'#e6d4a6':c.v1[0]):(c.m?c.m[1]:c.v0[1]);
+        f+=[[11.6,25,-30,a],[14.6,21.4,20,b],[18.6,18.4,-14,a],[23,18.6,24,b],[27.4,21.4,-28,a],[29,25.6,16,b],[16.4,26.4,8,a],[22.6,24,-10,a],[20,28.4,14,b],[25,27.6,-20,a],[12.6,28,18,b],[19,22,30,b]].map(q=>strip(q[0],q[1],q[2],6.4,q[3],1.9)).join('')+dot(17.4,24.2,.6,'#fffdf8')+dot(24.4,21.6,.6,'#fffdf8')+dot(21,26.6,.6,'#fffdf8'); }
+      else f+=chunk(12.6,23.6,1.05,c.v0)+chunk(26.2,20.6,1.05,c.two?c.v1:c.v0)+(c.m?oval(19,19.4,3.4,2,c.m)+oval(18.6,26.8,3.8,1.9,c.m):chunk(19.4,19.6,.8,c.v1)+bit(19,27,-10,c.v0,1.1))+strip(26.6,25.8,-8,6.4,GREEN,2.1)+strip(14.2,28.6,10,3.6,GREEN,1.9)+strip(20,15.8,-6,4.2,GREEN,1.9);
+      return {v:plate(29,17,6), f}; },
+    salad(c,n){ const glass='<path d="M4 19 C4 29.5 10 34.5 20 34.5 C30 34.5 36 29.5 36 19Z" fill="#d3ebf2" stroke="#a5cdda" stroke-width="1.2"/><path d="M7.6 24 q1.6 5.2 6.6 7.2" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>', rim='<path d="M4 19 H36" stroke="#a5cdda" stroke-width="1.2"/>';
+      const leaf='<path d="M5.6 19.6 q-.6 -5 4 -6 q1.6 -4.6 6.4 -3.4 q3.4 -3.6 7.6 -.6 q5 -1 6.2 3.6 q4.6 1.4 4.4 6.4Z" fill="#a9d48b"/><path d="M9.6 19.6 q.4 -4 3.6 -5 q2.4 -3 6 -1.6 q3.6 -1.6 6 1.4 q3.6 .8 4.4 5.2Z" fill="#8cc272"/>';
+      const wedge=(x,y,r,k)=>'<path d="M'+(x-r)+' '+y+' a'+r+' '+r+' 0 0 1 '+(2*r)+' 0Z" fill="'+k[0]+'"'+ol(k)+'/><path d="M'+(x-r*.5)+' '+(y-r*.3)+' q'+(r*.4)+' -'+(r*.5)+' '+r+' -'+(r*.5)+'" fill="none" stroke="'+k[1]+'" stroke-width="1.1" stroke-linecap="round"/>';
+      const ring=(x,y,k)=>'<circle cx="'+x+'" cy="'+y+'" r="3.2" fill="'+k[0]+'"'+ol(k)+'/><circle cx="'+x+'" cy="'+y+'" r="2.1" fill="'+k[1]+'"/>';
+      let f=leaf;
+      if(c.v0===VC.jagaimo || c.v1===VC.jagaimo) f+='<path d="M9 19.4 q.6 -7.4 11 -7.6 q10.4 .2 11 7.6Z" fill="#f6e7b4"/><path d="M12.6 15.6 q3 -2.6 7 -2.6" fill="none" stroke="#fdf6d8" stroke-width="1.4" stroke-linecap="round"/>'+dot(15,16.8,1.4,c.v0===VC.jagaimo?c.v1[0]:c.v0[0])+dot(22.6,14.8,1.4,c.v0===VC.jagaimo?c.v1[0]:c.v0[0])+dot(26,17.6,1.3,'#f0954e')+dot(19,17.8,1.2,'#5d9c50');
+      else f+=wedge(13.2,19.4,4.6,c.v0)+(c.two?ring(21,14.6,c.v1)+ring(20,19.2,c.v1)+wedge(27.8,19.4,4.2,c.v0):wedge(27.6,19.4,4.4,c.v0)+wedge(20.4,15.6,4,c.v0))+(c.m?strip(18,12.6,-8,7,c.m[0],2.4)+strip(23.6,16.8,14,6,c.m[0],2.4):'');
+      return {v:glass, f:f+rim}; },
+    kobachi(c,n){ return {v:'<rect x="15.4" y="32.4" width="9.2" height="3" rx="1.3" fill="#3a5270"/><path d="M8 21 C8 29.5 13 33.6 20 33.6 C27 33.6 32 29.5 32 21Z" fill="#4f6d8f"/><path d="M10.8 25.4 q1.6 4 5.4 5.6" fill="none" stroke="#7f9bbb" stroke-width="1.5" stroke-linecap="round"/><ellipse cx="20" cy="21" rx="12" ry="4.6" fill="#3f5a78"/>',
+        f:'<path d="M9.8 21.4 q.8 -8.6 10.2 -9 q9.4 .4 10.2 9 q-10.2 3.6 -20.4 0Z" fill="'+c.v0[0]+'"'+ol(c.v0)+'/>'+strip(15.4,16.6,-24,6,c.v0[1],1.5)+strip(23,15,18,5.6,c.v0[1],1.5)+(c.m?oval(16.6,19.4,3.2,1.7,c.m)+oval(24.4,19.6,3,1.6,c.m):'')+(c.two?strip(19.6,19.8,4,6.4,c.v1[0],2)+strip(24.6,17.4,-30,4.6,c.v1[0],2):'')
+          +(/ごま/.test(n)?[[16,14.8],[20,13.4],[23.6,16.6],[18.4,18],[22,19.6]].map(q=>dot(q[0],q[1],.55,'#fbf1d8')).join(''):/おひたし/.test(n)?'<path d="M17.6 12.6 q2.4 -2 4.8 0 q-2.4 1.6 -4.8 0Z" fill="#e3c08a"/>':dot(20,12.8,1,'#e0524f'))}; },
+    yaki(c,n){ const foil=/ホイル/.test(n), stuffed=/肉詰め|はさみ|肉巻き/.test(n), butter=/バター/.test(n);
+      const marks=(x,y,w)=>'<path d="M'+(x+w*.25)+' '+(y-3.6)+' l-1.8 7.4 M'+(x+w*.5)+' '+(y-3.8)+' l-1.8 7.8 M'+(x+w*.75)+' '+(y-3.6)+' l-1.8 7.4" stroke="#8a5a2c" stroke-width="1.3" stroke-linecap="round" opacity=".75"/>';
+      const slab=(x,y,rot,k,inner)=>{ const round=k===VC.shiitake||k===VC.jagaimo||k===VC.renkon, stick=k===VC.negi, corn=k===VC.corn; let s='<g transform="rotate('+rot+' '+(x+8)+' '+y+')">';
+        if(round) s+='<ellipse cx="'+(x+8)+'" cy="'+y+'" rx="7" ry="4.6" fill="'+k[0]+'"'+ol(k)+'/><path d="M'+(x+4)+' '+(y-1.4)+' q3 -2.2 7 -1.2" fill="none" stroke="'+k[1]+'" stroke-width="1.2" stroke-linecap="round"/>';
+        else if(stick) s+='<rect x="'+x+'" y="'+(y-2.4)+'" width="17" height="4.8" rx="2.4" fill="#e9f4d6"/><rect x="'+(x+9)+'" y="'+(y-2.4)+'" width="8" height="4.8" rx="2.4" fill="'+k[0]+'"/>';
+        else s+='<rect x="'+x+'" y="'+(y-4.6)+'" width="17" height="9.2" rx="4.6" fill="'+k[0]+'"'+ol(k)+'/><path d="M'+(x+3)+' '+(y-2)+' q4 -2 9 -1.2" fill="none" stroke="'+k[1]+'" stroke-width="1.2" stroke-linecap="round"/>';
+        if(corn) s+='<path d="M'+(x+3)+' '+(y-2.2)+' H'+(x+14)+' M'+(x+3)+' '+(y+.2)+' H'+(x+14)+' M'+(x+3)+' '+(y+2.6)+' H'+(x+14)+'" stroke="#f9e08b" stroke-width="1.1" stroke-linecap="round" stroke-dasharray="1.6 1.4"/>';
+        if(inner) s+='<ellipse cx="'+(x+8.5)+'" cy="'+y+'" rx="4.6" ry="2.5" fill="'+inner[0]+'"/>';
+        return s+(stick?'<path d="M'+(x+4)+' '+(y-2)+' l-1 4 M'+(x+8)+' '+(y-2)+' l-1 4 M'+(x+12)+' '+(y-2)+' l-1 4" stroke="#8a5a2c" stroke-width="1.1" stroke-linecap="round" opacity=".7"/>':marks(x,y,17))+'</g>'; };
+      const A=(c.m&&!stuffed)?c.m:c.v0, B=c.m&&!stuffed?c.v0:(c.two?c.v1:c.v0);
+      return {v:rectPlate, f:steam+(foil?'<path d="M4 27 l3 -7 l4 2.4 l3.6 -3.6 l4 3 l4 -3.4 l3.6 3.6 l4 -2.6 l3.4 7.6 q-15 4 -29.6 0Z" fill="#dfe5ea"/><path d="M8 25 l2.4 -3 M30 24.6 l-2 -3" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round"/>':'')
+          +slab(5,21.4,-8,A,stuffed&&c.m)+slab(18.6,26,7,B,stuffed&&c.m)+(butter?'<rect x="10.6" y="17.6" width="4.6" height="3.4" rx=".8" fill="#fbe79c" transform="rotate(-8 13 19)"/>':'')
+          +(c.m===VC.fish?'<path d="M31 21 a3.4 3.4 0 0 1 5.4 3Z" fill="#f4d64e"/>':'<path d="M30 20.6 q3 -2.6 5.6 -.4 q-2 2.8 -5.6 .4Z" fill="'+GREEN+'"/>')}; },
+    age(c,n){ const chips=/チップス/.test(n);
+      let f='<path d="M6.6 29 l3 -6 l3.4 3 l3 -5.4 l4 4.6 l3.6 -5 l3.4 5 l3.4 -3.2 l3 7Z" fill="#fffdf8" stroke="'+OUT+'" stroke-width=".8"/>';
+      if(chips){ const ch=(x,y)=>'<circle cx="'+x+'" cy="'+y+'" r="4.6" fill="#ecc36c"/><circle cx="'+x+'" cy="'+y+'" r="1.1" fill="#c99a44"/>'+[0,60,120,180,240,300].map(a=>dot((x+2.7*Math.cos(a*Math.PI/180)).toFixed(1),(y+2.7*Math.sin(a*Math.PI/180)).toFixed(1),.8,'#c99a44')).join('');
+        f+=ch(12.6,25)+ch(27,25.4)+ch(20,21)+ch(16.4,28)+ch(24,28.6); }
+      else f+='<path d="M8.6 27.6 q-1 -5 3.6 -6.6 q1 -4.4 5.6 -3.6 q3.6 -3.4 7.4 .2 q4.8 -.2 5.2 4.4 q3 3 -.2 6 q-5 2.6 -11 2.4 q-7 0 -10.6 -2.8Z" fill="#e6a94a"/><path d="M12 23 q1.4 -2.6 4.2 -2.4 M19.4 19.2 q2.6 -1.6 4.8 .2 M25.6 23.6 q2.4 -.6 3.4 1.4 M14.6 27 q2.6 -1 4.8 .6" fill="none" stroke="#f7d48a" stroke-width="1.5" stroke-linecap="round"/>'
+        +dot(17.4,23.6,1.7,c.v0[0])+dot(24,26.6,1.7,c.v0[0])+dot(22.4,21.6,1.5,c.v0[0])+strip(13,26.4,20,3.4,c.v1[2]?'#fbf1d8':c.v1[0],1.5)+strip(28,21.4,20,2.8,c.v1[2]?'#fbf1d8':c.v1[0],1.5);
+      return {v:plate(30,17,5.6), f}; },
+    gohan(c,n){ return {v:'<rect x="15.4" y="33.2" width="9.2" height="3.2" rx="1.3" fill="#9bb3c4"/><path d="M7 20.6 C7 30 12.6 34.6 20 34.6 C27.4 34.6 33 30 33 20.6Z" fill="#eef3f6" stroke="#c4d3dc" stroke-width="1"/><path d="M9.4 26 q10.6 4 21.2 0" fill="none" stroke="#7fa3bd" stroke-width="1.5" stroke-linecap="round"/><ellipse cx="20" cy="20.6" rx="13" ry="3.4" fill="#dfe8ee"/>',
+        f:steam+'<path d="M7.4 20.8 C7.6 9.6 32.4 9.6 32.6 20.8 Q20 24.6 7.4 20.8Z" fill="#fbf3df" stroke="'+OUT+'" stroke-width="1"/><path d="M11.4 16 q3 -3.6 7.6 -3.8" fill="none" stroke="#fffdf8" stroke-width="1.4" stroke-linecap="round"/>'
+          +bit(14.6,17.6,-40,c.v0,1.05)+bit(22.6,14.8,-14,c.v0,1.05)+bit(26.6,19.2,-22,c.v0,1)+bit(19,20,-24,c.v0,.8)+'<path d="M18.6 12.4 q1.6 -2.6 4 -2.2 q-.4 2.4 -4 2.2Z" fill="'+GREEN+'"/>'+dot(15,14.8,.9,'#f0954e')+dot(27.2,16,.9,'#f0954e')+dot(22.6,18.6,.9,'#f0954e')}; },
+    curry(c,n){ return {v:plate(28,18,6.8), f:steam+'<path d="M18.6 27 q-.6 -7.6 6.8 -8.6 q7.6 .2 9 6.4 q-1.4 5.4 -8.6 6.2 q-5.4 -.4 -7.2 -4Z" fill="#b9722e"/><path d="M22.6 21.6 q2.6 -1.6 5.6 -1" fill="none" stroke="#d99a55" stroke-width="1.4" stroke-linecap="round"/>'
+          +'<path d="M5.4 27.6 C5 17.4 19.6 16.4 20.4 25 q.4 4.6 -5 5.6 q-8 .6 -10 -3Z" fill="#fffdf8" stroke="'+OUT+'" stroke-width="1"/><path d="M8.6 23 q2.4 -3.2 6 -3.4" fill="none" stroke="#f1eadb" stroke-width="1.4" stroke-linecap="round"/>'
+          +chunk(24.8,25.2,.62,c.v0)+bit(30.2,24.6,-24,['#f0954e'],.9)+(c.m?oval(26.6,29.2,2.2,1.2,c.m):'')+dot(13,24,1,'#e0524f')}; },
+    gratin(c,n){ return {v:'<rect x="0.6" y="20.6" width="5.6" height="4" rx="2" fill="#a8483c"/><rect x="33.8" y="20.6" width="5.6" height="4" rx="2" fill="#a8483c"/><path d="M4 21 C4.6 29 10 33.4 20 33.4 C30 33.4 35.4 29 36 21Z" fill="#c9574a"/><path d="M7.6 25.6 q2 4 6.6 5.6" fill="none" stroke="#e08a7e" stroke-width="1.6" stroke-linecap="round"/><ellipse cx="20" cy="21" rx="16.4" ry="6.6" fill="#a8483c"/><ellipse cx="20" cy="20.6" rx="14.6" ry="5.4" fill="#8e3a30"/>',
+        f:steam+'<ellipse cx="20" cy="20.6" rx="14.6" ry="5.4" fill="#f6dc8e"/><path d="M9 20 q2 -2.6 5 -1.6 q1 2.4 -1.6 3.4 q-2.6 0 -3.4 -1.8Z M18 17 q3 -1.6 5.6 .2 q-.6 2.2 -3 2.2 q-2.2 -.4 -2.6 -2.4Z M25.6 21.6 q2.6 -1.6 5 .2 q-1 2 -3 1.8 q-1.6 -.4 -2 -2Z M15.6 22.8 q2.2 -1 4 .4 q-.8 1.4 -2.4 1.2 q-1.2 -.4 -1.6 -1.6Z" fill="#dc9c4c"/>'
+          +strip(15,17.2,0,3.4,c.v0[0],2)+strip(25.8,17.8,10,3,c.v0[0],2)+strip(22.4,23.4,180,3,/ミート/.test(n)?'#c4452f':(c.m?c.m[0]:'#c4452f'),1.8)+dot(12,22.8,.9,GREEN)+dot(28.6,19,.9,GREEN)}; },
+    omelet(c,n){ return {v:plate(29,17.4,6.2), f:steam+'<path d="M6.4 26.4 C8 15.6 32 15.6 33.6 26.4 C30 32 10 32 6.4 26.4Z" fill="#f7d25c"/><path d="M10.4 22.4 q4 -4.4 10 -4.4" fill="none" stroke="#fbe79c" stroke-width="1.7" stroke-linecap="round"/><path d="M14.6 25.4 q2 -2.4 4 0 q2 2.4 4 0 q2 -2.4 4 0" fill="none" stroke="#e0524f" stroke-width="2" stroke-linecap="round"/>'
+          +strip(29.2,22.6,20,3.8,c.v0[0],2)+strip(11,27,40,3.4,c.v0[0],2)+'<path d="M30.6 30.4 q2.4 -2.2 1.4 -5 q-2.8 .8 -3 3.6Z" fill="'+GREEN+'"/>'}; }
+  };
+  /* 個別の絵（おやつと、形の決まっている料理） */
+  const berry=(x,y,s)=>'<g transform="translate('+x+' '+y+') scale('+s+')"><path d="M-3.4 -.4 q.2 -4.6 3.6 -5 q3.4 .4 3.4 5 q-1.6 2.6 -3.6 2.6 q-2 -.2 -3.4 -2.6Z" fill="#e0524f"/><path d="M-1.8 -5.2 q1.8 -1.6 3.6 0 q-1.8 1 -3.6 0Z" fill="#6fae62"/><g fill="#fbd9c9"><circle cx="-1.2" cy="-2.4" r=".55"/><circle cx="1.2" cy="-2.8" r=".55"/><circle cx="0" cy="-.4" r=".55"/></g></g>';
+  const SP={
+    'いちごジャム':()=>({v:plate(31.4,15,4.6)+'<rect x="11" y="13.4" width="18" height="18.6" rx="4.4" fill="#f4f1ec" stroke="'+OUT+'" stroke-width=".8"/><rect x="12.4" y="17" width="15.2" height="13.8" rx="3.4" fill="#e9e4dc"/>',
+      f:'<rect x="12.4" y="17" width="15.2" height="13.8" rx="3.4" fill="#d8403f"/><path d="M14.4 19.4 v8" stroke="#f08c86" stroke-width="1.5" stroke-linecap="round"/>',
+      t:'<rect x="9.8" y="8.6" width="20.4" height="6" rx="2.2" fill="#e8786d"/><path d="M13 8.6 v6 M17.6 8.6 v6 M22.4 8.6 v6 M27 8.6 v6" stroke="#fbe3c8" stroke-width="1.3"/><rect x="15" y="20" width="10" height="7.6" rx="1.6" fill="#fffdf8"/>'+berry(20,25.6,.62)}),
+    'いちごミルク':()=>({v:'<ellipse cx="20" cy="33.6" rx="9" ry="2" fill="#e9dfcd"/><path d="M11.6 10 H28.4 L26.6 32.4 Q20 34.6 13.4 32.4Z" fill="#f3f6f7" stroke="#d3dde2" stroke-width=".9"/>',
+      f:'<path d="M24.6 3.4 L21 20" stroke="#e0524f" stroke-width="2.2" stroke-linecap="round"/><path d="M11.6 10 H28.4 L26.6 32.4 Q20 34.6 13.4 32.4Z" fill="#f9c6cf" stroke="#e3b9c1" stroke-width=".9"/><path d="M11.8 12.6 H28.2 L28.4 10 H11.6Z" fill="#fde6ea"/>'+berry(28.6,12.4,.8),
+      t:'<path d="M14.4 15 l1 13.6" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity=".8"/>'}),
+    'にんじんのグラッセ':c=>({v:plate(29.4,16.4,5.6), f:oval(13.6,26,4,2.5,VC.ninjin)+oval(21.6,23.4,4.2,2.6,VC.ninjin)+oval(27.2,27.2,3.8,2.4,VC.ninjin)+oval(19.4,28.6,3.8,2.3,VC.ninjin)+'<path d="M24.6 20.6 q1.6 -3 4.2 -2.6 q-.2 2.8 -4.2 2.6Z" fill="'+GREEN+'"/>'}),
+    '焼きいも':()=>({v:plate(30.4,16.4,5.2), f:'<use href="#i-yakiimo" x="4" y="2" width="32" height="32"/>'}),
+    '大学いも':()=>{ const w=(x,y,r)=>'<g transform="translate('+x+' '+y+') rotate('+r+')"><path d="M-4.6 1.8 L-2.6 -3 L4 -2.6 L4.8 2.2Z" fill="#eab64a"/><path d="M-4.6 1.8 L4.8 2.2 L4.4 3.4 L-4.2 3Z" fill="#a8446b"/><path d="M-2 -1.6 H2.4" stroke="#f9dc8c" stroke-width="1.1" stroke-linecap="round"/></g>';
+      return {v:plate(30,16.6,5.6), f:w(13.4,26.4,-8)+w(26,26.8,10)+w(19.6,22.4,4)+w(14.6,20.6,-16)+w(25,19.6,14)+w(20,16.6,-4)+[[13,25],[19,21],[25.4,25.6],[20.6,15.6],[15.4,19.6],[24.6,18.6]].map(q=>dot(q[0],q[1],.5,'#3a2f28')).join('')}; },
+    'かぼちゃプリン':()=>({v:plate(31,15.6,5), f:'<path d="M11.4 30 L14.4 17 H25.6 L28.6 30 Q20 33 11.4 30Z" fill="#f2ae4a"/><path d="M14.4 17 H25.6 L26.6 21 Q20 23.4 13.4 21Z" fill="#8a4a1c"/><ellipse cx="20" cy="17" rx="5.6" ry="1.9" fill="#74390f"/><path d="M15 23.6 v5" stroke="#f8cf85" stroke-width="1.7" stroke-linecap="round"/><path d="M17 15.4 q.4 -3 3 -3 q2.6 0 3 3 q-3 1.6 -6 0Z" fill="#fffdf8" stroke="'+OUT+'" stroke-width=".6"/><path d="M19.4 11.6 q1.2 -1.6 2.4 0 q-1.2 1 -2.4 0Z" fill="#4f7d4a"/>'}),
+    'いちごのパンケーキ':()=>({v:plate(31,17,5.4), f:'<ellipse cx="20" cy="29" rx="12.4" ry="4" fill="#d99a4e"/><rect x="7.6" y="25.6" width="24.8" height="3.4" fill="#f1cf8e"/><ellipse cx="20" cy="25.6" rx="12.4" ry="4" fill="#d99a4e"/><rect x="7.6" y="22.2" width="24.8" height="3.4" fill="#f1cf8e"/><ellipse cx="20" cy="22.2" rx="12.4" ry="4" fill="#d99a4e"/><rect x="7.6" y="18.8" width="24.8" height="3.4" fill="#f1cf8e"/><ellipse cx="20" cy="18.8" rx="12.4" ry="4" fill="#e3a85a"/><path d="M11.6 18 q3 -2 7 -2" fill="none" stroke="#f1c98a" stroke-width="1.5" stroke-linecap="round"/><path d="M14 19.6 q5 2.6 12 .2 q1.6 2 .6 4.6 q-1 1.4 -1.8 -.6 q-.2 -2 -2 -1.6 q-5 1 -9.4 -.6Z" fill="#fffdf8" stroke="'+OUT+'" stroke-width=".6"/>'+berry(20,17.8,1)}),
+    'スイートポテト':()=>{ const sp=(x,y)=>'<path d="M'+(x-8)+' '+(y+1)+' l1.6 3 h12.8 l1.6 -3Z" fill="#fffdf8" stroke="'+OUT+'" stroke-width=".7"/><ellipse cx="'+x+'" cy="'+y+'" rx="7.6" ry="4.2" fill="#f1c453"/><ellipse cx="'+x+'" cy="'+(y-.8)+'" rx="5.4" ry="2.6" fill="#dc9a3c"/><path d="M'+(x-3.6)+' '+(y-1.6)+' q3 -1.6 6.4 -.6" fill="none" stroke="#f3c27a" stroke-width="1.1" stroke-linecap="round"/>'+dot(x-1,y-.4,.5,'#3a2f28')+dot(x+1.6,y-1,.5,'#3a2f28');
+      return {v:plate(30.4,17,5.6), f:sp(13.4,23.6)+sp(26,27)}; },
+    '茶わん蒸し':()=>({v:'<ellipse cx="20" cy="33" rx="13" ry="3" fill="#e9dfcd"/><ellipse cx="20" cy="32" rx="13" ry="3" fill="#eef3f6" stroke="#c4d3dc" stroke-width=".9"/><path d="M10 16.6 H30 L28.2 30.6 Q20 33.4 11.8 30.6Z" fill="#eef3f6" stroke="#c4d3dc" stroke-width="1"/><path d="M12.4 22 q7.6 3 15.2 0" fill="none" stroke="#7fa3bd" stroke-width="1.5" stroke-linecap="round"/><ellipse cx="20" cy="16.6" rx="10" ry="3.6" fill="#dfe8ee" stroke="#c4d3dc" stroke-width="1"/>',
+      f:steam+'<ellipse cx="20" cy="16.6" rx="8.6" ry="2.8" fill="#f9e7a0"/><path d="M14.6 16.4 q2 -2 4.4 -.6 q-1.6 2 -4.4 .6Z" fill="'+GREEN+'"/><path d="M20.6 17.6 a2.6 1.5 0 0 1 5.2 0Z" fill="#a9784f"/>'+dot(18.6,18.2,.9,'#f4d64e')+'<path d="M22 15 h3.4 v1.2 h-3.4Z" fill="#f4a9a0"/>'}),
+    'ねぎま':()=>{ const sk=(x,y,r)=>'<g transform="translate('+x+' '+y+') rotate('+r+')"><path d="M-15 0 H15" stroke="#d9b98c" stroke-width="1.3" stroke-linecap="round"/><rect x="-11" y="-3.2" width="6.4" height="6.4" rx="2.4" fill="#c98a4e"/><rect x="-4" y="-2.4" width="5" height="4.8" rx="1.6" fill="#dcebb8"/><rect x="1.6" y="-3.2" width="6.4" height="6.4" rx="2.4" fill="#c98a4e"/><rect x="8.6" y="-2.4" width="4.6" height="4.8" rx="1.6" fill="#dcebb8"/><path d="M-9.6 -1.4 q1.6 -1.2 3.4 -.6 M3 -1.4 q1.6 -1.2 3.4 -.6" fill="none" stroke="#e6b47e" stroke-width="1" stroke-linecap="round"/><path d="M-2 -2 v4 M10.6 -2 v4" stroke="#9a7a3c" stroke-width=".9" opacity=".7"/></g>';
+      return {v:rectPlate, f:steam+sk(18,21.6,-7)+sk(22,27.4,5)}; },
+    'ねぎ入りたまご焼き':()=>{ const sl=(x,y)=>'<rect x="'+x+'" y="'+y+'" width="8.4" height="7.4" rx="2.2" fill="#f7d25c"/><path d="M'+(x+2)+' '+(y+3.8)+' q0 -2 2.2 -2 q2.4 0 2.4 2.2 q0 1.6 -1.8 1.6" fill="none" stroke="#e3b53c" stroke-width="1" stroke-linecap="round"/>'+dot(x+2,y+1.8,.7,'#6fae62')+dot(x+6.4,y+5.6,.7,'#6fae62');
+      return {v:rectPlate, f:steam+sl(5.4,19)+sl(13.4,20)+sl(21.4,21)+'<path d="M29.4 27.4 q.4 -4 3.4 -4 q3 0 3.2 4Z" fill="#fffdf8" stroke="'+OUT+'" stroke-width=".7"/>'+dot(32.8,24.6,.8,'#8a5a2c')}; }
+  };
+  const typeOf=r=>{ const n=r.name;
+    if(r.art) return r.art; if(SP[n]) return 'sp';
+    if(/鍋|芋煮/.test(n)) return 'nabe'; if(/カレー/.test(n)) return 'curry'; if(/グラタン/.test(n)) return 'gratin'; if(/ごはん/.test(n)) return 'gohan'; if(/オムレツ/.test(n)) return 'omelet';
+    if(/かき揚げ|チップス/.test(n)) return 'age'; if(/みそ汁|豚汁|けんちん汁|スープ|ポタージュ/.test(n)) return 'soup'; if(/サラダ|バンバンジー|冷やしトマト/.test(n)) return 'salad';
+    if(/浅漬け|おひたし|ごま和え|酢のもの|南蛮漬け|揚げびたし/.test(n)) return 'kobachi'; if(/きんぴら|しりしり|炒め|チンジャオロース|しょうが焼き/.test(n)) return 'itame';
+    if(/焼き|肉巻き|肉詰め|じゃがバター/.test(n)) return 'yaki'; return 'nimono'; };
+  const art=r=>{ const t=typeOf(r), c=cols(r); return t==='sp' ? SP[r.name](c) : (T[t]||T.nimono)(c,r.name); };
+  /* しるし（メニュー・写真立て）。px を渡さなければ、大きさはCSSで決める */
+  const icon=r=>{ const a=art(r); return '<svg class="dishArt" viewBox="0 0 40 40" aria-hidden="true">'+a.v+'<g class="food">'+a.f+'</g>'+(a.t||'')+'</svg>'; };
+  /* 食卓の大皿のところ：器ごと置く。はばは .hDish（88×50）に合わせ、器は 前の大皿より少し手前（まんなかの取り皿を かくさないように） */
+  const table=r=>{ const a=art(r); return '<svg class="plate" viewBox="0 0 150 84" aria-hidden="true"><ellipse cx="75" cy="83" rx="46" ry="6.6" fill="rgba(90,60,30,.16)"/><svg x="13" y="-27" width="124" height="124" viewBox="0 0 40 40" overflow="visible">'+a.v+'<g class="food">'+a.f+'</g>'+(a.t||'')+'</svg></svg>'; };
+  /* 取り皿の上の ひとりぶん（小さな山）の色 */
+  const NO_PORTION={'いちごミルク':1,'いちごジャム':1};   /* のみもの・びんのものは、取り皿に よそわない */
+  const portion=r=>{ if(NO_PORTION[r.name]) return null; const c=cols(r), t=typeOf(r); return [t==='soup'||t==='nabe'?'#ecd9a4':(c.m?c.m[0]:c.v0[1]), c.v0[0], (c.two?c.v1:(c.m||c.v0))[0]]; };
+  return {art,icon,table,portion,typeOf,cols};
+})();
+
+/* 前からの大皿（しるしを2つのせる）。いまは、おみやげの夜（cakePlate）だけで使う */
 function plateSVG(ids){
   const n=Math.min(2,ids.length); let items='';
   ids.slice(0,2).forEach((id,j)=>{ const x=n===1?54:(j?74:34); items+='<use href="#'+id+'" x="'+x+'" y="16" width="42" height="42"/>'; });
@@ -4862,7 +5012,7 @@ async function boot(){
 }
 /* しらべる用：アドレスの最後に #debug をつけたときだけ使える */
 if(location.hash.indexOf('debug')>=0){
-  window.__hatake={ get S(){return S;}, get busy(){return busy;}, A, homeEvening, pickPre, dishCandidates, makeRequest, get HA(){return HA;}, advance, maybeEvent, renderAll, addHarvest, checkUnlocks, nextMorning, Store, CROPS, RECIPES, UNLOCKS, EVENTS, FRIDGE, rollFridge, rollWeather, placeFrost, weatherScenes, importSave, exportSave, normalize, Snd, GIFTS, planVisit, visitDue, fitVisit,
+  window.__hatake={ get S(){return S;}, get busy(){return busy;}, A, homeEvening, pickPre, dishCandidates, makeRequest, get HA(){return HA;}, advance, maybeEvent, renderAll, addHarvest, checkUnlocks, nextMorning, Store, CROPS, RECIPES, UNLOCKS, EVENTS, FRIDGE, rollFridge, rollWeather, placeFrost, weatherScenes, importSave, exportSave, normalize, Snd, GIFTS, planVisit, visitDue, fitVisit, DISH, setPortions,
     visit:async()=>{ if(busy) return false; busy=true; renderButtons(); S.oji={sy:Math.floor((S.day-1)/SEASON_DAYS),day:S.day,at:S.clock,done:false}; await visitScene(); busy=false; renderButtons(); return true; },
     force:async id=>{ if(busy) return false; busy=true; renderButtons(); S.sinceEvent=9; const r=await maybeEvent(false,id); await checkUnlocks(); busy=false; renderButtons(); return r; } };
 }
