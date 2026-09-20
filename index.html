@@ -423,8 +423,12 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 .hSteam.on{opacity:1}
 .hSteam i{position:absolute;bottom:0;width:7px;height:16px;border-radius:50%;border:2.4px solid rgba(180,172,160,.9);border-color:rgba(180,172,160,.9) transparent transparent rgba(180,172,160,.9);animation:steam 1.6s ease-in-out infinite}
 .hSteam i:nth-child(1){left:4px}.hSteam i:nth-child(2){left:16px;animation-delay:.5s}.hSteam i:nth-child(3){left:28px;animation-delay:1s}
-.hDish{position:absolute;left:218px;top:324px;width:88px;height:50px;z-index:331;display:none}   /* 台（330）のすぐ上。台の手前に立つ人（z＝y の値、350より上）の顔を かくさないように（v1.13.2。前は400） */
+.hDish{position:absolute;left:210px;top:320px;width:104px;height:60px;z-index:331;display:none}   /* 台（330）のすぐ上。台の手前に立つ人（z＝y の値、350より上）の顔を かくさないように（v1.13.2。前は400） */
 .hDish.on{display:block;animation:popIn .5s ease-out}
+.hDish.clearing{animation:mealClear .45s ease-in forwards}
+@keyframes mealClear{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-7px)}}
+.seed .mealThumb{display:block;flex:none;width:66px;height:41px}
+.seed .mealThumb svg{width:66px;height:37px;margin:0;display:block}
 .hDish svg{width:100%;height:100%;display:block;overflow:visible}
 .hDish.eaten svg use{opacity:.25}
 .hBlanket{position:absolute;left:166px;top:396px;width:124px;height:34px;border-radius:14px 14px 10px 10px;background:#b9cbe0;border:2px solid #9bb2cc;z-index:460;display:none;
@@ -867,7 +871,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 <div class="game" id="game">
   <div class="head">
     <h1>えりとしゃだはるの ちいさな畑</h1>
-    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.18.0</span></span>
+    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.19.0</span></span>
   </div>
 
   <div class="hud">
@@ -3085,6 +3089,7 @@ const HBODY={
 };
 const home=$('#home'), homeStage=$('#homeStage'), eveningBar=$('#eveningBar'), eveInfo=$('#eveInfo'), sleepBtn=$('#sleepBtn'), homeSkipBtn=$('#homeSkip'), panelEl=document.querySelector('.panel');
 let HA=null, homeSkip=false, hScale=1;
+let morningBubbleBoxes={};
 
 const hp=ms=>homeSkip?Promise.resolve():pause(ms);
 function hbubOff(x){ clearTimeout(x.bubT); x.bubLift=0; x.bub.classList.remove('on'); }
@@ -3125,20 +3130,22 @@ function hsay(a,text,opt){
    ・「しっぽの先が、ほかの人の頭のほうに近い」置きかたは、大きく減点する（＝だれのセリフか、まぎらわしい）。 */
 const HB_BASE=TOK*1.12;
 function hBox(a,dir,bottom){
-  const extra=a.bubLift||0;
-  const w=a.bub.offsetWidth, h=a.bub.offsetHeight, l=dir==='toL' ? a.x+TOK*.22-w : a.x-TOK*.22, b=(a.y+TOK/2)-(bottom+extra);
-  return {l, r:l+w, t:b-h, b, dir, bottom:bottom+extra};
+  /* bottom は最終値。lift をここで重ね足ししない。 */
+  const w=a.bub.offsetWidth, h=a.bub.offsetHeight, l=dir==='toL' ? a.x+TOK*.22-w : a.x-TOK*.22, b=(a.y+TOK/2)-bottom;
+  return {l, r:l+w, t:b-h, b, dir, bottom};
 }
 const hFace=o=>({l:o.x-TOK/2, r:o.x+TOK/2, t:o.y-TOK/2, b:o.y+TOK/2});
 const hOv=(p,q,m)=>Math.min(p.r,q.r)-Math.max(p.l,q.l)>-m && Math.min(p.b,q.b)-Math.max(p.t,q.t)>-m;
 function hLayout(a){
   const others=Object.values(HA).filter(o=>o!==a);
-  const bubs=others.filter(o=>o.bub.classList.contains('on') && o.bubBox).map(o=>o.bubBox);
+  const isMorning=home.classList.contains('morning');
+  const bubs=others.map(o=>isMorning ? (morningBubbleBoxes[o.who] || (o.bub.classList.contains('on')&&o.bubBox)) : (o.bub.classList.contains('on')&&o.bubBox)).filter(Boolean);
+  const base=HB_BASE+(a.bubLift||0);
   const faces=others.map(hFace);
   /* 顔にかぶる深さ（px）。顔の四角の下4pxは、あごの下の余白なので数えない */
   const cover=(bx,f)=>{ const x=Math.min(bx.r,f.r)-Math.max(bx.l,f.l), y=Math.min(bx.b,f.b-4)-Math.max(bx.t,f.t); return (x>3 && y>0) ? y : 0; };
   const solve=(dir,avoidFaces)=>{
-    let bottom=HB_BASE, bx=hBox(a,dir,bottom);
+    let bottom=base, bx=hBox(a,dir,bottom);
     for(let n=0;n<5;n++){
       let top=null;
       bubs.forEach(q=>{ if(hOv(bx,q,6)) top=top==null?q.t:Math.min(top,q.t); });
@@ -3173,6 +3180,7 @@ function hLayout(a){
   a.bub.classList.toggle('toL',bx.dir==='toL'); a.bub.classList.toggle('toR',bx.dir==='toR');
   a.bub.style.bottom=bx.bottom>HB_BASE+.5 ? Math.round(bx.bottom)+'px' : '';
   a.bubBox=bx;
+  if(isMorning) morningBubbleBoxes[a.who]={...bx};
 }
 /* 2人の吹き出しが（置いたあとも）重なっているか。これも、決めてある位置でしらべる */
 const hBubClash=(a,x)=>x!==a && x.bub.classList.contains('on') && a.bubBox && x.bubBox && hOv(a.bubBox,x.bubBox,-2);
@@ -3235,96 +3243,354 @@ function dishIcons(r){
   const v=r.need.map(k=>'c-'+k);
   return (r.fridge&&FRIDGE[r.fridge]) ? [v[0],FRIDGE[r.fridge].icon] : v.slice(0,2);
 }
-function ingredientTone(key){
-  const M={
-    tomato:['#de5d55','#f4a08b','#6fae62'], kyuri:['#6fbf73','#b9df93','#f4f7dd'], nasu:['#8c68b8','#d5b4ec','#7fb069'], corn:['#f2c84b','#fff2a8','#88b45f'],
-    jagaimo:['#d7b37a','#f3dfb4','#8caf64'], tamanegi:['#e8d7ac','#f6eed1','#9fc07c'], soramame:['#7fb069','#cfe8a6','#f5f0cb'], ninjin:['#ef8a3c','#ffd28a','#7fb069'],
-    satsumaimo:['#8c4f78','#f3d36e','#c6875c'], satoimo:['#d7c2ad','#f2e5d1','#9eaf7d'], kabocha:['#f0a744','#ffd58a','#6a9350'], horenso:['#4c9860','#a7d5a8','#f2f2d9'],
-    hakusai:['#d8f0a6','#f8f5d4','#8db26e'], negi:['#72b57f','#edf7dc','#c5d388'], daikon:['#f7f6ef','#d0e6b8','#93b371'], ichigo:['#e66072','#ffd0d6','#7fb069'],
-    takenoko:['#d1b57b','#f0e0b3','#93a96b'], piman:['#4f9b52','#c6e7a1','#f4f0d0'], shiitake:['#8f6a55','#d9c2ad','#6f9153'], renkon:['#d8c1a1','#f3ead8','#9c875f'],
-    chicken:['#d6b07d','#f6e0bc','#7f9d63'], pork:['#d68489','#f4c8cf','#8eaf72'], fish:['#7fa9c8','#d7e8f4','#88b59b'], egg:['#f0d662','#fff3b5','#e19b55']
+/* ================= 料理の絵 v1.19.0 =================
+   料理名から明示的に引く。tag・文字列の部分一致では絵を決めない。
+   畑の c-*／冷蔵庫の f-* は一切参照しない。ここにあるのは切り身、薄切り、
+   乱切り、ほぐした肉、加熱した卵など「盛り付けた料理」のための部品。
+   器と一部の部品は共用し、各レシピの切り方・調理・盛り付けを指定する。 */
+const RECIPE_ART = Object.freeze({
+  '夏野菜のラタトゥイユ':{kind:'ragout',pieces:['tomatoCook','eggplant','pepper','tomatoCook','eggplant','onion'],sauce:'#c35838',garnish:'herbs',note:'赤いトマトソースで煮込んだ、角切りの夏野菜'},
+  'トマトときゅうりのサラダ':{kind:'salad',pieces:['tomatoSlice','cucumber','tomatoSlice','cucumber','onion','cucumber'],garnish:'dressing',cold:true,note:'くし切りトマトと薄切りきゅうりの盛り合わせ'},
+  '秋のほくほくスープ':{kind:'soup',pieces:['sweetChunk','pumpkin','sweetChunk','pumpkin','onion'],sauce:'#ebc084',garnish:'herbs',note:'さつまいもの断面とかぼちゃの角切り入りスープ'},
+  '白菜と大根のお鍋':{kind:'pot',pieces:['cabbage','daikon','cabbage','daikon','cabbage','tofu'],sauce:'#eddcb7',note:'とろりとした白菜と輪切り大根を並べた土鍋'},
+  'そら豆とじゃがいものサラダ':{kind:'salad',pieces:['potato','bean','potato','bean','onion','bean'],garnish:'dressing',cold:true,note:'ゆでて切ったじゃがいもと、さやを外したそら豆'},
+  'ポテトサラダ':{kind:'mash',pieces:['cucumber','carrotFine'],cold:true,note:'白いマッシュポテトの山に薄切りきゅうりとにんじん'},
+  'コーンポタージュ':{kind:'potage',sauce:'#f3cd64',garnish:'croutons',note:'なめらかな黄色いスープ、クリームの渦とクルトン'},
+  'じゃがいもとたまねぎのみそ汁':{kind:'miso',pieces:['potato','onion','potato','onion','onion'],sauce:'#bd925e',note:'お椀のみそ汁、じゃがいもと透き通った玉ねぎ'},
+  'そら豆とたまねぎのかき揚げ':{kind:'fritter',note:'さっくりした衣の輪郭に、玉ねぎの細線とそら豆'},
+  'けんちん汁':{kind:'miso',pieces:['carrot','taro','tofu','carrot','taro','tofu'],sauce:'#c9ab7c',garnish:'scallion',note:'根菜の乱切りと崩した豆腐が入った澄んだ汁'},
+  'にんじんとかぼちゃのポタージュ':{kind:'potage',sauce:'#e6a04c',garnish:'cream',note:'にんじん・かぼちゃ色の濃いポタージュと白いクリーム'},
+  'ほうれん草とねぎのみそ汁':{kind:'miso',pieces:['spinach','scallion','spinach','scallion','tofu'],sauce:'#b68c5f',note:'刻んだほうれん草とねぎの小口切りが浮かぶみそ汁'},
+  'ねぎと大根のみぞれ鍋':{kind:'mizore',pieces:['leek','daikon','leek','daikon'],sauce:'#e4dac0',note:'ねぎと大根の上に、白い大根おろしの山'},
+  'いちごジャム':{kind:'jam',cold:true,note:'煮詰めた赤いジャムを小鉢とスプーンに盛る'},
+  'いちごミルク':{kind:'drink',cold:true,note:'潰したいちごの粒が沈む、ピンク色のミルクグラス'},
+  '焼きそら豆':{kind:'beans',note:'さやではなく、焼き目のついた豆を器に盛る'},
+  'じゃがバター':{kind:'butterpotato',note:'割ってほぐした黄色いじゃがいもに溶けかけのバター'},
+  'オニオンスープ':{kind:'soup',pieces:['onion','onion','onion','onion'],sauce:'#bc8742',garnish:'herbs',note:'琥珀色のスープに透き通った細切り玉ねぎ'},
+  'きゅうりの浅漬け':{kind:'pickles',pieces:['cucumber','cucumber','cucumber','cucumber','cucumber'],garnish:'ginger',cold:true,note:'薄く斜め切りにしたきゅうりに細いしょうが'},
+  '冷やしトマト':{kind:'tomatofan',cold:true,note:'ヘタのないトマトの切り口を扇状に並べる'},
+  '焼きなす':{kind:'peeledEggplant',garnish:'bonito',note:'皮をむいて裂いた焼きなすに、かつお節としょうが'},
+  '焼きとうもろこし':{kind:'cornrounds',note:'輪切りのとうもろこし、粒の列にこんがりした焼き目'},
+  'にんじんのグラッセ':{kind:'glaze',pieces:['carrot','carrot','carrot','carrot','carrot'],sauce:'#eabc68',garnish:'herbs',note:'面取りしたにんじんの艶のあるバター煮'},
+  'にんじんのきんぴら':{kind:'julienne',strips:['carrotFine','carrotFine','carrotFine'],garnish:'sesame',note:'細切りにんじんを炒めて、ごまをふる'},
+  '焼きいも':{kind:'splitSweet',note:'割った焼きいもの黄色いほくほくの断面'},
+  '大学いも':{kind:'candied',note:'角切りのさつまいもに琥珀色の蜜と黒ごま'},
+  '里いもの煮っころがし':{kind:'simmer',pieces:['taro','taro','taro','taro','taro'],sauce:'#a87843',garnish:'gloss',note:'皮をむいた里いも、薄いしょうゆ色と照り'},
+  'かぼちゃの煮物':{kind:'simmer',pieces:['pumpkin','pumpkin','pumpkin','pumpkin','pumpkin'],sauce:'#a88042',note:'皮を少し残した、黄色いかぼちゃの煮崩れた角切り'},
+  'かぼちゃプリン':{kind:'pudding',cold:true,note:'かぼちゃ色の台形プリン、カラメルと小さなクリーム'},
+  'ほうれん草のおひたし':{kind:'greens',garnish:'bonito',cold:true,note:'ゆでて短く切りそろえた葉と茎に、かつお節'},
+  'ほうれん草のごま和え':{kind:'greens',garnish:'sesameSauce',cold:true,note:'ほぐしたほうれん草に、薄茶のごま衣とごま粒'},
+  '白菜のスープ':{kind:'soup',pieces:['cabbage','cabbage','cabbage','cabbage','cabbage'],sauce:'#eee0bc',garnish:'pepper',note:'半透明の白菜の短冊が入った淡い色のスープ'},
+  '焼きねぎ':{kind:'leekgrill',note:'ねぎの短い筒切りを並べ、表面に焦げ目'},
+  'ふろふき大根':{kind:'furofuki',note:'厚い輪切り大根の上に、茶色のみそだれと柚子'},
+  'いちごのパンケーキ':{kind:'pancake',cold:true,note:'重ねたパンケーキ、いちごのスライスとソース、クリーム'},
+  'そら豆のオムレツ':{kind:'omelet',filling:'bean',note:'焼けた卵のふくらみ、切り口からそら豆がのぞく'},
+  'そら豆と豚肉の炒めもの':{kind:'stirfry',pieces:['pork','bean','pork','bean','onion','bean'],sauce:'#c9945a',note:'火の通った豚肉の薄切りと、さやなしそら豆'},
+  'じゃがいものそぼろ煮':{kind:'simmer',pieces:['potato','potato','potato','potato','potato'],sauce:'#c79854',garnish:'mince',note:'じゃがいもの乱切りに、細かいそぼろあん'},
+  '鮭とじゃがいものバター焼き':{kind:'salmonPlate',side:'potato',garnish:'butter',note:'焼いた鮭の切り身に、焼きじゃがいもとバター'},
+  '肉じゃが':{kind:'simmer',pieces:['potato','pork','onion','potato','onion','pork','carrot'],sauce:'#bc874b',note:'じゃがいも・薄切り肉・玉ねぎを甘辛い煮汁で煮る'},
+  'チキンカレー':{kind:'curry',note:'白いごはんと茶色のルー、鶏肉・じゃがいもの角切り'},
+  '豚肉のしょうが焼き':{kind:'gingerpork',note:'焼けた豚の薄切りを重ね、しょうがだれと千切りキャベツ'},
+  'たまねぎのかきたまスープ':{kind:'eggSoup',pieces:['onion','onion','onion'],sauce:'#ebd8a5',note:'透明な玉ねぎと、ふわりと流した黄色い卵'},
+  '鮭の南蛮漬け':{kind:'nanban',fish:'salmon',cold:true,note:'揚げた鮭の角切りに、細切り玉ねぎとにんじんの甘酢'},
+  'バンバンジー':{kind:'bangbang',cold:true,note:'きゅうりの細切りに、ほぐした白い鶏肉とごまだれ'},
+  '豚しゃぶサラダ':{kind:'shabuSalad',cold:true,note:'きゅうりの上に、ゆでた薄切り豚肉をふんわり盛る'},
+  'あじときゅうりの酢のもの':{kind:'vinegarfish',cold:true,note:'あじの小さな切り身と薄切りきゅうりを小鉢に'},
+  '鶏肉のトマト煮':{kind:'ragout',pieces:['chicken','tomatoCook','chicken','onion','tomatoCook','chicken'],sauce:'#bf5136',garnish:'herbs',note:'焼いた鶏肉の一口大のかたまりに赤いトマトソース'},
+  'トマトとたまごの炒めもの':{kind:'scramble',pieces:['tomatoCook','egg','tomatoCook','egg','egg'],sauce:'#e89554',note:'くずれたトマトと、ふわふわの大きな炒り卵'},
+  'アクアパッツァ':{kind:'acqua',note:'白身魚の加熱した切り身、刻んだトマトと貝のスープ'},
+  'なすのミートグラタン':{kind:'gratin',filling:'eggplant',sauce:'#b9563d',garnish:'mince',note:'耐熱皿の焦げたチーズ、下からなすとミートソース'},
+  'なすと豚肉のみそ炒め':{kind:'stirfry',pieces:['eggplant','pork','eggplant','onion','pork','eggplant'],sauce:'#94643f',garnish:'sesame',note:'なすの乱切りと薄切り豚肉に、濃いみそだれ'},
+  'なすと鶏肉の揚げびたし':{kind:'agedashi',pieces:['eggplant','chicken','eggplant','chicken','eggplant'],sauce:'#bd945b',garnish:'ginger',cold:true,note:'揚げたなすと鶏肉を、だしに浸した小鉢'},
+  'コーンのかきたまスープ':{kind:'eggSoup',pieces:['kernels','kernels','kernels'],sauce:'#f0d787',note:'コーンの粒と、細く流した黄色い卵のスープ'},
+  '鶏肉とコーンのバター炒め':{kind:'stirfry',pieces:['chicken','kernels','chicken','kernels','kernels','chicken'],sauce:'#dbb563',garnish:'butter',note:'香ばしい鶏肉とばらしたコーンに小さなバター'},
+  'にんじんしりしり':{kind:'julienne',strips:['carrotFine','carrotFine','eggStrip'],garnish:'egg',note:'にんじんの細切りに黄色い炒り卵をからめる'},
+  'にんじんの肉巻き':{kind:'meatroll',note:'焼いた肉巻きの輪切り、中心ににんじんの断面'},
+  '鮭とにんじんのホイル焼き':{kind:'foil',note:'開いた銀色のホイルに焼いた鮭とにんじんの細切り'},
+  '豚汁':{kind:'miso',pieces:['pork','carrot','taro','pork','tofu','taro'],sauce:'#b48654',garnish:'scallion',note:'みそ色のお椀に豚肉と根菜の一口大の具'},
+  '筑前煮':{kind:'simmer',pieces:['chicken','carrot','taro','bamboo','chicken','lotus'],sauce:'#a77743',garnish:'snowpea',note:'焼いた鶏肉と根菜の乱切り、甘辛い煮汁'},
+  'さつまいもと鶏肉の甘辛炒め':{kind:'stirfry',pieces:['sweetChunk','chicken','sweetChunk','chicken','sweetChunk'],sauce:'#af713d',garnish:'sesame',note:'さつまいもの角切りと鶏肉を照りのある甘辛だれで'},
+  'スイートポテト':{kind:'sweetPotato',cold:true,note:'舟形に成形して表面をこんがり焼いたスイートポテト'},
+  '芋煮':{kind:'pot',pieces:['taro','pork','taro','leek','tofu','pork'],sauce:'#b98e59',note:'里いもと薄切り肉、ねぎを入れたしょうゆ色の鍋'},
+  '里いもと鶏肉の煮もの':{kind:'simmer',pieces:['taro','chicken','taro','chicken','taro'],sauce:'#c09254',garnish:'snowpea',note:'白い里いもの煮物と、鶏肉のかたまりの対比'},
+  'かぼちゃのそぼろ煮':{kind:'simmer',pieces:['pumpkin','pumpkin','pumpkin','pumpkin'],sauce:'#b78640',garnish:'mince',note:'黄色いかぼちゃの角切りに、そぼろあんをかける'},
+  'かぼちゃとチキンのグラタン':{kind:'gratin',filling:'pumpkin',sauce:'#f2dfac',garnish:'chicken',note:'焼き色のチーズから、かぼちゃと鶏肉がのぞく耐熱皿'},
+  'ほうれん草のオムレツ':{kind:'omelet',filling:'spinach',note:'黄色いオムレツの切り口に、刻んだほうれん草'},
+  '常夜鍋':{kind:'pot',pieces:['spinach','pork','spinach','pork','spinach','tofu'],sauce:'#e0d5b5',note:'刻んだほうれん草とゆで豚肉を並べた澄んだ鍋'},
+  '鮭とほうれん草のクリーム煮':{kind:'cream',pieces:['salmonBite','spinach','salmonBite','spinach','salmonBite'],sauce:'#f5e6c6',note:'白いクリームソースに、鮭の切り身とほうれん草'},
+  '白菜と豚肉のミルフィーユ鍋':{kind:'millefeuille',note:'白菜と加熱した薄切り肉を、交互の層で詰めた土鍋'},
+  '白菜と鶏肉のクリーム煮':{kind:'cream',pieces:['cabbage','chicken','cabbage','chicken','cabbage'],sauce:'#f3e7ce',note:'白いクリームの中に、白菜の短冊と鶏肉の角切り'},
+  'ねぎま':{kind:'skewers',note:'鶏肉の焼き目とねぎの筒切りが交互に並ぶ2本の串'},
+  'ねぎ入りたまご焼き':{kind:'tamagoyaki',note:'巻き目のある厚焼き卵を切り分け、ねぎの緑を点在'},
+  'お魚のねぎみそ焼き':{kind:'fishMiso',note:'魚の焼いた切り身に、茶色いねぎみそを塗る'},
+  'ぶり大根':{kind:'simmer',pieces:['daikon','yellowtail','daikon','yellowtail','daikon'],sauce:'#a97243',garnish:'ginger',note:'しょうゆ色の大根と、皮付きぶりの角切り'},
+  'とり大根':{kind:'simmer',pieces:['daikon','chicken','daikon','chicken','daikon'],sauce:'#c49d64',garnish:'scallion',note:'大根の半月切りと、焼いた鶏肉の煮もの'},
+  '豚バラ大根':{kind:'simmer',pieces:['daikon','belly','daikon','belly','daikon','belly'],sauce:'#ae7644',garnish:'scallion',note:'煮た大根と、赤身・脂の層のある豚バラ肉'},
+  'たけのこごはん':{kind:'rice',filling:'bamboo',note:'茶碗に炊き込みごはん、薄く切ったたけのこと木の芽'},
+  '若竹煮':{kind:'simmer',pieces:['bamboo','wakame','bamboo','wakame','bamboo'],sauce:'#ccae78',garnish:'snowpea',note:'たけのこの薄切りと、煮たわかめの深い緑'},
+  'たけのこと豚肉の炒めもの':{kind:'stirfry',pieces:['bamboo','pork','bamboo','pork','onion'],sauce:'#bb8c50',garnish:'scallion',note:'たけのこの薄切りと、香ばしい豚肉の薄切り'},
+  'ピーマンのおかか炒め':{kind:'julienne',strips:['pepperStrip','pepperStrip','pepperStrip'],garnish:'bonito',note:'短く細切りにしたピーマン、かつお節をふる'},
+  'ピーマンの肉詰め':{kind:'stuffedPepper',note:'半分に切ったピーマンの中に、焼けたひき肉の詰めもの'},
+  'チンジャオロース':{kind:'julienne',strips:['pepperStrip','porkStrip','bambooStrip'],garnish:'gloss',note:'緑のピーマン・細い肉・たけのこを同じ細切りで炒める'},
+  'ピーマンとたまごの炒めもの':{kind:'scramble',pieces:['pepper','egg','pepper','egg','egg'],sauce:'#ebca66',note:'ピーマンの短い切り身と、ふんわりした炒り卵'},
+  'なすとピーマンのみそ炒め':{kind:'stirfry',pieces:['eggplant','pepper','eggplant','pepper','onion'],sauce:'#8f623e',garnish:'sesame',note:'紫のなすの乱切りと緑のピーマンに濃いみそだれ'},
+  'きのこごはん':{kind:'rice',filling:'mushroom',note:'茶色い炊き込みごはんに、薄切りきのこと刻み海苔'},
+  '焼きしいたけ':{kind:'mushroomgrill',note:'軸を外し、切って焼き目を付けたしいたけの断面'},
+  '茶わん蒸し':{kind:'custard',note:'縦長の蒸し碗、なめらかな卵の表面に薄切りしいたけと三つ葉'},
+  'れんこんのきんぴら':{kind:'lotuskinpira',note:'薄い半月切りれんこんを炒め、しょうゆの照りとごま'},
+  'れんこんチップス':{kind:'lotuschips',cold:true,note:'薄いれんこんの輪切りをこんがり揚げたチップス'},
+  'れんこんのはさみ焼き':{kind:'lotussandwich',note:'れんこんの輪切りで肉を挟んだ、厚みのある焼きもの'},
+  'れんこんと鶏肉の甘酢炒め':{kind:'stirfry',pieces:['lotus','chicken','lotus','chicken','lotus'],sauce:'#bc713f',garnish:'sesame',note:'揚げ焼きしたれんこんと鶏肉に、艶のある甘酢あん'}
+});
+const MealDrawing=(()=>{
+  const path=(d,f,s,w)=>'<path d="'+d+'" fill="'+(f||'none')+'"'+(s?' stroke="'+s+'" stroke-width="'+(w||1)+'"':'')+'/>';
+  const ell=(x,y,rx,ry,f,s,w)=>'<ellipse cx="'+x+'" cy="'+y+'" rx="'+rx+'" ry="'+ry+'" fill="'+f+'"'+(s?' stroke="'+s+'" stroke-width="'+(w||1)+'"':'')+'/>';
+  const rect=(x,y,w,h,r,f,s)=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="'+r+'" fill="'+f+'"'+(s?' stroke="'+s+'" stroke-width="1"':'')+'/>';
+  const group=(s,x,y,k=1,a=0)=>'<g transform="translate('+x+' '+y+') rotate('+a+') scale('+k+')">'+s+'</g>';
+  const line=(d,c,w)=>path(d,'none',c,w);
+  const specks=(color,n=18)=>Array.from({length:n},(_,i)=>ell(47+(i*19%57),33+(i*13%21),.9,.55,color)).join('');
+  /* 大皿の素材アイコンとは別の、調理後の切り口。 */
+  const part={
+    potato:path('M-8 -4 L-1 -8 L9 -3 L6 6 L-5 7 L-9 2Z','#edce86','#cfab67')+path('M-8 -4 L-1 -8 L9 -3 L0 0Z','#f7e2a5')+line('M0 0 L-2 6','#d7b976',.8),
+    sweetChunk:path('M-9 -4 L0 -8 L9 -2 L6 7 L-6 6Z','#95516c')+path('M-8 -4 L0 -7 L8 -2 L0 4 L-7 3Z','#efc463')+line('M-5 -2 L1 -4','#f9df8c',1.5),
+    pumpkin:path('M-9 -5 L7 -8 L10 5 L-5 8Z','#537042')+path('M-8 -5 L6 -7 L8 2 L-5 5Z','#efaa39')+path('M-8 -5 L-2 -7 L1 1 L-5 5Z','#f8c357')+line('M-3 -4 L0 0','#ffe09a',1.3),
+    taro:path('M-7 -5 L-1 -8 L6 -5 L9 2 L4 7 L-4 7 L-9 1Z','#e0c5a0','#bb996b')+path('M-7 -5 L-1 -8 L6 -5 L3 2 L-4 3Z','#f4e4c3')+line('M-4 -3 L-3 1','#fff5de',1.8),
+    carrot:path('M-9 -3 Q-10 -6 -5 -7 L8 -4 Q11 -2 8 2 L-3 7 Q-6 8 -8 4Z','#e98a38','#cc7030')+path('M-8 -4 L-5 -6 L8 -3 L5 0 L-6 1Z','#f5ad56')+line('M-4 -4 L3 -3','#ffd38a',1.3),
+    daikon:ell(0,2,10,6,'#d4c092','#b39a66')+path('M-10 -3 L-10 2 A10 6 0 0 0 10 2 L10 -3Z','#e6d6aa')+ell(0,-3,10,6,'#f4e8c2','#c9b685')+line('M-5 -5 Q0 -7 5 -4','#fff6df',1.5),
+    tofu:path('M-9 -4 L2 -8 L10 -3 L8 6 L-4 8 L-9 3Z','#eee3c8','#cbbf9f')+path('M-9 -4 L2 -8 L10 -3 L-2 1Z','#fff9e9')+line('M-2 1 L-4 8','#d8ccb3',.8),
+    chicken:path('M-10 -2 Q-9 -7 -3 -7 Q2 -10 7 -5 Q12 -4 10 2 Q8 9 1 7 Q-7 9 -10 3Z','#c89558','#a9723f')+path('M-8 -3 Q-5 -7 0 -4 Q4 -7 8 -1 L5 4 L-4 4Z','#edc691')+line('M-5 -2 L-2 -3 M3 2 L6 0','#ae7440',1.7),
+    pork:path('M-12 -3 Q-7 -9 -1 -4 Q4 -8 12 -4 L8 5 Q2 8 -3 3 Q-8 8 -12 3Z','#bd987b','#9e765a')+line('M-9 -2 Q-4 -5 -1 0 T8 0','#edcfac',3)+line('M-7 4 Q-3 2 0 4','#a67650',1),
+    belly:rect(-10,-5,20,12,2,'#ae754b')+path('M-10 -3 L10 -3 L10 0 L-10 0Z M-10 3 L10 3 L10 5 L-10 5Z','#f0d8af')+line('M-7 -4 L5 -4','#d9ad73',1.4),
+    yellowtail:path('M-10 -4 L5 -7 L11 1 L5 6 L-9 5Z','#b18460','#82664d')+path('M-10 -4 L5 -7 L11 1 L9 3 L4 -4 L-9 -1Z','#706c5e')+line('M-5 1 L2 -2 M-2 4 L5 1','#e8d0a9',1.6),
+    salmonBite:path('M-10 -5 L5 -7 L11 2 L-5 7 L-11 2Z','#e09a6b','#c47950')+path('M-11 2 L-5 7 L11 2 L10 5 L-5 9 L-11 5Z','#8c8170')+line('M-6 -3 L2 4 M-1 -5 L7 1','#ffe0b6',1.6),
+    whitefish:path('M-10 -4 Q0 -8 11 -4 L8 5 Q0 8 -10 4Z','#f0dfbc','#b7a888')+line('M-6 -2 L1 4 M0 -3 L6 3','#cbbb98',1.2),
+    tomatoSlice:path('M-11 -6 Q2 -10 12 5 Q-1 12 -11 -6Z','#da5845','#b64235')+path('M-7 -5 Q2 -5 8 4 Q0 8 -7 -5Z','#ed9772')+path('M-7 -5 L0 1 L8 4 L-1 3Z','#ffe1aa')+ell(-2,-2,.9,1.5,'#f9cf83')+ell(3,3,1,1.6,'#f9cf83'),
+    tomatoCook:path('M-9 -5 L1 -7 L10 -1 L6 6 L-4 7 L-10 1Z','#d75b38','#b3472e')+line('M-5 -3 Q0 -5 5 -1','#ef9670',2),
+    cucumber:ell(0,0,10,6,'#578b4c','#407643')+ell(0,0,8,4.5,'#cad591')+ell(-2,-1,1.4,.6,'#f4edb6')+ell(2,1,1.4,.6,'#f4edb6'),
+    bean:path('M-8 -2 Q-8 -7 -1 -7 Q7 -7 9 -1 Q9 5 3 6 Q-1 7 -1 2 Q-6 5 -8 -2Z','#91b962','#668a49')+line('M-5 -2 Q-4 -5 1 -4','#d1df92',2),
+    onion:line('M-10 -4 Q-6 9 8 2 M-7 -5 Q-4 3 4 2','#e6d7b1',4)+line('M-10 -5 Q-4 5 6 1','#fff0ca',1.8),
+    eggplant:path('M-10 -5 L6 -7 L10 4 L-2 8 L-10 3Z','#765060','#573d4b')+path('M-8 -4 L5 -5 L7 2 L-2 6 L-7 2Z','#c6bc81')+line('M-5 -3 L-1 4 M1 -4 L4 1','#9d935e',1.1),
+    pepper:path('M-10 -4 Q-5 -10 1 -5 L10 -1 L7 6 L1 2 Q-3 -3 -8 3Z','#638f45','#427637')+line('M-7 -3 Q-3 -6 0 -3 L6 0','#b2c577',2),
+    cabbage:path('M-11 -5 L-3 -7 L3 -4 L9 -6 L11 4 L4 7 L-2 5 L-8 7Z','#c6d09a','#a8b57b')+path('M-9 -4 L-3 -5 L-2 5 L-8 6Z M0 -3 L5 -2 L8 5 L3 5Z','#f6edca')+line('M-8 -2 L-5 3 M2 -1 L4 3','#dddcb2',1),
+    spinach:path('M-10 -3 L-6 -7 L-2 -4 L4 -7 L9 -3 L6 1 L10 5 L2 7 L-3 4 L-9 6 L-7 1Z','#4d7641','#355d35')+line('M-7 -3 L-1 4 M-2 -4 L3 4 M4 -4 L6 1','#9fac69',1.7),
+    wakame:path('M-10 -5 L-3 -7 L-1 -3 L7 -7 L10 -3 L5 1 L10 4 L3 6 L-1 3 L-7 7 L-10 2 L-5 -1Z','#3f5c40')+line('M-6 -4 L2 2 L6 1','#71855a',1),
+    leek:rect(-12,-4,24,8,3,'#e6dcb1','#b3ae79')+path('M3 -4 H9 Q13 -4 13 0 Q13 4 9 4 H3Z','#96ad64')+ell(-10,0,2,4,'#faf0cd','#c9c499')+line('M-6 -3 L-7 3 M0 -3 L-1 3','#b58846',2),
+    bamboo:path('M-11 4 L-2 -8 L10 3 L8 7 L-7 7Z','#e0c291','#bd9a68')+path('M-9 3 L-2 -6 L7 3Z','#f6dfaf')+line('M-6 0 L4 0 M-8 3 L7 3','#c9af7d',1),
+    mushroom:path('M-11 1 Q-8 -10 5 -7 Q13 -4 11 2 Q1 5 -11 1Z','#8f6948','#704c36')+path('M-9 1 Q1 -2 10 2 L6 5 Q-1 2 -6 5Z','#e4c7a0')+line('M-6 -2 Q0 -6 6 -2','#b89165',1.6),
+    egg:path('M-12 -2 Q-14 -8 -6 -6 Q-3 -10 2 -5 Q9 -8 12 -2 Q14 4 7 5 Q4 10 -1 5 Q-8 8 -10 2Z','#f4cf54','#d5a638')+line('M-8 -3 Q-4 -5 -2 -1 M2 1 Q7 -3 9 1','#fff0a1',2),
+    scallion:ell(-5,1,3,2,'#b3c378','#658a4e')+ell(3,-2,3,2,'#e2e5b4','#7c9c58')+ell(7,3,2.7,1.9,'#cdd798','#6e954c'),
+    kernels:Array.from({length:7},(_,i)=>ell(-7+(i*7%16),-4+(i*5%10),2.4,1.8,i%2?'#e6b13d':'#f6d263','#d0a139',.5)).join(''),
+    carrotFine:'', eggStrip:'', pepperStrip:'', porkStrip:'', bambooStrip:'', cucumberStrip:''
   };
-  const t=M[key]||['#d8c6a6','#f0e6d1','#8fb26f'];
-  return {main:t[0], sub:t[1], leaf:t[2]};
+  [['carrotFine','#e68c3f','#fac17a'],['eggStrip','#e8bd45','#fae792'],['pepperStrip','#507d3b','#96b565'],['porkStrip','#ae7950','#dfb68b'],['bambooStrip','#d5b77e','#f1dca9'],['cucumberStrip','#5f9355','#c4d7a1']].forEach(([k,c,l])=>{
+    part[k]=path('M-13 -2 Q-3 -4 13 -2 L11 2 Q-2 0 -12 2Z',c)+line('M-11 -2 L10 -1',l,1);
+  });
+  const lotus=(thick=false,chip=false)=>{
+    let s=thick?ell(0,3,11,7,'#bd874c')+rect(-11,-1,22,5,2,'#bd874c'):'';
+    s+=ell(0,0,11,7,chip?'#e3bb69':'#edd5a2',chip?'#b98b43':'#c0a06b');
+    [[0,0],[-6,-2],[0,-4],[6,-2],[-5,3],[4,3]].forEach(([x,y])=>s+=ell(x,y,1.6,1.25,thick?'#a36c44':chip?'#b59150':'#af986a'));
+    return s;
+  };
+  part.lotus=lotus();
+  const piece=(key,x,y,k=1,a=0)=>group(part[key]||part.potato,x,y,k,a);
+  const tray=(color='#fdf8ee')=>ell(75,63,62,15,'#b58b63')+ell(75,55,64,22,color,'#d0b995',1.3)+ell(75,54,53,16,'#efe3cb')+line('M22 53 Q32 36 57 36','#ffffff',2);
+  const bowl=(sauce='#ecd9b2',dark=false,pot=false)=>{
+    let s=ell(75,70,37,6,'#b98d65');
+    if(pot) s+=path('M27 41 Q14 32 14 41 Q13 48 29 48 M123 41 Q136 32 136 41 Q137 48 121 48','none','#88745e',5);
+    s+=path('M26 40 Q30 68 60 70 H90 Q120 68 124 40Z',dark?'#84604c':pot?'#bda487':'#f5eee0',dark?'#5e4438':pot?'#90785f':'#bbae94',1.3);
+    s+=ell(75,40,49,17,dark?'#a47d5b':pot?'#e3cfac':'#fffaf0',pot?'#927a59':'#bbad91',1.3)+ell(75,40,43,13.8,sauce);
+    s+=line('M39 56 Q46 63 58 64',dark?'#b38f6c':'#fffaf0',2);
+    return s;
+  };
+  const garnish=(kind)=>{
+    if(kind==='sesame') return specks('#efdbad',23);
+    if(kind==='sesameSauce') return path('M47 41 Q59 35 76 40 Q87 37 101 43 L96 46 Q85 44 77 46 Q61 41 49 46Z','#c5a26b')+specks('#f0dcb1',25);
+    if(kind==='bonito') return Array.from({length:9},(_,i)=>group(path('M-4 -2 L3 -3 L1 1 L4 2 L-3 3Z',i%2?'#b88b5c':'#dfbd89'),53+i*5.8,34+i%3*4,.8,((i%4)-1)*18)).join('');
+    if(kind==='mince') return Array.from({length:38},(_,i)=>ell(45+(i*17%62),31+(i*11%26),1.5,1.05,i%3?'#95643f':'#bc8e5a')).join('');
+    if(kind==='ginger') return group(line('M-8 0 L6 -4 M-6 3 L8 -1 M-3 -4 L4 4','#edce85',1.5),78,31);
+    if(kind==='scallion') return piece('scallion',58,34,.7)+piece('scallion',91,40,.65);
+    if(kind==='herbs' || kind==='snowpea') return group(path('M-9 2 Q-3 -5 7 -4 Q6 2 -9 2Z','#58813f')+line('M-5 1 L3 -2','#abbd68',1),76,28)+ (kind==='herbs'?specks('#718346',13):'');
+    if(kind==='pepper') return specks('#816b50',11);
+    if(kind==='butter') return group(path('M-7 -3 L3 -6 L9 -2 L7 3 L-4 5 L-7 1Z','#efc552','#c9a63f')+path('M-7 -3 L3 -6 L9 -2 L-2 1Z','#fff0a0'),80,34);
+    if(kind==='dressing') return line('M46 41 Q61 48 72 40 M77 47 Q88 50 99 43','#fdf1ca',1.7);
+    if(kind==='gloss') return line('M49 35 L59 33 M75 49 L87 47 M97 38 L102 36','#fbe0a0',1.7);
+    if(kind==='egg') return piece('egg',54,44,.55)+piece('egg',92,39,.55);
+    return '';
+  };
+  const scattered=(parts,compact=false)=>{
+    const xy=compact?[[49,37],[67,31],[89,32],[103,42],[82,45],[60,46],[75,38],[96,48]]:[[49,43],[66,34],[88,36],[103,46],[82,53],[61,53],[77,44],[97,55]];
+    return parts.map((k,i)=>{const q=xy[i%xy.length];return piece(k,q[0],q[1],compact?.88:1,[-16,13,-8,17,8,-13,22][i%7]);}).join('');
+  };
+  const strips=(keys,qty=22)=>Array.from({length:qty},(_,i)=>piece(keys[i%keys.length],51+(i*17%48),34+(i*11%23),.7+(i%3)*.08,[-22,9,31,-12,18][i%5])).join('');
+  const fillet=(salmon=true)=>path('M-26 -6 Q-10 -16 26 -8 L21 9 Q0 18 -27 8Z',salmon?'#df9667':'#e7d1a4',salmon?'#b97349':'#b2996b',1.4)+path('M-27 5 Q0 12 23 5 L21 10 Q0 18 -27 8Z',salmon?'#807460':'#99896b')+line('M-18 -5 L-7 7 M-7 -8 L4 8 M5 -9 L15 4',salmon?'#ffdab1':'#f9edd3',2)+line('M-17 -2 L-13 3 M-4 -4 L-1 1 M11 -5 L15 -1','#9f6c3e',1.6);
+  const cream=()=>path('M65 31 Q59 26 67 22 Q62 16 74 14 Q82 13 83 20 Q90 24 84 28 Q85 33 75 33Z','#fff7e7','#ddceb0',.8)+line('M67 23 Q74 26 81 22','#ebdfc8',1);
+  const steam=()=>'<g opacity=".6">'+line('M37 22 Q33 17 37 12 M112 22 Q116 17 112 12','#ac9f88',1.5)+'</g>';
+  function draw(d,quiet=false){
+    let s='', k=d.kind;
+    const a=d.pieces||[], sauce=d.sauce||'#c19962';
+    if(['soup','miso','pot','mizore','eggSoup','potage','cream'].includes(k)){
+      s=bowl(sauce,k==='miso',k==='pot'||k==='mizore');
+      if(k==='potage'){
+        s+=line('M59 40 C55 30 95 30 96 40 C95 49 64 51 63 42 C63 36 84 34 86 41','#fff0ca',2.7);
+        if(d.garnish==='croutons') s+=group(rect(-3,-3,6,6,1,'#bf8b47'),56,35,1,20)+group(rect(-3,-3,6,6,1,'#d6a45f'),99,41,1,-10);
+      }else if(k==='eggSoup'){
+        s+=line('M42 39 Q51 30 65 37 T94 36 M47 45 Q64 40 74 45 T105 41 M69 29 Q79 37 91 32','#fff0a2',3)+line('M56 38 Q62 34 70 40 M76 45 Q86 48 93 42','#e9c15e',1.4)+scattered(a,true);
+      }else s+=scattered(a,true);
+      if(k==='mizore') s+=path('M53 42 Q49 33 61 31 Q64 22 76 27 Q84 21 91 31 Q103 31 99 40 Q92 46 53 42Z','#f7f0d6','#d2c9a7',.6)+specks('#e3ddbe',13);
+      if(!['potage','eggSoup'].includes(k)) s+=garnish(d.garnish);
+    }else if(['simmer','ragout','agedashi'].includes(k)){
+      s=tray(k==='agedashi'?'#d6e1cc':'#faf2de')+ell(75,51,47,13,sauce)+scattered(a)+garnish(d.garnish);
+      if(k==='ragout') s+=line('M43 52 Q60 59 68 53 M87 54 Q94 58 103 52','#e17c4a',2);
+    }else if(['salad','pickles','stirfry','scramble','glaze'].includes(k)){
+      s=tray(k==='pickles'?'#d9e4cf':'#fff9ef');
+      if(['stirfry','scramble','glaze'].includes(k)) s+=ell(75,54,43,11,sauce);
+      s+=scattered(a)+garnish(d.garnish);
+    }else if(k==='mash'){
+      s=tray()+path('M38 51 Q32 40 46 37 Q47 26 60 31 Q68 20 80 30 Q92 24 99 35 Q115 35 112 48 Q116 59 97 60 H49 Q35 59 38 51Z','#f3e4b9','#d7c59e',1.2)+line('M43 46 Q48 38 57 42 M70 36 Q78 32 86 38 M65 55 Q77 49 88 55','#fff8df',2.5);
+      [[49,42],[95,44],[76,50]].forEach(([x,y],i)=>s+=piece('cucumber',x,y,.55,i*17));
+      s+=piece('carrotFine',62,35,.35,12)+piece('carrotFine',95,53,.3,29);
+    }else if(k==='julienne'){
+      s=tray()+ell(75,54,43,11,'#d5af70')+strips(d.strips)+garnish(d.garnish);
+    }else if(k==='tomatofan'){
+      s=tray('#e3ece0'); [[45,44,-27],[62,38,-12],[79,39,8],[96,43,26],[81,53,42]].forEach(([x,y,a])=>s+=piece('tomatoSlice',x,y,1.2,a));
+      s+=garnish('herbs');
+    }else if(k==='greens'){
+      s=tray('#eee7d2')+ell(75,55,38,9,'#b7a678');
+      s+=strips(['pepperStrip'],12); [[50,45],[66,38],[84,39],[100,46],[64,53],[85,53]].forEach(([x,y],i)=>s+=piece('spinach',x,y,.88,i%2*35));
+      s+=garnish(d.garnish);
+    }else if(k==='beans'){
+      s=tray('#e9edda'); [[47,43],[64,36],[83,34],[103,43],[91,53],[69,53],[51,54]].forEach(([x,y],i)=>{s+=piece('bean',x,y,.95,i*33)+group(line('M-4 -2 L-1 0 M3 -3 L4 -1','#92672f',1.6),x,y);});
+    }else if(k==='butterpotato'){
+      s=tray()+ell(75,55,36,8,'#d4b16d')+path('M43 53 Q40 30 60 30 Q72 23 78 35 Q97 23 108 43 Q110 59 92 61 L58 61Z','#d0a471','#b08a59',1.2)+path('M46 49 L54 36 L65 31 L73 41 L85 32 L100 36 L103 52 L88 57 L78 51 L65 58Z','#f4d58c','#dab96e')+line('M54 43 L65 46 L60 52 M84 43 L94 48 M74 44 L78 53','#ffe7ae',2.5)+garnish('butter')+garnish('herbs');
+    }else if(k==='peeledEggplant'){
+      s=tray('#e1e8d5'); [[59,40,-10],[81,49,-5],[66,55,12]].forEach(([x,y,a])=>{
+        s+=group(path('M-26 -3 Q-13 -10 7 -6 L25 -1 L19 5 L5 4 L-8 7 L-25 3Z','#c5b97d','#988a54')+line('M-22 -2 Q-8 -6 14 -1 M-19 2 Q-3 0 18 2','#ece0a4',2)+line('M-13 -2 L-8 -3 M6 2 L11 2','#967549',1.5),x,y,1,a);
+      }); s+=garnish('bonito')+garnish('ginger');
+    }else if(k==='cornrounds'){
+      s=tray(); [[49,44,-16],[76,37,8],[99,50,19]].forEach(([x,y,a])=>{
+        let c=rect(-12,-8,24,19,4,'#e1ac3d','#c28b2a')+ell(0,-8,12,5,'#f1d479','#d0ac4a')+ell(0,-8,4,2,'#f8e9b5');
+        for(let i=0;i<5;i++) for(let j=0;j<3;j++) c+=ell(-9+i*4.5,-3+j*4.2,1.8,1.8,(i+j)%4===0?'#a97530':'#f7cb4c');
+        s+=group(c,x,y,1,a);
+      });
+    }else if(k==='leekgrill'){
+      s=tray('#e9e7d6'); [[51,41,-18],[80,36,10],[98,50,-12],[64,53,12]].forEach(([x,y,a])=>s+=piece('leek',x,y,1.28,a)); s+=garnish('bonito');
+    }else if(k==='furofuki'){
+      s=tray('#dde7d3')+group(part.daikon,74,44,2.3)+path('M58 35 Q73 29 91 36 Q97 44 79 46 Q57 47 57 40Z','#9c6836')+group(line('M-8 -1 L4 -4 M-5 2 L8 0','#f4cf65',1.7),75,36);
+    }else if(k==='splitSweet'){
+      s=tray(); [[58,45,-13],[91,44,17]].forEach(([x,y,a])=>s+=group(path('M-17 -8 Q1 -21 19 -9 L17 13 Q-1 23 -17 9Z','#854e65','#6a3f50')+path('M-15 -8 Q1 -18 16 -8 L12 12 Q0 19 -14 7Z','#efc767')+line('M-9 -7 Q-2 -10 5 -6 M-7 3 L4 0 M1 10 L8 6','#ffe59b',2),x,y,1,a));
+    }else if(k==='candied'){
+      s=tray()+ell(75,55,40,10,'#d29948')+scattered(['sweetChunk','sweetChunk','sweetChunk','sweetChunk','sweetChunk','sweetChunk'])+specks('#51432c',20)+garnish('gloss');
+    }else if(k==='sweetPotato'){
+      s=tray(); [[55,48,-12],[89,44,13]].forEach(([x,y,a])=>s+=group(path('M-20 4 L-15 12 Q0 16 18 8 L20 2Z','#e7d9be','#baa989')+path('M-21 3 Q-12 -15 2 -13 Q15 -13 22 2 Q19 13 0 12 Q-20 12 -21 3Z','#e6b959','#b78d3b')+line('M-11 -2 Q-1 -9 10 -2 M-9 3 Q0 -1 11 3','#ca923a',2.7)+line('M-14 2 L-10 7 M-5 5 L-3 10 M4 6 L6 10 M12 3 L14 8','#f4d582',1.4),x,y,1,a));
+    }else if(k==='pudding'){
+      s=tray()+ell(75,58,29,9,'#a36b3e')+path('M56 31 L49 56 C48 71 102 71 101 56 L94 31Z','#e6b958','#c99842',1.2)+path('M56 31 L54 39 Q61 43 65 40 L65 46 Q69 49 72 44 L73 39 Q86 43 96 37 L94 31Z','#98552e')+ell(75,31,19,6,'#7a4428')+line('M56 45 L54 55','#ffe19a',3)+group(cream(),0,-5,.99);
+    }else if(k==='pancake'){
+      s=tray(); [53,46,39].forEach((y,i)=>{s+=path('M43 '+(y-2)+' V'+(y+4)+' C44 '+(y+14)+' 106 '+(y+14)+' 107 '+(y+4)+' V'+(y-2)+'Z',i%2?'#c68d43':'#d5a355')+ell(75,y-2,32,10,'#efc779','#c8964a');});
+      s+=path('M50 36 Q62 30 75 34 Q87 37 101 32 L103 39 Q91 42 85 39 L83 49 Q80 52 77 47 V40 Q61 36 50 41Z','#bb4f46')+group(cream(),-7,1,.9)+piece('tomatoSlice',55,33,.65,-5).replaceAll('#da5845','#d95767').replaceAll('#b64235','#bb3f52')+piece('tomatoSlice',92,32,.7,25).replaceAll('#da5845','#d95767').replaceAll('#b64235','#bb3f52');
+    }else if(k==='jam'){
+      s=tray()+path('M48 43 Q51 66 77 65 Q101 64 104 43Z','#faf0dc','#bcab8b',1.2)+ell(76,42,29,11,'#b94355','#96404b')+path('M53 42 Q57 29 70 33 Q82 26 94 38 L97 43 Q73 54 53 42Z','#d75e70')+line('M62 39 Q70 34 79 38','#f4a4a9',2.7)+group(line('M0 0 L28 -14','#b09a7b',3)+ell(-3,1,8,4,'#e7d6b5','#b09a7b'),104,51,1,4);
+    }else if(k==='drink'){
+      s=ell(75,71,25,5,'#d7b58c')+path('M52 16 H98 L94 65 Q74 75 56 65Z','#f2ece2','#bdc2b7',1.5)+path('M56 30 H94 L91 63 Q75 70 59 63Z','#efbac0')+path('M60 54 Q72 48 90 54 L91 63 Q74 71 59 63Z','#d9798d')+ell(75,30,19,5,'#fae6df')+line('M63 23 L65 57','#ffffff',2.8)+line('M83 39 L90 10 L98 7','#c3686c',2.8);
+      for(let i=0;i<8;i++) s+=ell(64+i*3.1,58+(i%3)*2,.9,.6,'#b85b73');
+    }else if(k==='omelet'){
+      s=tray()+path('M38 50 Q48 23 80 28 Q101 29 114 49 Q98 64 54 61Z','#ebbc46','#c79a36',1.3)+path('M78 37 L87 58 L112 49 Q99 42 90 39Z','#ffed9b')+line('M47 44 Q59 30 75 34','#ffe4a0',3)+line('M52 49 Q58 47 66 49 T80 47','#ce7247',2.5);
+      s+=piece(d.filling,93,47,.67,15)+piece(d.filling,104,50,.5,-20);
+    }else if(k==='tamagoyaki'){
+      s=tray(); [[51,49,-8],[74,42,0],[97,48,8]].forEach(([x,y,a])=>{
+        let p=rect(-12,-10,24,22,4,'#edc34b','#c59837')+path('M-12 -5 H12 V3 H-12Z','#d8a23c')+ell(0,3,11,8,'#ffe695','#ccab52')+line('M-7 3 Q-5 -2 1 -2 Q7 -1 6 4 Q3 9 -2 5 Q-5 2 1 2','#d6b44c',1.4)+ell(-4,1,1.2,.9,'#578347')+ell(5,6,1.3,.8,'#578347'); s+=group(p,x,y,1,a);
+      });
+    }else if(k==='curry'){
+      s=tray()+path('M35 56 Q29 45 40 39 Q41 26 56 29 Q68 21 77 31 Q90 28 91 43 L77 61 Q42 67 35 56Z','#faf0d5','#dfd2ae')+path('M73 36 Q96 29 114 42 Q126 57 109 63 Q92 68 68 62 Q78 55 72 49 Q65 42 73 36Z','#966030','#784c28')+piece('chicken',88,45,.65)+piece('potato',107,50,.62,20)+piece('carrot',84,58,.4)+group(path('M-5 0 Q-8 -4 -2 -5 L5 -2 L2 3Z','#ae4840'),45,60);
+      for(let i=0;i<15;i++) s+=ell(41+i*7%30,36+i*7%21,1.5,.65,'#ded3b6');
+    }else if(k==='salmonPlate'||k==='fishMiso'||k==='foil'){
+      s=tray(k==='fishMiso'?'#e8e8d5':'#faf3e5');
+      if(k==='foil') s+=path('M27 47 L31 32 L44 34 L48 27 L99 30 L106 27 L115 34 L124 34 L127 53 L115 63 L42 64 L24 55Z','#c5cbcb','#9fa7a5',1)+path('M32 34 L42 43 L38 56 L26 53 M111 32 L105 43 L114 56 L124 50','#edf1ed')+line('M44 35 L51 42 M110 36 L116 45 M40 58 L52 54','#929f9e',1);
+      if(k==='salmonPlate') s+=piece('potato',45,51,.8,-10)+piece('potato',109,53,.75,12);
+      if(k==='foil') s+=group(strips(['carrotFine'],10),7,2,.95);
+      s+=group(fillet(k!=='fishMiso'),76,43,1.15,-8);
+      if(k==='fishMiso') s+=path('M50 34 Q68 27 102 31 L100 38 Q79 36 53 44Z','#a07639')+garnish('scallion')+piece('leek',110,58,.7);
+      else s+=garnish('butter')+garnish('herbs');
+    }else if(k==='meatroll'){
+      s=tray('#eee9d8'); [[49,47,-12],[75,40,2],[98,51,10]].forEach(([x,y,a])=>{
+        s+=group(path('M-11 -7 L5 -13 Q15 -10 15 1 L3 11Z','#b47745','#8d5a36')+ell(-2,2,11,9,'#cba072','#91623e')+ell(-2,2,8.4,6.6,'#edca96')+rect(-7,-2,4,8,1,'#df8139')+rect(-2,-3,4,9,1,'#ef9b44')+rect(3,-1,3,6,1,'#df8139')+line('M5 -7 L10 -3','#8b562d',2),x,y,1,a);
+      }); s+=garnish('gloss');
+    }else if(k==='gingerpork'){
+      s=tray()+group(strips(['cabbage','bambooStrip'],14),21,3,.87)+ell(69,52,37,10,'#b28047');
+      [[49,42,-12],[69,47,2],[88,52,14]].forEach(([x,y,a])=>s+=piece('pork',x,y,1.45,a)); s+=garnish('ginger')+garnish('gloss');
+    }else if(k==='bangbang'||k==='shabuSalad'||k==='vinegarfish'){
+      s=tray('#e5ecdc')+group(strips(['cucumberStrip'],17),-8,3,1.12);
+      if(k==='bangbang'){
+        for(let i=0;i<9;i++) s+=group(path('M-15 -3 Q-3 -8 15 -2 L13 2 Q-2 0 -13 3Z','#f0e1c6','#d1bfa2',.6)+line('M-12 -2 Q0 -3 12 -1','#fff7e3',1),56+i*5,38+i%3*5,1,[-18,10,27][i%3]);
+        s+=garnish('sesameSauce');
+      }
+      if(k==='shabuSalad') s+=scattered(['pork','pork','pork','pork','cucumber']).replaceAll('#bd987b','#d9baa0')+garnish('dressing');
+      if(k==='vinegarfish') s+=scattered(['whitefish','cucumber','whitefish','cucumber','whitefish'])+piece('wakame',53,53,.6);
+    }else if(k==='nanban'){
+      s=tray('#dae5cf')+ell(75,54,45,11,'#caa471')+scattered(['salmonBite','salmonBite','salmonBite','salmonBite'])+strips(['bambooStrip','carrotFine'],14)+garnish('scallion');
+    }else if(k==='acqua'){
+      s=bowl('#d7c89e')+group(fillet(false),76,39,1,-6)+piece('tomatoCook',43,37,.65)+piece('tomatoCook',107,45,.65);
+      [[50,48,-15],[102,30,20]].forEach(([x,y,a])=>s+=group(path('M-8 3 Q-11 -8 -2 -8 Q3 -5 2 3 Q8 -9 13 -4 Q17 4 5 7Z','#8d8b72','#686c5b')+ell(3,3,4,2,'#e4c899'),x,y,.75,a)); s+=garnish('herbs');
+    }else if(k==='gratin'){
+      s=ell(75,66,57,10,'#ba946e')+path('M24 38 H126 L117 65 Q74 76 33 65Z','#c27d57','#955e41',1.3)+path('M23 36 Q75 19 127 36 L119 58 Q75 73 31 57Z','#f8ead0','#c7ad88',1.5)+path('M31 38 Q75 25 119 38 L113 54 Q74 65 37 54Z',sauce);
+      s+=scattered([d.filling,d.filling,d.garnish==='chicken'?'chicken':d.filling,d.filling],true);
+      s+=path('M33 37 Q51 29 65 36 Q79 28 93 35 Q112 27 119 39 L115 49 Q102 56 89 49 Q76 59 61 50 Q49 58 37 49Z','#efd284')+line('M43 39 Q54 35 61 41 M70 39 L80 36 M91 42 L105 38 M62 47 L69 50','#bf8b3e',3)+garnish('herbs');
+      s+=piece(d.filling,42,54,.65)+piece(d.garnish==='chicken'?'chicken':'eggplant',105,53,.65);
+    }else if(k==='millefeuille'){
+      s=bowl('#dfcfaa',false,true);
+      for(let j=0;j<3;j++){
+        let stack='';
+        for(let i=0;i<6;i++) stack+=path('M'+(-25+i*8)+' -9 l5 -1 l3 19 l-6 1Z',i%2?'#c1a184':'#ede5bc')+line('M'+(-24+i*8)+' -7 l2 15',i%2?'#ead2b1':'#a4b47a',1.4);
+        s+=group(stack,75,29+j*10,1,j===1?0:j===0?-5:5);
+      }s+=garnish('scallion');
+    }else if(k==='skewers'){
+      s=tray('#e6e3cc');
+      [[70,42,-13],[77,54,-13]].forEach(([x,y,a])=>{
+        let sk=line('M-37 0 H40','#ad7b46',2);
+        [-23,-8,7,22].forEach((z,i)=>sk+=piece(i%2?'leek':'chicken',z,0,.65)); s+=group(sk,x,y,1,a);
+      });
+    }else if(k==='fritter'){
+      s=tray('#e7e6cd'); [[55,46,-8],[92,44,14]].forEach(([x,y,a])=>{
+        let f=path('M-22 4 L-20 -3 L-14 -5 L-13 -13 L-5 -11 L0 -17 L7 -12 L15 -13 L17 -5 L24 -1 L20 6 L22 12 L13 15 L8 19 L0 15 L-7 19 L-14 13 L-20 13Z','#d9a747','#b98835',1.2)+line('M-13 3 Q-9 -9 1 -5 T13 3 M-14 9 Q-3 2 11 10 M-4 -9 L7 12','#f6d989',2.5)+piece('bean',-7,0,.5)+piece('bean',10,4,.45,20);s+=group(f,x,y,.93,a);
+      });
+    }else if(k==='stuffedPepper'){
+      s=tray(); [[50,47,-16],[76,40,2],[101,49,17]].forEach(([x,y,a])=>{
+        s+=group(path('M-13 -8 Q-3 -18 10 -9 Q17 4 6 14 Q-10 14 -13 -8Z','#5d883e','#3d6432',1.3)+path('M-9 -7 Q-1 -13 8 -6 Q11 4 4 10 Q-8 9 -9 -7Z','#a87a4a','#855a34')+line('M-6 -3 L5 2 M-4 2 L2 6','#d8ae77',1.6),x,y,1,a);
+      });s+=path('M41 47 Q48 43 56 49 M68 37 Q74 34 84 40 M92 49 Q99 45 105 51','none','#a14f34',2.2);
+    }else if(k==='rice'){
+      s=bowl('#eddbaf'); s+=path('M32 39 Q32 29 42 28 Q44 20 56 23 Q67 13 78 22 Q91 15 101 27 Q117 25 118 39 Q94 55 53 50Z','#e5cf9e','#c9b487',.8);
+      for(let i=0;i<42;i++) s+=ell(39+i*17%73,26+i*11%21,1.6,.65,i%2?'#fff0c9':'#c8b181');
+      s+=scattered(Array(5).fill(d.filling),true);
+      s+=d.filling==='bamboo'?garnish('herbs'):group(line('M-16 -3 L14 3 M-13 3 L9 -3 M-4 -6 L2 6','#414d34',1.5),76,30);
+    }else if(k==='mushroomgrill'){
+      s=tray('#e7e5d1'); [[46,42,-10],[66,35,3],[85,41,16],[103,48,26],[64,54,-5]].forEach(([x,y,a])=>s+=piece('mushroom',x,y,1.2,a)+group(line('M-5 -3 L0 0 M2 -4 L6 -1','#694531',1.5),x,y)); s+=garnish('butter');
+    }else if(k==='custard'){
+      s=ell(75,72,32,6,'#c5ab88')+path('M50 29 L53 65 Q75 77 97 65 L100 29Z','#f2e9d6','#baab8b',1.4)+ell(75,29,25,9,'#fff7e5','#c9b894')+ell(75,29,21,6.5,'#f1d98f')+line('M58 46 V63 M92 45 V63','#9cab8c',2)+piece('mushroom',74,27,.6,-15)+group(path('M-7 1 Q-7 -5 0 -3 Q3 -9 7 -3 Q13 -2 9 3 L0 4Z','#6c914e'),82,31,.8);
+      s+=group(ell(0,0,16,5,'#ecdfc4','#beaa87')+ell(0,-4,3,2,'#8f9e7a'),109,55,1,24);
+    }else if(['lotuskinpira','lotuschips','lotussandwich'].includes(k)){
+      s=tray(k==='lotuskinpira'?'#e7e9d3':'#faf3df');
+      const coords=k==='lotussandwich'?[[47,43,-10],[74,36,0],[100,45,12],[72,56,6]]:[[46,43,-18],[66,36,-5],[86,39,12],[105,50,28],[61,54,8],[85,56,-12]];
+      coords.forEach(([x,y,a],i)=>{
+        let p=lotus(k==='lotussandwich',k==='lotuschips');
+        if(k==='lotuskinpira') p=path('M-11 0 A11 7 0 0 1 11 0 V2 H-11Z','#d1ac68','#b38c4f')+ell(-6,-2,1.7,1.2,'#ab8648')+ell(0,-4,1.7,1.3,'#ab8648')+ell(6,-2,1.7,1.2,'#ab8648')+line('M-9 0 H9','#f2d898',1);
+        if(k==='lotussandwich') p=group(lotus(true),0,6)+rect(-11,-1,22,7,2,'#98663f')+lotus(true);
+        s+=group(p,x,y,k==='lotussandwich'?1.05:1.02,a);
+      }); s+=garnish(k==='lotuskinpira'?'sesame':'gloss');
+    }else{
+      /* 未登録の新メニュー用。素材アイコンに戻さず、調理済み小皿にする。既存92品はここへ来ない。 */
+      s=tray()+scattered(['potato','chicken','carrot'])+garnish('herbs');
+    }
+    return '<g class="cookedMeal" stroke-linecap="round" stroke-linejoin="round">'+s+(!quiet&&!d.cold?steam():'')+'</g>';
+  }
+  return {draw};
+})();
+function mealArt(r,quiet){
+  return MealDrawing.draw(RECIPE_ART[r.name]||{kind:'fallback'},!!quiet);
 }
-function dishKind(r){
-  const n=r.name;
-  if(/ジャム/.test(n)) return 'jam';
-  if(/ミルク/.test(n)) return 'drink';
-  if(/パンケーキ/.test(n)) return 'pancake';
-  if(/プリン/.test(n)) return 'pudding';
-  if(/茶わん蒸し/.test(n)) return 'cup';
-  if(/焼きいも/.test(n)) return 'roastSweetPotato';
-  if(/大学いも/.test(n)) return 'candiedSweetPotato';
-  if(/スイートポテト/.test(n)) return 'sweetPotato';
-  if(/ごはん/.test(n)) return 'rice';
-  if(/カレー/.test(n)) return 'curry';
-  if(/オムレツ|たまご焼き/.test(n)) return 'omelet';
-  if(/ミルフィーユ鍋/.test(n)) return 'millefeuille';
-  if(/鍋/.test(n)) return 'nabe';
-  if(/ポタージュ/.test(n)) return 'potage';
-  if(/みそ汁|豚汁|けんちん汁|芋煮|スープ|煮|汁|アクアパッツァ/.test(n)) return 'soup';
-  if(/グラタン/.test(n)) return 'gratin';
-  if(/かき揚げ/.test(n)) return 'fritter';
-  if(/ねぎま/.test(n)) return 'skewer';
-  if(/肉詰め|はさみ焼き/.test(n)) return 'stuffed';
-  if(/チップス/.test(n)) return 'chips';
-  if(/浅漬け|おひたし|ごま和え|酢のもの|サラダ|バンバンジー|南蛮漬け/.test(n) || r.tag==='fresh') return 'salad';
-  if(/きんぴら/.test(n)) return 'kinpira';
-  if(/炒|しりしり/.test(n)) return 'stirfry';
-  if(/焼|ホイル|しょうが焼き/.test(n) || r.tag==='grill') return 'grill';
-  if(r.tag==='sweet') return 'sweet';
-  return 'simmer';
+function mealPlate(r,quiet){
+  return '<svg class="plate mealPlate" viewBox="0 0 150 84" data-meal="'+esc(r.name)+'" aria-hidden="true">'+mealArt(r,quiet)+'</svg>';
 }
-function dishPalette(r){
-  const a=ingredientTone(r.need[0]), b=ingredientTone(r.need[1]||r.fridge||r.need[0]);
-  return {main:a.main, sub:b.main, light:a.sub, leaf:(a.leaf||b.leaf), accent:ingredientTone(r.fridge||r.need[0]).sub};
-}
-function mealArt(r){
-  const k=dishKind(r), p=dishPalette(r), n=r.name;
-  const hot=!/^(salad|drink|jam|pudding|pancake|sweet|roastSweetPotato|candiedSweetPotato|sweetPotato|chips)$/.test(k);
-  const steam=hot?'<g fill="none" stroke="#cfc6b9" stroke-width="2.4" stroke-linecap="round"><path d="M38 22 q-5 -4.5 0 -9"/><path d="M75 18 q0 -5 0 -10"/><path d="M112 22 q5 -4.5 0 -9"/></g>':'';
-  const greens='<g fill="'+p.leaf+'"><circle cx="49" cy="48" r="3.6"/><circle cx="101" cy="39" r="3.2"/></g>';
-  let art='';
-  if(k==='salad') art='<g><ellipse cx="75" cy="47" rx="35" ry="13" fill="#fbf8ef"/><path d="M45 48 C54 29 97 30 105 47 C95 59 55 59 45 48Z" fill="'+p.leaf+'"/><g fill="'+p.main+'"><circle cx="58" cy="41" r="5.6"/><circle cx="74" cy="37" r="5.4"/><circle cx="91" cy="42" r="5.2"/></g><g fill="'+p.sub+'"><ellipse cx="65" cy="49" rx="8" ry="3.8"/><ellipse cx="85" cy="48" rx="8" ry="3.8"/></g><path d="M57 36 C66 39 82 39 92 36" fill="none" stroke="#fffaf4" stroke-width="2" stroke-linecap="round"/></g>';
-  else if(k==='kinpira') art='<g><ellipse cx="75" cy="47" rx="35" ry="13" fill="#f6ebdc"/><g stroke-width="3" stroke-linecap="round"><path d="M51 42 L94 48" stroke="'+p.main+'"/><path d="M53 47 L96 41" stroke="'+p.sub+'"/><path d="M56 44 L89 51" stroke="'+p.leaf+'"/></g><g fill="#f2e5c3"><circle cx="61" cy="38" r="1.5"/><circle cx="87" cy="50" r="1.5"/><circle cx="75" cy="45" r="1.5"/></g></g>';
-  else if(k==='grill') art='<g><ellipse cx="75" cy="46" rx="36" ry="12" fill="#f4ead7"/><g fill="'+p.main+'" stroke="#8a5a38" stroke-width="1.2"><ellipse cx="58" cy="45" rx="14" ry="8" transform="rotate(-12 58 45)"/><ellipse cx="76" cy="42" rx="14" ry="8" transform="rotate(8 76 42)"/><ellipse cx="92" cy="46" rx="14" ry="8" transform="rotate(-8 92 46)"/></g><g stroke="#6f4b34" stroke-width="1.5" stroke-linecap="round"><path d="M49 42 L64 47"/><path d="M67 39 L82 44"/><path d="M83 43 L99 48"/></g>'+greens+'</g>';
-  else if(k==='stirfry') art='<g><ellipse cx="75" cy="46" rx="37" ry="13" fill="#f6ece0"/><g stroke-linecap="round"><path d="M50 47 C60 34 90 34 101 46" stroke="'+p.main+'" stroke-width="8" fill="none"/><path d="M52 44 L97 49" stroke="'+p.sub+'" stroke-width="5"/><path d="M56 50 L92 39" stroke="'+p.leaf+'" stroke-width="4"/></g><path d="M60 36 L89 52" stroke="#f4e5bc" stroke-width="2" stroke-dasharray="1 5"/></g>';
-  else if(k==='stuffed') art='<g><ellipse cx="75" cy="47" rx="37" ry="13" fill="#f5eadb"/><g><path d="M48 48 C49 35 63 33 69 43 C71 54 55 58 48 48Z" fill="'+p.leaf+'"/><path d="M72 44 C73 33 87 32 93 41 C95 53 79 57 72 44Z" fill="'+p.leaf+'"/><path d="M92 48 C93 35 107 34 112 43 C114 54 99 58 92 48Z" fill="'+p.leaf+'"/><ellipse cx="59" cy="46" rx="6.5" ry="4.7" fill="'+p.main+'"/><ellipse cx="83" cy="43" rx="6.5" ry="4.7" fill="'+p.main+'"/><ellipse cx="103" cy="46" rx="6.5" ry="4.7" fill="'+p.main+'"/></g></g>';
-  else if(k==='fritter') art='<g><ellipse cx="75" cy="47" rx="37" ry="13" fill="#f5ebdc"/><g fill="#e2b356" stroke="#c38b34" stroke-width="1.1"><path d="M55 49 C45 40 54 31 66 35 C76 27 88 31 86 43 C95 49 89 56 77 54 C70 59 60 56 55 49Z"/><path d="M84 45 C76 37 82 30 92 33 C100 30 108 34 107 42 C114 47 108 54 98 53 C91 56 86 53 84 45Z"/></g><g fill="'+p.leaf+'"><circle cx="67" cy="39" r="2.3"/><circle cx="95" cy="42" r="2.3"/></g></g>';
-  else if(k==='sweet') art='<g><ellipse cx="75" cy="47" rx="31" ry="11" fill="#f6e9cf"/><ellipse cx="75" cy="43" rx="24" ry="9" fill="'+p.sub+'"/><ellipse cx="75" cy="40" rx="18" ry="7" fill="'+p.main+'"/><path d="M62 34 C69 28 81 28 88 34" fill="none" stroke="#fff7ef" stroke-width="3" stroke-linecap="round"/><circle cx="88" cy="31" r="3.4" fill="#e0524f"/></g>';
-  else if(k==='pudding') art='<g><ellipse cx="75" cy="48" rx="31" ry="10" fill="#f5ecd8"/><path d="M54 47 C55 34 95 34 96 47 C93 56 57 56 54 47Z" fill="#f2d169" stroke="#d4a45b" stroke-width="1.3"/><path d="M57 41 C65 36 85 36 93 41" fill="#8f5228"/><ellipse cx="75" cy="34" rx="12" ry="4" fill="#fff7ef"/><circle cx="91" cy="31" r="3.2" fill="#dc5a59"/></g>';
-  else if(k==='pancake') art='<g><ellipse cx="75" cy="48" rx="33" ry="10" fill="#f3ead8"/><ellipse cx="75" cy="45" rx="23" ry="7.5" fill="#e8b96a"/><ellipse cx="75" cy="40" rx="21" ry="6.8" fill="#efc57a"/><ellipse cx="75" cy="35" rx="19" ry="6" fill="#f4cf86"/><path d="M64 34 C70 31 81 31 87 34" fill="none" stroke="#fff9f1" stroke-width="3" stroke-linecap="round"/><path d="M61 40 C68 44 83 44 89 40" fill="none" stroke="#9d6534" stroke-width="2.5" stroke-linecap="round"/></g>';
-  else if(k==='jam') art='<g><ellipse cx="75" cy="49" rx="29" ry="9" fill="#f6ecde"/><rect x="60" y="27" width="30" height="21" rx="6" fill="#fbfbfb" stroke="#d6d0c4" stroke-width="1.4"/><rect x="58" y="23" width="34" height="7" rx="3" fill="#dcb88e"/><rect x="63" y="31" width="24" height="13" rx="5" fill="#d85d72"/><path d="M68 38 C73 34 79 34 83 38" fill="none" stroke="#f9ced6" stroke-width="2" stroke-linecap="round"/></g>';
-  else if(k==='drink') art='<g><ellipse cx="75" cy="51" rx="26" ry="7.5" fill="#f6ebdd"/><path d="M62 25 H88 L84 49 H66 Z" fill="#f8f5f3" stroke="#d2cbc0" stroke-width="1.3"/><path d="M66 30 H84 L81 46 H69 Z" fill="#f0b2c1"/><path d="M82 24 L88 14" stroke="#da6f85" stroke-width="2.5" stroke-linecap="round"/><circle cx="78" cy="34" r="2.1" fill="#fff8f1"/></g>';
-  else if(k==='roastSweetPotato') art='<g><ellipse cx="75" cy="48" rx="34" ry="10" fill="#f2e6d8"/><path d="M48 46 C53 36 67 34 77 40 C68 49 57 54 48 46Z" fill="#7d4971"/><path d="M73 42 C83 35 98 36 103 47 C94 54 82 51 73 42Z" fill="#8d547f"/><path d="M56 43 C62 39 67 39 71 42 C66 47 61 49 56 43Z" fill="#f1d068"/><path d="M81 41 C87 38 92 39 97 45 C90 48 85 48 81 41Z" fill="#f3d56f"/></g>';
-  else if(k==='candiedSweetPotato') art='<g><ellipse cx="75" cy="48" rx="33" ry="10" fill="#f6ecde"/><g fill="#b26a6f" stroke="#8b4b53" stroke-width="1"><rect x="54" y="39" width="12" height="9" rx="2.2" transform="rotate(-12 54 39)"/><rect x="69" y="35" width="12" height="9" rx="2.2" transform="rotate(8 69 35)"/><rect x="84" y="40" width="12" height="9" rx="2.2" transform="rotate(-8 84 40)"/></g><g fill="#f4e5b3"><circle cx="59" cy="43" r="1.3"/><circle cx="73" cy="39" r="1.3"/><circle cx="89" cy="44" r="1.3"/></g></g>';
-  else if(k==='sweetPotato') art='<g><ellipse cx="75" cy="49" rx="31" ry="9" fill="#f6ecde"/><path d="M53 47 C57 34 93 34 97 47 C92 53 58 53 53 47Z" fill="#e8bc67" stroke="#c48d40" stroke-width="1.2"/><path d="M58 44 C67 37 82 37 91 44" fill="none" stroke="#f6e9ae" stroke-width="2.2" stroke-linecap="round"/></g>';
-  else if(k==='rice') art='<g><ellipse cx="75" cy="47" rx="37" ry="13" fill="#f2e8d5"/><path d="M48 48 C49 34 101 34 102 48 C95 57 55 57 48 48Z" fill="#fffdf7" stroke="#ddd7cc" stroke-width="1.2"/><g fill="'+p.main+'"><ellipse cx="65" cy="42" rx="6.5" ry="4.3"/><ellipse cx="79" cy="45" rx="6.5" ry="4.3"/><ellipse cx="90" cy="40" rx="5.6" ry="3.8"/></g><path d="M58 39 C70 47 83 47 95 39" fill="none" stroke="'+p.leaf+'" stroke-width="2.2" stroke-linecap="round"/></g>';
-  else if(k==='omelet') art=/たまご焼き/.test(n)
-    ? '<g><ellipse cx="75" cy="48" rx="34" ry="10" fill="#f4ead6"/><rect x="52" y="36" width="46" height="15" rx="7" fill="#f2d45b" stroke="#d0a24a" stroke-width="1.2"/><path d="M57 43 H93" stroke="#e8c24a" stroke-width="2"/><g fill="'+p.leaf+'"><circle cx="53" cy="49" r="3.2"/><circle cx="97" cy="40" r="3.2"/></g></g>'
-    : '<g><ellipse cx="75" cy="47" rx="34" ry="12" fill="#f4ead6"/><path d="M48 47 C54 34 96 34 102 47 C95 56 55 56 48 47Z" fill="#f1d45e" stroke="#d0a24a" stroke-width="1.4"/><path d="M59 45 C67 42 84 42 92 45" fill="none" stroke="#de6b5d" stroke-width="2.4" stroke-linecap="round"/><g fill="'+p.leaf+'"><circle cx="52" cy="48" r="4"/><circle cx="97" cy="41" r="4"/></g></g>';
-  else if(k==='curry') art='<g><ellipse cx="75" cy="47" rx="37" ry="13" fill="#f4ead6"/><path d="M48 48 C50 36 77 35 82 47 C82 56 53 57 48 48Z" fill="#fffdf7" stroke="#ddd7cc" stroke-width="1.2"/><path d="M72 39 C89 34 103 39 103 46 C103 55 83 57 72 53 C69 49 68 43 72 39Z" fill="#9e6532"/><g fill="'+p.main+'"><circle cx="82" cy="44" r="4"/><circle cx="94" cy="47" r="4"/></g></g>';
-  else if(k==='nabe') art='<g><ellipse cx="75" cy="47" rx="37" ry="13" fill="#d6dde4"/><ellipse cx="75" cy="45" rx="33" ry="11" fill="'+p.light+'"/><g fill="'+p.main+'"><circle cx="61" cy="43" r="5"/><circle cx="75" cy="40" r="5"/><circle cx="89" cy="44" r="5"/></g><g fill="'+p.leaf+'"><ellipse cx="56" cy="49" rx="8" ry="4"/><ellipse cx="94" cy="49" rx="8" ry="4"/></g><path d="M44 42 H38 M112 42 H106" stroke="#8799a6" stroke-width="3" stroke-linecap="round"/></g>';
-  else if(k==='millefeuille') art='<g><ellipse cx="75" cy="47" rx="37" ry="13" fill="#d6dde4"/><ellipse cx="75" cy="45" rx="33" ry="11" fill="#f5f0df"/><path d="M49 40 H101 M49 44 H101 M49 48 H101" stroke="#e8dcbf" stroke-width="3.2" stroke-linecap="round"/><path d="M52 37 H98 M52 47 H98" stroke="#d9bfbe" stroke-width="2.2" stroke-linecap="round"/><g fill="'+p.leaf+'"><circle cx="57" cy="51" r="3"/><circle cx="93" cy="38" r="3"/></g><path d="M44 42 H38 M112 42 H106" stroke="#8799a6" stroke-width="3" stroke-linecap="round"/></g>';
-  else if(k==='potage') art='<g><ellipse cx="75" cy="49" rx="34" ry="11" fill="#ece6dd"/><path d="M46 48 C47 36 103 36 104 48 C99 56 51 56 46 48Z" fill="'+p.main+'"/><path d="M60 44 C68 39 82 39 90 44" fill="none" stroke="#fff3d3" stroke-width="2.8" stroke-linecap="round"/><circle cx="92" cy="44" r="2.2" fill="#f8f0d7"/></g>';
-  else if(k==='soup') art=/ふろふき大根|大根/.test(n)
-    ? '<g><ellipse cx="75" cy="49" rx="34" ry="11" fill="#efe7db"/><path d="M46 48 C47 36 103 36 104 48 C99 56 51 56 46 48Z" fill="#d5ae6f"/><g fill="#f5f1e8" stroke="#d6cab7" stroke-width="1"><circle cx="61" cy="45" r="6.2"/><circle cx="76" cy="42" r="6.2"/><circle cx="90" cy="47" r="6.2"/></g><path d="M75 37 C77 34 82 34 84 37" fill="none" stroke="'+p.leaf+'" stroke-width="2" stroke-linecap="round"/></g>'
-    : /アクアパッツァ/.test(n)
-    ? '<g><ellipse cx="75" cy="49" rx="35" ry="11" fill="#efe8dd"/><path d="M46 48 C47 36 103 36 104 48 C99 56 51 56 46 48Z" fill="#dce8ef"/><path d="M58 45 C62 38 79 37 88 43 C79 49 64 50 58 45Z" fill="#9db9cf" stroke="#7692a8" stroke-width="1.2"/><circle cx="84" cy="43" r="1.4" fill="#fff"/><circle cx="84" cy="43" r=".7" fill="#4b5e6c"/><g fill="'+p.main+'"><circle cx="57" cy="48" r="3.2"/><circle cx="94" cy="47" r="3.2"/></g></g>'
-    : '<g><ellipse cx="75" cy="49" rx="34" ry="11" fill="#efe7db"/><path d="M46 48 C47 36 103 36 104 48 C99 56 51 56 46 48Z" fill="'+(/みそ汁|豚汁/.test(n)?'#b68657':p.light)+'"/><g fill="'+p.main+'"><circle cx="60" cy="45" r="5.2"/><circle cx="75" cy="41" r="5.2"/><circle cx="89" cy="46" r="5.2"/></g><g fill="'+p.leaf+'"><ellipse cx="56" cy="49" rx="7" ry="3.3"/><ellipse cx="93" cy="49" rx="7" ry="3.3"/></g></g>';
-  else if(k==='gratin') art='<g><path d="M46 38 H104 L98 53 H52 Z" fill="#d7c5b5" stroke="#baa28b" stroke-width="1.4"/><path d="M50 40 H100 L95 50 H55 Z" fill="#f1cd73"/><path d="M55 42 C64 37 86 37 95 43" fill="none" stroke="#d49742" stroke-width="2.5" stroke-linecap="round"/><g fill="'+p.leaf+'"><circle cx="61" cy="47" r="3.1"/><circle cx="89" cy="45" r="3.1"/></g></g>';
-  else if(k==='skewer') art='<g><ellipse cx="75" cy="48" rx="34" ry="10" fill="#f4ead6"/><path d="M52 41 L96 48" stroke="#b98a5a" stroke-width="3.2" stroke-linecap="round"/><g><circle cx="59" cy="42" r="6" fill="'+p.main+'"/><circle cx="73" cy="44" r="6" fill="'+p.leaf+'"/><circle cx="86" cy="46" r="6" fill="'+p.main+'"/></g></g>';
-  else if(k==='chips') art='<g><ellipse cx="75" cy="48" rx="34" ry="10" fill="#f5ebdb"/><g fill="#e9cf8f" stroke="#d7b56f" stroke-width="1"><ellipse cx="60" cy="45" rx="6" ry="4.5" transform="rotate(-18 60 45)"/><ellipse cx="74" cy="40" rx="6" ry="4.5"/><ellipse cx="88" cy="45" rx="6" ry="4.5" transform="rotate(18 88 45)"/></g><g fill="#cdb38e"><circle cx="60" cy="45" r=".8"/><circle cx="74" cy="40" r=".8"/><circle cx="88" cy="45" r=".8"/></g></g>';
-  else if(k==='cup') art='<g><ellipse cx="75" cy="49" rx="29" ry="9" fill="#f3eadc"/><path d="M58 31 C58 26 63 23 69 23 H81 C87 23 92 26 92 31 V44 C92 49 87 53 81 53 H69 C63 53 58 49 58 44 Z" fill="#f6f0e4" stroke="#d3c7b6" stroke-width="1.4"/><ellipse cx="75" cy="31" rx="16" ry="5" fill="#e7d2a4"/><g fill="'+p.main+'"><circle cx="69" cy="29" r="3"/><circle cx="79" cy="31" r="3"/></g><path d="M65 27 C71 34 78 34 85 27" fill="none" stroke="'+p.leaf+'" stroke-width="2" stroke-linecap="round"/></g>';
-  else art='<g><ellipse cx="75" cy="48" rx="37" ry="13" fill="#f4ead6"/><path d="M46 47 C50 31 100 31 104 47 C98 57 52 57 46 47Z" fill="'+p.light+'"/><g fill="'+p.main+'"><circle cx="58" cy="43" r="6"/><circle cx="74" cy="39" r="6"/><circle cx="90" cy="44" r="6"/></g><g fill="'+p.sub+'"><ellipse cx="67" cy="49" rx="8" ry="4"/><ellipse cx="86" cy="49" rx="8" ry="4"/></g></g>';
-  return steam+art;
-}
-function mealPlate(r){
-  return '<svg class="plate" viewBox="0 0 150 84" aria-hidden="true"><ellipse cx="75" cy="64" rx="62" ry="15" fill="#e9dfcd"/><ellipse cx="75" cy="60" rx="62" ry="15" fill="#fffdf8" stroke="#d9d0c3" stroke-width="2"/><ellipse cx="75" cy="60" rx="44" ry="9" fill="#f4ecdd"/>'+mealArt(r)+'</svg>';
-}
-/* 取り皿の上の料理（3人ぶん）。ids＝料理のしるし（null で からにする） */
-const PORTION_AT=[[209,334],[315,335],[262,328]];   /* 取り皿の場所（#g-setting の3枚と同じ。えり・しゃだはる・ほまれ の前） */
+/* 取り皿は小さな「調理済みの料理」。元の野菜・肉・魚アイコンは使わない。 */
+const PORTION_AT=[[209,334],[315,335],[262,328]];
 function setPortions(ids){
   const g=$('#hPortions'); if(!g) return;
   if(!ids || !ids.length){ g.innerHTML=''; return; }
@@ -3332,36 +3598,32 @@ function setPortions(ids){
     ? '<use href="#'+ids[0]+'" x="'+(x-10.5)+'" y="'+(y-11.5)+'" width="11.5" height="11.5"/><use href="#'+ids[1]+'" x="'+(x-.5)+'" y="'+(y-10.5)+'" width="11.5" height="11.5"/>'
     : '<use href="#'+ids[0]+'" x="'+(x-6.5)+'" y="'+(y-12)+'" width="13" height="13"/>').join('');
 }
-function portionFood(kind,p,x,y){
-  if(kind==='salad') return '<g><ellipse cx="'+x+'" cy="'+y+'" rx="6.8" ry="2.8" fill="'+p.leaf+'"/><circle cx="'+(x-2.5)+'" cy="'+(y-1.6)+'" r="2.2" fill="'+p.main+'"/><circle cx="'+(x+2.2)+'" cy="'+(y-1.2)+'" r="2.1" fill="'+p.sub+'"/></g>';
-  if(kind==='drink') return '<g><rect x="'+(x-3.6)+'" y="'+(y-6.8)+'" width="7.2" height="8.5" rx="1.6" fill="#f1bfd0" stroke="#d9d0c3" stroke-width=".7"/><path d="M'+(x+1.6)+' '+(y-6.8)+' L'+(x+4.9)+' '+(y-10.5)+'" stroke="#d36e84" stroke-width="1"/></g>';
-  if(kind==='jam') return '<g><rect x="'+(x-4)+'" y="'+(y-5.5)+'" width="8" height="7.2" rx="1.7" fill="#d95c73" stroke="#d9d0c3" stroke-width=".7"/><rect x="'+(x-4.6)+'" y="'+(y-7.3)+'" width="9.2" height="2" rx="1" fill="#dcb88e"/></g>';
-  if(kind==='pancake' || kind==='pudding' || kind==='sweet' || kind==='roastSweetPotato' || kind==='candiedSweetPotato' || kind==='sweetPotato') return '<g><ellipse cx="'+x+'" cy="'+y+'" rx="7" ry="3" fill="#f4ead6"/><ellipse cx="'+x+'" cy="'+(y-1.4)+'" rx="4.8" ry="2.5" fill="'+p.main+'"/></g>';
-  if(kind==='nabe' || kind==='millefeuille' || kind==='soup' || kind==='potage' || kind==='curry' || kind==='cup' || kind==='gratin' || kind==='simmer') return '<g><ellipse cx="'+x+'" cy="'+y+'" rx="7" ry="3" fill="'+p.light+'"/><circle cx="'+(x-2)+'" cy="'+(y-1.3)+'" r="2" fill="'+p.main+'"/><circle cx="'+(x+2.3)+'" cy="'+(y-1)+'" r="2" fill="'+p.leaf+'"/></g>';
-  if(kind==='rice' || kind==='omelet') return '<g><ellipse cx="'+x+'" cy="'+y+'" rx="7" ry="3" fill="#f4ead6"/><ellipse cx="'+x+'" cy="'+(y-1.2)+'" rx="5" ry="2.6" fill="'+p.main+'"/></g>';
-  if(kind==='skewer') return '<g><path d="M'+(x-4.7)+' '+(y+1.8)+' L'+(x+4.7)+' '+(y-2)+'" stroke="#b98a5a" stroke-width="1.1"/><circle cx="'+(x-2.5)+'" cy="'+(y+.8)+'" r="1.8" fill="'+p.main+'"/><circle cx="'+x+'" cy="'+y+'" r="1.8" fill="'+p.leaf+'"/><circle cx="'+(x+2.4)+'" cy="'+(y-1)+'" r="1.8" fill="'+p.main+'"/></g>';
-  if(kind==='chips') return '<g><ellipse cx="'+(x-2.1)+'" cy="'+y+'" rx="2.6" ry="1.9" fill="#e9cf8f"/><ellipse cx="'+(x+1.8)+'" cy="'+(y-1.2)+'" rx="2.6" ry="1.9" fill="#edd9a4"/></g>';
-  return '<g><ellipse cx="'+x+'" cy="'+y+'" rx="7" ry="3" fill="#f4ead6"/><ellipse cx="'+(x-2.4)+'" cy="'+(y-1.1)+'" rx="3.8" ry="2.1" fill="'+p.main+'"/><ellipse cx="'+(x+2.4)+'" cy="'+(y-1.2)+'" rx="3.8" ry="2.1" fill="'+p.sub+'"/></g>';
-}
 function setMealPortions(r){
   const g=$('#hPortions'); if(!g) return;
-  if(!r){ g.innerHTML=''; return; }
-  const kind=dishKind(r), p=dishPalette(r);
-  g.innerHTML=PORTION_AT.map(([x,y])=>portionFood(kind,p,x,y)).join('');
+  g.innerHTML=r?PORTION_AT.map(([x,y])=>'<svg x="'+(x-12)+'" y="'+(y-11)+'" width="24" height="13.44" viewBox="0 0 150 84" aria-hidden="true">'+mealArt(r,true)+'</svg>').join(''):'';
 }
+
 function updatePhoto(pop){
   const ph=S.photo, ids=ph ? (Array.isArray(ph.icons)&&ph.icons.length ? ph.icons : (ph.need||[]).map(k=>'c-'+k)).slice(0,2) : [];
   const has=ids.length>0;
   $('#photoDefault').style.display=has?'none':'';
   const g=$('#photoDish');
   if(!has){ g.innerHTML=''; return; }
+  const meal=ph && RECIPES.find(r=>r.name===ph.name);
   const n=ids.length;
-  let h='<rect x="108" y="84" width="28" height="24" fill="#fdf3dc"/><ellipse cx="122" cy="102" rx="11" ry="3.6" fill="#ffffff" stroke="#d9d0c3" stroke-width="1"/>';
-  ids.forEach((id,j)=>{ h+='<use href="#'+id+'" x="'+(n===1?114:(j?122:107))+'" y="85" width="16" height="16"/>'; });
+  let h='<rect x="108" y="84" width="28" height="24" fill="#fdf3dc"/>';
+  if(meal){
+    h+='<svg x="108" y="88" width="28" height="16" viewBox="0 0 150 84">'+mealArt(meal,true)+'</svg>';
+  }else{
+    /* 古いセーブの、料理名を持たない写真だけの互換表示。 */
+    h+='<ellipse cx="122" cy="102" rx="11" ry="3.6" fill="#ffffff" stroke="#d9d0c3" stroke-width="1"/>';
+    ids.forEach((id,j)=>{ h+='<use href="#'+id+'" x="'+(n===1?114:(j?122:107))+'" y="85" width="16" height="16"/>'; });
+  }
   g.innerHTML=h;
   if(pop && !reduceMotion && !homeSkip){ const f=$('#g-photo'); f.classList.remove('popIn'); void f.getBoundingClientRect(); f.classList.add('popIn'); }
 }
 function setupRoom(){
+  morningBubbleBoxes={};
   if(!HA){
     HA={ eri:makeActor('eri',$('#homeActors')), shada:makeActor('shada',$('#homeActors')), homare:makeActor('homare',$('#homeActors')) };
     ['eri','shada','homare'].forEach(w=>HA[w].el.querySelector('.bob').insertAdjacentHTML('afterbegin',HBODY[w]));
@@ -3443,7 +3705,7 @@ function chooseMenu(cands){
       +'<div class="fridgeNow">きょうの冷蔵庫'+(S.fridge||[]).map(k=>'<span>'+icon(FRIDGE[k].icon)+esc(FRIDGE[k].name)+'</span>').join('')+'</div><div class="seeds menu">';
     cands.forEach((r,i)=>{
       const f=r.fridge?FRIDGE[r.fridge]:null;
-      html+='<button class="seed" type="button" data-dish="'+i+'"><span class="icons">'+r.need.map(k=>icon('c-'+k)).join('')+(f?icon(f.icon):'')+'</span><span><b>'+esc(r.name)+'</b><span>'+r.need.map(vegName).concat(f?[f.name]:[]).join('＋')
+      html+='<button class="seed" type="button" data-dish="'+i+'"><span class="mealThumb">'+mealPlate(r,true)+'</span><span><b>'+esc(r.name)+'</b><span>'+r.need.map(vegName).concat(f?[f.name]:[]).join('＋')
         +(S.recipes[r.name]?'':'<em class="tagNew">はじめて</em>')+(S.request&&r.need.indexOf(S.request.crop)>=0?'<em class="tagReq">リクエスト</em>':'')+'</span></span></button>';
     });
     html+='</div>';
@@ -3665,7 +3927,7 @@ const REWARD_NIGHT={
     hmood(D,'happy',2000);
     hsay(D,'あまいばう。');
     await hp(1600);
-    dishEl.classList.remove('eating'); dishEl.classList.add('eaten'); setPortions(null);
+    await clearDinnerTable();
   }
 };
 /* おみやげの夜（プリン・どらやき・2回め以降のケーキ）。ケーキの夜と同じ流れで、クリームの場面はない */
@@ -3696,7 +3958,7 @@ async function sweetsNight(E,D,H,kind){
   dishEl.classList.add('eating'); setPortions([w.icon]);
   await hp(700);
   for(const [k,text,mood] of w.after){ const a=who[k]; hmood(a,mood==='smile'?'normal':mood,1800); hsay(a,text,k==='E'?{mood}:undefined); await hp(1500+text.length*45); }
-  dishEl.classList.remove('eating'); dishEl.classList.add('eaten'); setPortions(null);
+  await clearDinnerTable();
 }
 const SEASONAL_SCENE={
   /* 夏の風鈴（セリフは依頼者が了解ずみ） */
@@ -3732,6 +3994,20 @@ const SEASONAL_SCENE={
     await hp(1800);
   }
 };
+/* 食後の片付け（v1.19.0）：SVGの内容ごと消す。大皿・料理・湯気・取り皿は残さない。
+   呼び出し側がawaitするので、直後のおみやげの皿を古いタイマーで消さない。 */
+function resetDinnerTable(){
+  const el=$('#hDish'); el.className='hDish'; el.innerHTML='';
+  setPortions(null); $('#g-setting').style.display='none';
+  $('#hSteam').classList.remove('on');
+}
+async function clearDinnerTable(){
+  const el=$('#hDish');
+  if(!homeSkip && !reduceMotion && el.classList.contains('on')){
+    el.classList.add('clearing'); await hp(460);
+  }
+  resetDinnerTable();
+}
 async function homeEvening(cands){
   cands=cands||[];
   homeSkip=false; menuResolve=null;
@@ -3980,14 +4256,14 @@ async function homeEvening(cands){
       await hp(1500);
     }
     hhush();
-    hsay(E,'ごちそうさまでした。',{mood:'smile'});
-    hsay(H,'ごちそうさまでした。',{lift:12});
-    hsay(D,'ごちそうさまでした。');
-    await hp(1850);
-    /* ごちそうさま：なごみ度がふえる。お皿は、ここで からになる */
+    /* 3人分を同時に表示し、読み終わってから料理も大皿も片付ける。 */
+    hsay(E,'ごちそうさまでした。',{mood:'smile',ms:2400});
+    hsay(H,'ごちそうさまでした。',{lift:12,ms:2400});
+    hsay(D,'ごちそうさまでした。',{ms:2400});
+    await hp(2450);
+    hhush();
     hNagomi(isNew?2:1,{x:(E.x+D.x)/2,y:E.y-40});
-    await hp(900);
-    $('#hDish').classList.remove('eating'); $('#hDish').classList.add('eaten'); setPortions(null);
+    await clearDinnerTable();
   }else{
     await Promise.all([hmove(E,HSPOT.tableEri), hmove(D,HSPOT.tableShada), hmove(H,HSPOT.tableHomare)]);
     hsay(E,'今日はゆっくり休もうね。',{mood:'smile'});
@@ -4086,9 +4362,9 @@ async function homeEvening(cands){
     const ds=(S.decor.cushion?HSPOT.cushion:HSPOT.tableShada); place(D,ds.x,ds.y,0);
     [H,D,E].forEach(a=>{ a.el.classList.remove('sleeping'); hmood(a,'normal'); });
     hhold(E,null); hhold(H,null); openFridge(false); if(passed){ passed.remove(); passed=null; }
-    if(dish){ $('#hDish').classList.add('on','eaten'); $('#g-setting').style.display=''; }
+    resetDinnerTable();
     if(newDecor) document.getElementById(newDecor.g).style.display='';
-    if(newReward){ if(newReward.key==='photo') $('#g-photo').style.display=''; if(newReward.key==='cake'||newReward.key==='omiyage'){ const de=$('#hDish'); de.className='hDish on eaten'; if(!de.innerHTML) de.innerHTML=cakePlate(); $('#g-setting').style.display=''; } }
+    if(newReward && newReward.key==='photo') $('#g-photo').style.display='';
     seasonalShow();
     D.el.classList.remove('cream','carrying'); D.el.querySelector('.carry').innerHTML=''; $('#hShoot').style.display='none'; $('#hReward').classList.remove('on'); homeStage.querySelectorAll('.fx.still').forEach(f=>f.remove());
     $('#hSteam').classList.remove('on'); $('#hBlanket').classList.remove('on');
@@ -5005,7 +5281,7 @@ async function boot(){
 }
 /* しらべる用：アドレスの最後に #debug をつけたときだけ使える */
 if(location.hash.indexOf('debug')>=0){
-  window.__hatake={ say, morning, LINES, fieldLine, harvestTalk, inviteNapHelper, playerAction, shadaMode, wakeShada, get S(){return S;}, get busy(){return busy;}, A, homeEvening, pickPre, dishCandidates, makeRequest, get HA(){return HA;}, advance, maybeEvent, renderAll, addHarvest, checkUnlocks, nextMorning, Store, CROPS, RECIPES, UNLOCKS, EVENTS, FRIDGE, rollFridge, rollWeather, placeFrost, weatherScenes, importSave, exportSave, normalize, Snd, GIFTS, planVisit, visitDue, fitVisit,
+  window.__hatake={ RECIPE_ART, mealArt, mealPlate, setMealPortions, resetDinnerTable, clearDinnerTable, homeMorning, setupRoom, hsay, hLayout, hBox, hhush, HSPOT, FUTON, newGame, REWARDS, seasonalShow, say, morning, LINES, fieldLine, harvestTalk, inviteNapHelper, playerAction, shadaMode, wakeShada, get S(){return S;}, get busy(){return busy;}, A, homeEvening, pickPre, dishCandidates, makeRequest, get HA(){return HA;}, advance, maybeEvent, renderAll, addHarvest, checkUnlocks, nextMorning, Store, CROPS, RECIPES, UNLOCKS, EVENTS, FRIDGE, rollFridge, rollWeather, placeFrost, weatherScenes, importSave, exportSave, normalize, Snd, GIFTS, planVisit, visitDue, fitVisit,
     visit:async()=>{ if(busy) return false; busy=true; renderButtons(); S.oji={sy:Math.floor((S.day-1)/SEASON_DAYS),day:S.day,at:S.clock,done:false}; await visitScene(); busy=false; renderButtons(); return true; },
     force:async id=>{ if(busy) return false; busy=true; renderButtons(); S.sinceEvent=9; const r=await maybeEvent(false,id); await checkUnlocks(); busy=false; renderButtons(); return r; } };
 }
