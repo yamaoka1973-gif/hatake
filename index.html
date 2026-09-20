@@ -442,6 +442,18 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 .home .actor.inFuton .hbody,.home .actor.inFuton .shadow{display:none}
 .home.morning #hGlow{opacity:0}
 .home.morning #hBulb{fill:#efe6cf}
+/* v1.19.1：未解放のこたつは初期HTMLでも隠す。朝は、布団を敷く床の家具を片付ける。
+   表示を再計算する関数が呼ばれても、起床の途中に夕食用の家具が戻らないためのガード。 */
+#home:not([data-kotatsu="on"]) #g-kotatsu{display:none!important}
+#home[data-kotatsu="on"] #g-chabudai{display:none!important}
+#home[data-room-mode="sleep"] #roomTable,
+#home[data-room-mode="sleep"] #g-heater,
+#home[data-room-mode="sleep"] #g-fan,
+#home[data-room-mode="sleep"] #g-rug,
+#home[data-room-mode="sleep"] #g-cushion,
+#home[data-room-mode="sleep"] #g-toybox,
+#home[data-room-mode="sleep"] #hDish,
+#home[data-room-mode="sleep"] #hBlanket{display:none!important}
 /* 電気をけしたあとの部屋（v1.12.0）。窓のガラスのところだけ あけた 暗い色を、部屋ぜんたいにかぶせる。月あかりが床にさす */
 .hNight{z-index:560;opacity:0;transition:opacity .9s ease;pointer-events:none}
 .home.dark .hNight{opacity:1}
@@ -871,7 +883,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 <div class="game" id="game">
   <div class="head">
     <h1>えりとしゃだはるの ちいさな畑</h1>
-    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.19.0</span></span>
+    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.19.1</span></span>
   </div>
 
   <div class="hud">
@@ -992,7 +1004,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
     <button class="pan r" id="panR" type="button" aria-label="右を見る">›</button>
     <button class="ngauge" id="ngauge" type="button" aria-label="なごみ度"><svg aria-hidden="true"><use href="#i-heart"/></svg><span>なごみ</span><b id="ngNum">0</b><span class="bar" aria-hidden="true"><i id="ngBar"></i></span><span class="next" id="ngNext"></span></button>
     <!-- おうちの夕がた（1日の終わりに、景色の上にかさなって出る） -->
-    <div class="home" id="home" aria-hidden="true">
+    <div class="home" id="home" data-room-mode="living" data-kotatsu="off" aria-hidden="true">
       <div class="homeStage" id="homeStage">
         <svg class="roomArt" id="roomBack" viewBox="0 0 360 440" aria-hidden="true">
           <rect x="-400" y="0" width="1160" height="292" fill="#f7eedd"/>
@@ -1706,7 +1718,7 @@ function newGame(){
     plots, shadaPlot:{phase:'none',crop:null,growth:0,appearDay:0},
     totals:{}, total:0, today:{}, pantry:{}, recipes:{}, nagomi:0, stones:0, acorns:0, frogs:0, snowman:false,
     unlocked:{}, decor:{}, request:null, photo:null, newToday:[], basketToday:[], held:null, lastSeed:null,
-    eventsToday:0, sinceEvent:0, petsToday:0, log:[], intro:false, sound:'all', oji:null, giftToday:[], gifts:0, preSeen:{}, nagomiDay:0, joyN:0, mornH:-1, seasonEv:null, wetSeen:null, shelterDay:0, rewards:null, rewardAt:null, omiyageN:0, seasonal:null, fieldTalk:{}, napHelpDay:0
+    eventsToday:0, sinceEvent:0, petsToday:0, log:[], intro:false, sound:'all', oji:null, giftToday:[], gifts:0, preSeen:{}, nagomiDay:0, joyN:0, mornH:-1, seasonEv:null, wetSeen:null, shelterDay:0, rewards:null, rewardAt:null, omiyageN:0, seasonal:{furin:false,kotatsu:false}, fieldTalk:{}, napHelpDay:0
   };
 }
 const season=()=>Math.floor((S.day-1)/SEASON_DAYS)%4;
@@ -2006,7 +2018,7 @@ function openNagomi(){
   });
   { const all=REWARDS.every(r=>S.rewards[r.key]), at=S.rewardAt.omiyage;
     h+='<li><span class="at">'+icon('i-heart')+(all?at:'…')+'</span><span>'+(all?'ほまれくんのおみやげ（30ごとに、くり返し）':'？？？')+'</span><span class="st">'+(all?(S.nagomi>=at?'こんや':'あと '+(at-S.nagomi)):'')+'</span></li>'; }
-  { const se=S.seasonal||{}; h+='</ul><p class="sub" style="margin:6px 0 0">なごみ度'+SEASONAL_AT+'から、季節のものも ふえます：夏は '+(se.furin?'風鈴 ✓':'？？？')+'、冬は '+(se.kotatsu?'こたつ ✓':'？？？')+'</p><ul class="nlist" style="display:none">'; }
+  { const se={furin:seasonalOwned('furin'),kotatsu:seasonalOwned('kotatsu')}; h+='</ul><p class="sub" style="margin:6px 0 0">なごみ度'+SEASONAL_AT+'から、季節のものも ふえます：夏は '+(se.furin?'風鈴 ✓':'？？？')+'、冬は '+(se.kotatsu?'こたつ ✓':'？？？')+'</p><ul class="nlist" style="display:none">'; }
   h+='</ul><p style="margin:8px 0 2px"><b>こんなときに ふえます</b></p>'
     +'<div class="tally"><span>ひとやすみ</span><span>なでる（1日3回まで）</span><span>しゃだはる君のできごと</span><span>カエル・虹・霜柱</span><span>おじさんのおすそわけ</span><span>みんなで夕ごはん</span><span>はじめての料理 +2</span><span>リクエストがかなう +3</span><span>あそんで寝落ち +2</span></div>';
   openSheet(h,{center:true,kind:'nagomi'});
@@ -3040,13 +3052,44 @@ const SEASONAL=[
   {key:'furin',   season:1, name:'夏の風鈴', log:'窓に、風鈴をつるしました。夏のあいだ、ちりんと鳴ります。'},
   {key:'kotatsu', season:3, name:'冬のこたつ', log:'こたつを出しました。冬のあいだは、ちゃぶ台のかわりに使います。'}
 ];
-const seasonalDue=()=>{ const x=SEASONAL.find(q=>q.season===season()); return x && S.nagomi>=SEASONAL_AT && !(S.seasonal&&S.seasonal[x.key]) ? x : null; };
-function seasonalShow(){
-  const se=S.seasonal||{}, kt=season()===3 && !!se.kotatsu;
-  $('#g-furin').style.display=(season()===1 && se.furin)?'':'none';
-  $('#g-kotatsu').style.display=kt?'':'none'; $('#g-chabudai').style.display=kt?'none':''; $('#g-mikan').style.display='';
+/* v1.19.1：ポイント到達と「ごほうびを受け取った」を分ける。
+   newGame/setupRoom/表示更新は獲得フラグを書き換えない。旧セーブのtrueは維持する。 */
+const seasonalOwned=key=>!!S && Number.isFinite(S.nagomi) && S.nagomi>=SEASONAL_AT &&
+  !!S.seasonal && S.seasonal[key]===true;
+const seasonalDue=()=>{ const x=SEASONAL.find(q=>q.season===season()); return x && S.nagomi>=SEASONAL_AT && !seasonalOwned(x.key) ? x : null; };
+function receiveSeasonal(key){
+  const item=SEASONAL.find(q=>q.key===key);
+  if(!item || item.season!==season() || !Number.isFinite(S.nagomi) || S.nagomi<SEASONAL_AT) return false;
+  if(!S.seasonal || typeof S.seasonal!=='object' || Array.isArray(S.seasonal)) S.seasonal={};
+  S.seasonal[key]=true;
+  return true;
 }
-const furinOn=()=>season()===1 && S.seasonal && S.seasonal.furin;
+function seasonalShow(){
+  const sleeping=home.dataset.roomMode==='sleep';
+  const kt=!sleeping && season()===3 && seasonalOwned('kotatsu');
+  home.dataset.kotatsu=kt?'on':'off';
+  $('#g-furin').style.display=(season()===1 && seasonalOwned('furin'))?'':'none';
+  $('#g-kotatsu').style.display=kt?'':'none';
+  $('#g-chabudai').style.display=(sleeping||kt)?'none':'';
+  $('#g-mikan').style.display=kt?'':'none';
+}
+/* 部屋の用途だけを変える。ごほうび・なごみ度・持ち物の記録は変えない。
+   壁の絵・棚・本だな・観葉植物・窓の風鈴は据え置き。床の可動家具だけを片付ける。 */
+function setRoomMode(mode){
+  const sleeping=mode==='sleep';
+  home.dataset.roomMode=sleeping?'sleep':'living';
+  $('#roomTable').style.display=sleeping?'none':'';
+  $('#futonBack').style.display=sleeping?'':'none';
+  $('#futonFront').style.display=sleeping?'':'none';
+  $('#g-heater').style.display=(!sleeping && season()===3)?'':'none';
+  $('#g-fan').style.display=(!sleeping && season()===1)?'':'none';
+  ['rug','cushion','toybox'].forEach(key=>{
+    $('#g-'+key).style.display=(!sleeping && S.decor && S.decor[key])?'':'none';
+  });
+  seasonalShow();
+  if(sleeping){ resetDinnerTable(); $('#hBlanket').classList.remove('on'); }
+}
+const furinOn=()=>season()===1 && seasonalOwned('furin');
 const rewardOK=r=>!r.cond || r.cond();
 const dueReward=()=>{ const r=nextReward(); return r && S.nagomi>=S.rewardAt[r.key] && rewardOK(r) ? r : null; };
 const TAG_LINES={sweet:'あまくて、しあわせばう。',hot:'あつあつで、ぽかぽかばう。',fresh:'しゃきしゃきばう。',grill:'こうばしいばう。'};
@@ -3622,7 +3665,9 @@ function updatePhoto(pop){
   g.innerHTML=h;
   if(pop && !reduceMotion && !homeSkip){ const f=$('#g-photo'); f.classList.remove('popIn'); void f.getBoundingClientRect(); f.classList.add('popIn'); }
 }
-function setupRoom(){
+function setupRoom(mode='living'){
+  /* 暗転中に用途を確定。朝の準備でいったん居間の家具を出さない。 */
+  home.dataset.roomMode=mode==='sleep'?'sleep':'living';
   morningBubbleBoxes={};
   if(!HA){
     HA={ eri:makeActor('eri',$('#homeActors')), shada:makeActor('shada',$('#homeActors')), homare:makeActor('homare',$('#homeActors')) };
@@ -3642,14 +3687,12 @@ function setupRoom(){
   $('#hMoon').style.display=S.raining?'none':'';
   $('#hMoon').setAttribute('r',season()===2?12:9);
   $('#hStars').style.display=S.raining?'none':'';
-  seasonalShow();
-  $('#g-fan').style.display=season()===1?'':'none';
-  $('#g-heater').style.display=season()===3?'':'none';
+  ['g-kotatsu','g-furin','g-mikan'].forEach(id=>$('#'+id).classList.remove('popIn'));
   DECOR.forEach(d=>{ const g=document.getElementById(d.g); g.style.display=S.decor&&S.decor[d.key]?'':'none'; g.classList.remove('popIn'); });
   updatePhoto(false);
   $('#g-setting').style.display='none'; setPortions(null);
   home.classList.remove('dark','morning'); $('#hBeam').style.display=S.raining?'none':'';
-  $('#roomTable').style.display=''; $('#futonBack').style.display='none'; $('#futonFront').style.display='none'; $('#hSun').style.display='none'; $('#hMornBeam').style.display='none';
+  setRoomMode(mode); $('#hSun').style.display='none'; $('#hMornBeam').style.display='none';
   Object.values(HA).forEach(a=>a.el.classList.remove('inFuton'));
   $('#hBlanket').classList.remove('on');
   /* たなの上：しゃだはる君のたからもの */
@@ -3965,7 +4008,9 @@ const SEASONAL_SCENE={
   async furin(E,D,H){
     hsay(E,'そうだ。風鈴、つるしてみたよ。',{mood:'smile'});
     await hp(1600);
-    const g=$('#g-furin'); g.style.display=''; if(!reduceMotion&&!homeSkip) g.classList.add('popIn');
+    if(!receiveSeasonal('furin')) return;
+    seasonalShow();
+    const g=$('#g-furin'); if(!reduceMotion&&!homeSkip) g.classList.add('popIn');
     if(!homeSkip) Snd.play('furin'); hfxText('リーン',{x:250,y:90});
     await hp(1700);
     hmood(D,'happy',1900);
@@ -3979,6 +4024,7 @@ const SEASONAL_SCENE={
     await hwalkAll([[E,HSPOT.tableEri],[D,HSPOT.tableShada],[H,HSPOT.tableHomare]]);
     hsay(H,'そうだ。こたつ、出したよ。');
     await hp(1700);
+    if(!receiveSeasonal('kotatsu')) return;
     seasonalShow(); $('#g-mikan').style.display='none';
     const g=$('#g-kotatsu'); if(!reduceMotion&&!homeSkip) g.classList.add('popIn'); if(!homeSkip) Snd.play('spark');
     await hp(1100);
@@ -4293,7 +4339,7 @@ async function homeEvening(cands){
     renderNagomi();
   }else if(sz){
     /* 季節のもの（べつわく）：夏の風鈴・冬のこたつ */
-    newSeasonal=sz; if(!S.seasonal) S.seasonal={}; S.seasonal[sz.key]=true;
+    newSeasonal=sz;   /* 獲得はカードの前ではなく、各場面で実物を出す瞬間に記録する。 */
     hhush();
     await rewardCard('なごみ度 '+SEASONAL_AT+'から','きせつのもの：'+sz.name);
     await SEASONAL_SCENE[sz.key](E,D,H);
@@ -4409,11 +4455,10 @@ async function homeEvening(cands){
 const FUTON={eri:{x:172,y:348}, homare:{x:242,y:348}, shada:{x:309,y:354}};
 async function homeMorning(){
   homeSkip=false;
-  setupRoom();
+  setupRoom('sleep');
   const E=HA.eri, D=HA.shada, H=HA.homare, dull=S.weather==='rain';
-  /* ちゃぶ台をかたづけて、ふとんを3つ。窓の外は朝の空（雨や雪になる日は、少しくもっている） */
+  /* ちゃぶ台・こたつ・暖房などを片付けた床に、ふとんを3つ。窓の外は朝の空。 */
   home.classList.add('morning','dark');
-  $('#roomTable').style.display='none'; $('#futonBack').style.display=''; $('#futonFront').style.display='';
   $('#hSky').setAttribute('fill',dull?'#cdd5dc':['#cfe6f5','#bfe3fb','#f7dfc4','#dde8f2'][season()]);
   ['#hMoon','#hStars','#hRain','#hSnow'].forEach(q=>{ $(q).style.display='none'; });
   $('#hSun').style.display=dull?'none':''; $('#hMornBeam').style.display=dull?'none':''; $('#hBeam').style.display='none';
@@ -4449,7 +4494,8 @@ async function homeMorning(){
   home.classList.remove('show');
   await pause(450);
   home.classList.remove('on','morning','dark','deep');
-  $('#roomTable').style.display=''; $('#futonBack').style.display='none'; $('#futonFront').style.display='none'; $('#hSun').style.display='none'; $('#hMornBeam').style.display='none';
+  /* 部屋が完全に非表示になってから、次の夕方の配置へ戻す。 */
+  setRoomMode('living'); $('#hSun').style.display='none'; $('#hMornBeam').style.display='none';
   Object.values(HA).forEach(a=>{ a.el.classList.remove('inFuton','jumping'); hmood(a,'normal'); });
 }
 
@@ -5281,7 +5327,7 @@ async function boot(){
 }
 /* しらべる用：アドレスの最後に #debug をつけたときだけ使える */
 if(location.hash.indexOf('debug')>=0){
-  window.__hatake={ RECIPE_ART, mealArt, mealPlate, setMealPortions, resetDinnerTable, clearDinnerTable, homeMorning, setupRoom, hsay, hLayout, hBox, hhush, HSPOT, FUTON, newGame, REWARDS, seasonalShow, say, morning, LINES, fieldLine, harvestTalk, inviteNapHelper, playerAction, shadaMode, wakeShada, get S(){return S;}, get busy(){return busy;}, A, homeEvening, pickPre, dishCandidates, makeRequest, get HA(){return HA;}, advance, maybeEvent, renderAll, addHarvest, checkUnlocks, nextMorning, Store, CROPS, RECIPES, UNLOCKS, EVENTS, FRIDGE, rollFridge, rollWeather, placeFrost, weatherScenes, importSave, exportSave, normalize, Snd, GIFTS, planVisit, visitDue, fitVisit,
+  window.__hatake={ RECIPE_ART, mealArt, mealPlate, setMealPortions, resetDinnerTable, clearDinnerTable, homeMorning, setupRoom, hsay, hLayout, hBox, hhush, HSPOT, FUTON, newGame, REWARDS, seasonalShow, seasonalOwned, seasonalDue, setRoomMode, say, morning, LINES, fieldLine, harvestTalk, inviteNapHelper, playerAction, shadaMode, wakeShada, get S(){return S;}, get busy(){return busy;}, A, homeEvening, pickPre, dishCandidates, makeRequest, get HA(){return HA;}, advance, maybeEvent, renderAll, addHarvest, checkUnlocks, nextMorning, Store, CROPS, RECIPES, UNLOCKS, EVENTS, FRIDGE, rollFridge, rollWeather, placeFrost, weatherScenes, importSave, exportSave, normalize, Snd, GIFTS, planVisit, visitDue, fitVisit,
     visit:async()=>{ if(busy) return false; busy=true; renderButtons(); S.oji={sy:Math.floor((S.day-1)/SEASON_DAYS),day:S.day,at:S.clock,done:false}; await visitScene(); busy=false; renderButtons(); return true; },
     force:async id=>{ if(busy) return false; busy=true; renderButtons(); S.sinceEvent=9; const r=await maybeEvent(false,id); await checkUnlocks(); busy=false; renderButtons(); return r; } };
 }
