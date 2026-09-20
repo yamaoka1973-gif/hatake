@@ -867,7 +867,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 <div class="game" id="game">
   <div class="head">
     <h1>えりとしゃだはるの ちいさな畑</h1>
-    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.17.0</span></span>
+    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.18.0</span></span>
   </div>
 
   <div class="hud">
@@ -1115,9 +1115,9 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
           </g>
           <!-- 冬：ストーブ -->
           <g id="g-heater" style="display:none">
-            <rect x="132" y="352" width="44" height="54" rx="7" fill="#f2efe9" stroke="#bfb7a8" stroke-width="2.4"/>
-            <rect x="139" y="362" width="30" height="24" rx="4" fill="#ffb15a"/><path d="M143 368 H165 M143 374 H165 M143 380 H165" stroke="#e9843a" stroke-width="2.4" stroke-linecap="round"/>
-            <circle cx="154" cy="396" r="3" fill="#bfb7a8"/>
+            <rect x="104" y="352" width="44" height="54" rx="7" fill="#f2efe9" stroke="#bfb7a8" stroke-width="2.4"/>
+            <rect x="111" y="362" width="30" height="24" rx="4" fill="#ffb15a"/><path d="M115 368 H137 M115 374 H137 M115 380 H137" stroke="#e9843a" stroke-width="2.4" stroke-linecap="round"/>
+            <circle cx="126" cy="396" r="3" fill="#bfb7a8"/>
           </g>
         </svg>
         <div class="hTreasures" id="hTreasures"></div>
@@ -1496,9 +1496,8 @@ const Snd=(()=>{
     visit:(c,o,t)=>notes(c,o,t,[NOTE.G5,NOTE.E5,NOTE.G5,NOTE.C6],.12,{type:'triangle',dur:.2,vol:.1,lastDur:.5}),
     ice:(c,o,t)=>{ tone(c,o,t,{f:2300,dur:.05,vol:.05}); tone(c,o,t+.07,{f:2900,dur:.09,vol:.045}); },
     lamp:(c,o,t)=>{ hiss(c,o,t,{freq:1500,q:1.5,dur:.03,vol:.12}); tone(c,o,t+.004,{f:540,f2:340,type:'triangle',dur:.07,vol:.1}); },
-    /* 風鈴（v1.17.0）：ガラスの高い音を2回（チリ…リン）。高い倍音は短く、もとの音は長くのこす */
-    furin:(c,o,t)=>{ [[2637,.028,1.3],[4186,.012,.8],[7040,.006,.4]].forEach(([f,v,d])=>tone(c,o,t,{f,dur:d,vol:v,attack:.004}));
-                     [[2794,.02,1.1],[4435,.009,.6]].forEach(([f,v,d])=>tone(c,o,t+.24,{f,dur:d,vol:v,attack:.004})); }   /* 高い音は耳につきやすいので、小さめ（いちばん強い0.1秒の大きさ 約0.017。「氷」0.011 と「きらっ」0.023 のあいだ） */
+    /* 風鈴（v1.17.1）：高めの音で、1回だけ「リーン」。高い倍音は短く、のびる余韻を残す */
+    furin:(c,o,t)=>{ [[3136,.024,1.45],[4699,.011,.95],[7040,.005,.45]].forEach(([f,v,d])=>tone(c,o,t,{f,dur:d,vol:v,attack:.004})); }   /* 高い音は耳につきやすいので、小さめ */
   };
   function build(){
     if(ctx || !AC) return;
@@ -1703,7 +1702,7 @@ function newGame(){
     plots, shadaPlot:{phase:'none',crop:null,growth:0,appearDay:0},
     totals:{}, total:0, today:{}, pantry:{}, recipes:{}, nagomi:0, stones:0, acorns:0, frogs:0, snowman:false,
     unlocked:{}, decor:{}, request:null, photo:null, newToday:[], basketToday:[], held:null, lastSeed:null,
-    eventsToday:0, sinceEvent:0, petsToday:0, log:[], intro:false, sound:'all', oji:null, giftToday:[], gifts:0, preSeen:{}, nagomiDay:0, joyN:0, mornH:-1, seasonEv:null, wetSeen:null, shelterDay:0, rewards:null, rewardAt:null, omiyageN:0, seasonal:null
+    eventsToday:0, sinceEvent:0, petsToday:0, log:[], intro:false, sound:'all', oji:null, giftToday:[], gifts:0, preSeen:{}, nagomiDay:0, joyN:0, mornH:-1, seasonEv:null, wetSeen:null, shelterDay:0, rewards:null, rewardAt:null, omiyageN:0, seasonal:null, fieldTalk:{}, napHelpDay:0
   };
 }
 const season=()=>Math.floor((S.day-1)/SEASON_DAYS)%4;
@@ -1926,7 +1925,7 @@ function makeActor(who,parent){
   e.querySelector('.bob').appendChild(makeFace(who));
   if(who==='eri' || parent) e.setAttribute('aria-hidden','true');
   (parent||layer).appendChild(e);
-  return {who, el:e, bub:e.querySelector('.bubble'), x:0, y:0, moveId:0, bubT:0, mode:'follow', napUntil:0, watchPlot:null};
+  return {who, el:e, bub:e.querySelector('.bubble'), x:0, y:0, moveId:0, bubT:0, bubLift:0, mode:'follow', napUntil:0, watchPlot:null};
 }
 const A={ eri:makeActor('eri'), shada:makeActor('shada') };
 A.shada.el.querySelector('.bob').insertAdjacentHTML('beforeend','<div class="carry">'+icon('i-stone')+'</div>');
@@ -2072,7 +2071,7 @@ function layoutBubbles(e,s,box,scale){
     liftAbove(a, on(o) ? Math.min(R(o.bub).t, o.y-TOK/2) : o.y-TOK/2);
   });
 }
-function hush(){ [A.eri,A.shada,A.homare,A.oji].forEach(a=>{ clearTimeout(a.bubT); a.bub.classList.remove('on'); }); }
+function hush(){ cancelFieldReply(); [A.eri,A.shada,A.homare,A.oji].forEach(a=>{ clearTimeout(a.bubT); a.bub.classList.remove('on'); }); }
 
 /* ちいさな演出 */
 function fx(id,pos,cls,ms){
@@ -2339,7 +2338,7 @@ function wakeShada(talk){
   if(A.shada.mode!=='nap') return;
   shadaMode('follow');
   setMood('shada','normal');
-  if(talk){ say('shada','ふぁ……よく寝たばう。'); log('しゃだはる君が、お昼寝から起きました。'); }
+  if(talk){ say('shada',fieldLine('wakeS')); log('しゃだはる君が、お昼寝から起きました。'); }
 }
 function stopWatch(){ if(A.shada.mode==='watch'){ shadaMode('follow'); A.shada.watchPlot=null; } }
 let errandId=0;
@@ -2430,9 +2429,11 @@ function fitVisit(){
   if(v.at>=w.from-30) v.at=Math.max(DAY_START+60, w.from-60-30*Math.floor(rnd()*3));
 }
 const visitDue=()=>{ const v=S.oji; return !!v && !v.done && v.day===S.day && S.clock>=v.at && S.clock<=DAY_END-60 && !S.raining && A.shada.mode!=='hide'; };
-const VISIT={ oji:{x:250,y:402}, eri:{x:346,y:396}, shada:{x:398,y:408}, pat:{x:298,y:416}, from:{x:36,y:418}, basket:{x:262,y:262} };
+const VISIT={ oji:{x:250,y:402}, eri:{x:346,y:396}, shada:{x:398,y:408}, pat:{x:298,y:416}, from:{x:36,y:418}, basket:{x:262,y:262}, handoffO:{x:276,y:402}, handoffE:{x:320,y:396} };
 /* しゃだはる君が気づくときのひとこと（日によって2とおり） */
 const VISIT_CALL=['だれか、きたばう！','えりちゃん、おきゃくさんばう！'];
+const VISIT_HELLO=['やあ、えりちゃん。今日も、せいが出るね。','こんにちは。畑がにぎやかで、いいね。'];
+const VISIT_GIVE=['うちでとれたんだ。よかったら食べてね。','朝とれたんだ。よかったら、夕ごはんにどうぞ。'];
 async function visitScene(){
   const key=GIFT_BY_SEASON[season()], g=GIFTS[key], O=A.oji, withS=A.shada.mode==='follow';
   S.oji.done=true;
@@ -2450,15 +2451,17 @@ async function visitScene(){
   hush(); say('eri','あ、おじさん。こんにちは。',0,'smile');
   await walkIn;
   await pause(600);
-  hush(); say('oji','やあ、えりちゃん。今日も、せいが出るね。',0,'happy');
+  hush(); say('oji',pick(VISIT_HELLO),0,'happy');
   await pause(2900);
-  hush(); say('oji','うちでとれたんだ。よかったら食べてね。');
-  await pause(2700);
-  /* 箱を手わたす（投げない。まっすぐ、ゆっくり） */
+  hush(); say('oji',pick(VISIT_GIVE));
+  await pause(2500);
+  /* 箱を手わたす（投げずに、近づいて丁寧に） */
   hush();
+  await Promise.all([moveTo(O,VISIT.handoffO,{ms:520}), moveTo(A.eri,VISIT.handoffE,{ms:520})]);
   O.el.classList.remove('carrying');
-  await flyStraight('i-crate',{x:O.x,y:O.y+16},{x:A.eri.x,y:A.eri.y+12},520);
+  await flyStraight('i-crate',{x:O.x+10,y:O.y+14},{x:A.eri.x-8,y:A.eri.y+13},360);
   A.eri.el.classList.add('carrying');
+  await Promise.all([moveTo(O,VISIT.oji,{ms:460}), moveTo(A.eri,VISIT.eri,{ms:460})]);
   fx('c-'+key,{x:A.eri.x+2,y:A.eri.y-36},'pop',1300);
   say('eri','わあ、'+g.name+'！ありがとうございます。',0,'happy');
   await pause(2500);
@@ -2521,26 +2524,115 @@ async function flyStraight(id,from,to,ms){
 }
 
 /* ================= プレイヤーの行動 ================= */
+/* v1.18.0：畑の会話。決まったあいさつと季節の場面は保ち、ふだんのひとことを増やす。 */
 const LINES={
-  plantE:['元気に育ってね。','おいしくなあれ。','ここにしよう。'],
-  plantS:['おおきくなるばう。','たのしみばう。','ばう！'],
-  waterE:['お水、気持ちよさそうだね。','たっぷりどうぞ。','のどかわいてたね。'],
-  waterS:['いっぱい飲むばう！','ごくごくばう。'],
-  harvE:['わ、できてる。','いい色だね。','今日のごはんにしよっか。'],
-  harvS:['とれたばう！','おいしそうばう！','やったばう！'],
-  petS:['ばう♪','もっとなでるばう。','えへへばう。'],
-  shooE:['むしさん、あっちいってね。','はい、おひっこしだよ。'],
+  tillE:['ここも畑にしよう。','土、ふかふかになったね。','少しずつ、広げていこう。','ここには何を育てようかな。','これで、種をまけるね。','よいしょ。いい感じ。'],
+  plantE:['元気に育ってね。','おいしくなあれ。','ここにしよう。','小さな種だね。','芽が出るの、楽しみだね。','土のおふとん、かけようね。','ゆっくり大きくなってね。','どんなふうに育つかな。','しゃだはる、ここにまくね。'],
+  plantS:['おおきくなるばう。','たのしみばう。','ばう！','めが出るの、待ってるばう。','ちいさな種ばう。','そっと、そっとばう。','おやさいの赤ちゃんばう。','いっしょに育てるばう！','ここが、おうちばう。'],
+  waterE:['お水、気持ちよさそうだね。','たっぷりどうぞ。','のどかわいてたね。','根っこまで、届くかな。','土がしっとりしたね。','これで、ひと安心。','少しずつ、あげようね。','大きく育ってね。','しゃだはる、しぶきが飛ぶよ。'],
+  waterS:['いっぱい飲むばう！','ごくごくばう。','おみず、きらきらばう。','ゆっくり飲むばう。','ねっこにも届くばう。','おやさい、よろこんでるばう。','じょうろの雨ばう。','げんきに育つばう！'],
+  harvE:['わ、できてる。','いい色だね。','今日のごはんにしよっか。','つやつやだね。','ちょうど食べごろだね。','育てたかいがあったね。','かごに入れようね。','どんな料理にしようかな。','しゃだはる、見て見て。','とれたて、うれしいね。'],
+  harvS:['とれたばう！','おいしそうばう！','やったばう！','ぴかぴかばう！','ごちそうばう！','かごに入れるばう。','えりちゃん、やったばう！','ばんごはん、楽しみばう。','りっぱに育ったばう。','うれしいばう！'],
+  petS:['ばう♪','もっとなでるばう。','えへへばう。','えりちゃんの手、すきばう。','そこそこばう。','なでなで、うれしいばう。','きもちいいばう。','もうちょっとだけ、ばう。'],
+  shooE:['むしさん、あっちいってね。','はい、おひっこしだよ。','葉っぱを守ろうね。','見つけた。こっちへどうぞ。','これで、ひと安心だね。','そっと、追いはらおうね。'],
+  shooS:['ばいばいばう。','むしさん、あっちばう。','葉っぱは守るばう。','もう、だいじょうぶばう。','おひっこしばう。','おやさい、あんしんばう。'],
+  thawE:['しもばしら、ざくざくだね。','足もと、いい音がするね。','土が少しほぐれたね。','踏むと、さくさくするね。','こおった土をほぐそうね。'],
+  thawS:['ざくざく、たのしいばう！','さくさくばう！','足もと、しゃりしゃりばう。','つちのおふとん、ほぐすばう。','いい音ばう！'],
   morningS:['おはようばう。今日は何するばう？','きょうも育てるばう。','いい朝ばう。','えりちゃん、おはようばう！'],
-  morningReply:['まかせるばう！','よろしくばう！'],
-  /* おうちで「おはよう。」を言ったあとの、畑でのひとこと（v1.13.0。「おはよう」を2回言わないように） */
-  morningS2:['今日は何するばう？','きょうも育てるばう。','いい朝ばう。']
+  morningReply:['まかせるばう！','よろしくばう！','いっしょにがんばるばう。','ばう！きょうもよろしくばう。','おてつだいするばう！','えりちゃんと、いっしょばう。'],
+  morningSleepy:['ふわぁ……がんばるばう。','ねむいけど、よろしくばう。','ばう。ゆっくりがんばるばう。'],
+  morningS2:['今日は何するばう？','きょうも育てるばう。','いい朝ばう。','畑、見てくるばう。','おやさい、大きくなったばう？','きょうも楽しみばう。'],
+  rainHintS:['あめ、くるばう。','あめのにおいがするばう。','雲がふえてきたばう。','おそら、あめの準備ばう。'],
+  snowHintS:['ゆき、くるばう。','ゆき雲ばう。','おそら、ゆきの準備ばう。','ゆきがふりそうばう。'],
+  droopyS:['元気ないばう……','おみず、ほしいみたいばう。','葉っぱが、しょんぼりばう。','えりちゃん、おみずの番ばう。'],
+  frostHintS:['つち、こおってるばう。','しもばしら、見つけたばう。','足もと、しゃりしゃりばう。','つちが白くなってるばう。'],
+  helpWaterS:['ここ、かわいてるばう。','ここにも、あげたばう。','おみず係ばう！','ひとマス、おまかせばう。','ねっこまで届けるばう。','おやさい、飲んでばう。'],
+  helpBugS:['むし、いるばう！','葉っぱに、むしばう！','むしさん、見つけたばう！','ここは守るばう！'],
+  helpThanksE:['しゃだはる、ありがとう。','助かったよ、しゃだはる。','上手にできたね。ありがとう。','ふたりだと、はかどるね。','頼りになるね、しゃだはる。','手伝ってくれて、うれしいな。'],
+  napS:['……ばう。','ふわぁ……ひとねむりばう。','かご、ぴったりばう。','ちょっとだけ、ねるばう。'],
+  wakeS:['ふぁ……よく寝たばう。','すっきりしたばう。','ふわぁ……起きたばう。','おやさいの夢、見たばう。'],
+  napCallE:['しゃだはる、少し手伝ってくれる？','しゃだはる、おいで。いっしょにやろう。','しゃだはる、こっちを手伝ってほしいな。','しゃだはる、起きられる？手を貸してね。'],
+  napReplyS:['ふわぁ……いま行くばう。','ばう！おてつだいするばう。','えりちゃん、まかせるばう！','ねむいけど、てつだうばう。'],
+  napWaterS:['おみず、あげたばう！','いっしょに水やりばう。','ひとねむりして、元気ばう！'],
+  napShooS:['むしさん、ばいばいばう。','葉っぱを守ったばう！','おてつだい、できたばう。'],
+  shadaPlotE:['しゃだはる畑の{crop}、りっぱだね。','しゃだはるの{crop}、とれたね。','{crop}、大きく育ったね。','しゃだはる、いい{crop}がとれたよ。'],
+  shadaPlotS:['えっへんばう。','しゃだはるの畑ばう！','じまんの{crop}ばう。','えりちゃんと、はんぶんこばう。','ちゃんと育ったばう！']
 };
+/* 同じ場面では直近2つを避けて選ぶ。小さな履歴はセーブにも残し、日をまたいで連発しない。 */
+function fieldLine(key,pool){
+  const options=pool||LINES[key];
+  if(!Array.isArray(options)||!options.length) return '';
+  if(!S.fieldTalk || typeof S.fieldTalk!=='object' || Array.isArray(S.fieldTalk)) S.fieldTalk={};
+  const recent=Array.isArray(S.fieldTalk[key])?S.fieldTalk[key].slice(-2):[];
+  let choices=options.filter(t=>!recent.includes(t));
+  if(!choices.length) choices=options.filter(t=>t!==recent[recent.length-1]);
+  const text=pick(choices.length?choices:options);
+  S.fieldTalk[key]=recent.concat(text).slice(-2);
+  return text;
+}
+/* 遅れて返すひとことは、新しい作業・別の場面に持ち越さない。 */
+let fieldReplyTimer=0;
+function cancelFieldReply(){ clearTimeout(fieldReplyTimer); fieldReplyTimer=0; }
+function fieldReply(text,mood,delay){
+  cancelFieldReply();
+  const state=S, day=S.day;
+  fieldReplyTimer=setTimeout(()=>{
+    fieldReplyTimer=0;
+    if(S!==state || S.day!==day || A.shada.mode!=='follow' || home.classList.contains('on')) return;
+    say('shada',text,0,mood);
+  },delay||420);
+}
+/* 昼寝を始めて30分たったあと、作業のあるときだけ時々呼ぶ。1日1回まで。
+   呼ばれた回は必ず返事→起床→合流。作業の効果・収穫数・時間は通常の1回分のまま。 */
+const NAP_CALL_RATE=.35;
+async function inviteNapHelper(i,kind,side){
+  const D=A.shada;
+  if(D.mode!=='nap' || S.napHelpDay===S.day || S.raining || S.clock>=DAY_END-ACT ||
+     S.clock<D.napUntil-150 || !['water','shoo','harvest'].includes(kind)) return false;
+  if(rnd()>=NAP_CALL_RATE) return false;
+  S.napHelpDay=S.day; S.sinceEvent=0;
+  hush();
+  say('eri',fieldLine('napCallE'),0,'smile');
+  await sleep(1900);
+  hush(); focus(D.x);
+  await pause(450);
+  wakeShada(false);
+  say('shada',fieldLine('napReplyS'),0,'happy');
+  await sleep(1900);
+  hush(); focusPlot(i);
+  await moveTo(D,spotOf(i,side),{ms:Math.round(clamp(Math.hypot(spotOf(i,side).x-D.x,spotOf(i,side).y-D.y)*2.6,400,1700))});
+  await pause(250);
+  return true;
+}
+/* 呼ばれた収穫では、取れた1こを手もとに持ってかごへ運ぶ（追加の収穫は発生させない）。 */
+async function carryHarvestToBasket(key,back){
+  const D=A.shada, carry=D.el.querySelector('.carry');
+  carry.innerHTML=icon('c-'+key); D.el.classList.add('carrying');
+  try{
+    await pause(450);
+    hush(); focusRange(252,D.x+30);
+    await moveTo(D,{x:SPOT.basket.x,y:SPOT.basket.y+32});
+    await pause(300);
+    D.el.classList.remove('carrying');
+    basketFront.classList.remove('bump'); void basketFront.getBoundingClientRect(); basketFront.classList.add('bump');
+    Snd.play('basket'); addHarvest(key,1); renderHUD();
+  }finally{ D.el.classList.remove('carrying'); carry.innerHTML=icon('i-stone'); }
+  focusRange(A.eri.x-85,back.x+70);
+  await moveTo(D,back);
+}
+
 function setQueued(i){ queued=i; renderPlots(); }
 function runQueued(){
   const q=queued; queued=null;
   if(q==null){ return; }
   renderPlots();
   if(q==='shada') actShadaPlot(); else actPlot(q);
+}
+function harvestTalk(who,crop){
+  const nm=(CROPS[crop]||{name:'おやさい'}).name, key=who==='eri'?'harvE':'harvS';
+  const named=who==='eri'?['{crop}、いい出来だね。','{crop}、おいしそう。','{crop}、今日のごはんが楽しみ。']
+    :['{crop}、とれたばう！','{crop}、いいにおいばう！','{crop}、うれしいばう！'];
+  return fieldLine(key,LINES[key].concat(named)).replace('{crop}',nm);
 }
 const near=(a,s)=>Math.hypot(a.x-s.x,a.y-s.y)<30;
 function eriSide(i){ return (A.shada.mode!=='follow' && near(A.shada,spotOf(i,'L'))) ? 'R' : 'L'; }
@@ -2570,27 +2662,28 @@ async function actPlot(i){
   await playerAction(kind,i,S.held);
 }
 async function playerAction(kind,i,seed){
-  busy=true; renderButtons();
+  busy=true; renderButtons(); cancelFieldReply();
   const p=S.plots[i], c0=centerOf(i);
   focusPlot(i);
   const side=eriSide(i);
   const follow=shadaFollowTo(spotOf(i,side==='L'?'R':'L'));
   await moveTo(A.eri,spotOf(i,side));
+  const napHelper=await inviteNapHelper(i,kind,side==='L'?'R':'L');
   const chatty=rnd()<.6, shadaNear=A.shada.mode==='follow';
 
   if(kind==='till'){
     Snd.play('dig');
     await work(A.eri,i);
     p.tilled=true;
-    say('eri','ここも畑にしよう。',0,half('smile'));
+    say('eri',fieldLine('tillE'),0,half('smile'));
     log('草地をたがやして、あたらしいマスができました。');
   }else if(kind==='plant'){
     Snd.play('plant');
     await work(A.eri,i);
     p.crop=seed; p.growth=0; p.watered=!!S.raining; p.dry=false; p.soggy=false;
     S.lastSeed=seed;
-    if(chatty) say('eri',pick(LINES.plantE),0,half('smile'));
-    if(shadaNear && rnd()<.5) setTimeout(()=>say('shada',pick(LINES.plantS)),420);
+    if(chatty) say('eri',fieldLine('plantE'),0,half('smile'));
+    if(shadaNear && rnd()<.5) fieldReply(fieldLine('plantS'));
     log(CROPS[seed].name+'の種をまきました。');
     /* かわいい失敗⑧：種袋からひとつぶ落とす（何日かあとに、畑のはしっこから芽が出る） */
     if(shadaNear && S.shadaPlot.phase==='none' && rnd()<.09){
@@ -2599,7 +2692,7 @@ async function playerAction(kind,i,seed){
       follow.then(()=>flyIcon('s-seed',{x:A.shada.x,y:A.shada.y+8},{x:640,y:368})).then(()=>renderWorld());
     }
   }else if(kind==='water'){
-    await work(A.eri,i,'i-drop');
+    await Promise.all([work(A.eri,i,'i-drop'),napHelper?work(A.shada,i,'i-drop'):Promise.resolve()]);
     const done=[i];
     p.watered=true; p.dry=false;
     if(S.unlocked.shed && !isGH(i)){
@@ -2609,9 +2702,9 @@ async function playerAction(kind,i,seed){
         if(q.unlocked&&q.crop&&!q.watered&&!q.frost&&!isRipe(q)){ q.watered=true; q.dry=false; done.push(j); poke(j); fx('i-drop',centerOf(j)); }
       });
     }
-    if(chatty) say('eri',pick(LINES.waterE),0,half('smile'));
-    if(shadaNear && rnd()<.5) setTimeout(()=>say('shada',pick(LINES.waterS)),420);
-    log(CROPS[p.crop].name+'に水をあげました。'+(done.length>1?'大きいじょうろで、となりのマスにも届きました。':''));
+    if(napHelper||chatty) say('eri',fieldLine(napHelper?'helpThanksE':'waterE'),0,napHelper?'smile':half('smile'));
+    if(shadaNear && (napHelper||rnd()<.5)) fieldReply(fieldLine(napHelper?'napWaterS':'waterS'));
+    log((napHelper?'えりちゃんが呼ぶと、しゃだはる君がお昼寝から起きて、一緒に':'')+CROPS[p.crop].name+'に水をあげました。'+(done.length>1?'大きいじょうろで、となりのマスにも届きました。':''));
   }else if(kind==='thaw'){
     /* 冬の朝：ふたりで霜柱をふんで、こおった土をほぐす */
     await follow;
@@ -2619,33 +2712,36 @@ async function playerAction(kind,i,seed){
     await Promise.all([work(A.eri,i), shadaNear?work(A.shada,i):Promise.resolve()]);
     await Promise.all([work(A.eri,i), shadaNear?work(A.shada,i):Promise.resolve()]);
     p.frost=false;
-    say('eri','しもばしら、ざくざくだね。',0,'happy');
-    if(shadaNear){ setMood('shada','happy',1600); setTimeout(()=>say('shada','ざくざく、たのしいばう！'),500); }
+    say('eri',fieldLine('thawE'),0,'happy');
+    if(shadaNear){ setMood('shada','happy',1600); fieldReply(fieldLine('thawS'),null,500); }
     if(!S.frostJoy){ S.frostJoy=true; addNagomi(1,shadaNear?A.shada:A.eri); }
     log(shadaNear?'ふたりで霜柱をふんで、こおった土をほぐしました。':'霜柱をふんで、こおった土をほぐしました。');
   }else if(kind==='shoo'){
-    await work(A.eri,i);
+    await Promise.all([work(A.eri,i),napHelper?work(A.shada,i):Promise.resolve()]);
     p.bug=false; renderPlots();
     fx('i-bug',{x:c0.x+16,y:c0.y-4},'away',820); Snd.play('shoo');
     p.growth=Math.min(totalOf(p),p.growth+60);
-    say('eri',pick(LINES.shooE),0,half('smile'));
-    if(shadaNear && rnd()<.5) setTimeout(()=>say('shada','ばいばいばう。'),420);
-    log('虫を追いはらいました。'+CROPS[p.crop].name+'が元気になりました。');
+    say('eri',fieldLine(napHelper?'helpThanksE':'shooE'),0,napHelper?'smile':half('smile'));
+    if(shadaNear && (napHelper||rnd()<.5)) fieldReply(fieldLine(napHelper?'napShooS':'shooS'));
+    log((napHelper?'えりちゃんが呼ぶと、しゃだはる君がお昼寝から起きて、一緒に':'')+'虫を追いはらいました。'+CROPS[p.crop].name+'が元気になりました。');
   }else if(kind==='harvest'){
     const key=p.crop, c=CROPS[key];
-    await work(A.eri,i);
+    await Promise.all([work(A.eri,i),napHelper?work(A.shada,i):Promise.resolve()]);
     S.plots[i]=Object.assign(p,{crop:null,growth:0,watered:false,dry:false,soggy:false,bug:false,frost:false});
     Snd.play('harvest');
-    say('eri',pick(LINES.harvE),0,'happy');
-    if(shadaNear) setTimeout(()=>say('shada',pick(LINES.harvS)),420);
+    say('eri',harvestTalk('eri',key),0,'happy');
+    if(shadaNear) fieldReply(harvestTalk('shada',key));
     if(shadaNear) setMood('shada','happy',1600);
     renderPlots();
-    await flyToBasket(key,c0);
-    addHarvest(key,1);
-    log(c.name+'を1こ収穫しました。');
+    if(napHelper){
+      await pause(1800);
+      await carryHarvestToBasket(key,spotOf(i,side==='L'?'R':'L'));
+      say('eri',fieldLine('helpThanksE'),0,'smile');
+    }else{ await flyToBasket(key,c0); addHarvest(key,1); }
+    log(napHelper?'えりちゃんが呼ぶと、しゃだはる君がお昼寝から起きて、一緒に'+c.name+'を1こ収穫し、かごまで運んでくれました。':c.name+'を1こ収穫しました。');
     renderHUD();
     /* おてつだい③：転がった野菜をひろってくる */
-    if(shadaNear && rnd()<(S.mood==='helpful'?.22:.1)){
+    if(shadaNear && !napHelper && rnd()<(S.mood==='helpful'?.22:.1)){
       await follow;
       const spot={x:clamp(c0.x+44,FX,W-40),y:c0.y+40};
       const lying=fx('c-'+key,{x:spot.x,y:spot.y+16},'still',0);
@@ -2661,6 +2757,7 @@ async function playerAction(kind,i,seed){
   }
   renderPlots();
   await follow;
+  if(napHelper){ await sleep(1900); hush(); }
   await advance(ACT);
   await afterAction(false);
   busy=false; renderButtons(); saveSoon(); runQueued();
@@ -2694,6 +2791,7 @@ async function actShadaPlot(){
   if(sp.phase!=='ripe') return;
   if(busy){ setQueued('shada'); return; }
   busy=true; renderButtons();
+  cancelFieldReply();
   const key=sp.crop, c0=centerOf('shada');
   focusPlot('shada');
   const follow=shadaFollowTo({x:c0.x+30,y:c0.y-22});
@@ -2701,8 +2799,8 @@ async function actShadaPlot(){
   await work(A.eri,'shada');
   S.shadaPlot={phase:'none',crop:null,growth:0,appearDay:0};
   renderPlots();
-  say('eri','しゃだはる畑の'+CROPS[key].name+'、りっぱだね。',0,'happy');
-  setTimeout(()=>{ if(A.shada.mode==='follow'){ say('shada','えっへんばう。'); setMood('shada','happy',1600); } },420);
+  say('eri',fieldLine('shadaPlotE').replace('{crop}',CROPS[key].name),0,'happy');
+  if(A.shada.mode==='follow') fieldReply(fieldLine('shadaPlotS').replace('{crop}',CROPS[key].name),'happy');
   await flyToBasket(key,c0);
   addHarvest(key,1); addNagomi(1,A.shada);
   log('しゃだはる畑から、'+CROPS[key].name+'を1こ収穫しました。');
@@ -2858,7 +2956,7 @@ function pet(){
   if(A.shada.mode==='hide'){ say('shada','かみなり、こわいばう……'); return; }
   setMood('shada','happy',1500); setMood('eri','smile',1500);
   Snd.play('pet');
-  say('shada',pick(LINES.petS));
+  say('shada',fieldLine('petS'));
   fx('i-heart',{x:A.shada.x,y:A.shada.y-26});
   if(S.petsToday<3){ S.petsToday+=1; addNagomi(1,{x:A.shada.x,y:A.shada.y+2},false); saveSoon(); }
 }
@@ -2956,7 +3054,7 @@ const HSPOT={
   tableEri:{x:208,y:280}, tableHomare:{x:262,y:276}, tableShada:{x:316,y:288},
   sneak:{x:150,y:259}, sneakH:{x:198,y:258},
   window:{x:288,y:245}, windowH:{x:234,y:238},
-  appliance:{x:194,y:386}, applianceH:{x:240,y:376},   /* せんぷうき・ストーブの前（v1.13.2：台を大きくしたので、台のまんなかに立って見えないよう、左手前へ） */
+  appliance:{x:182,y:386}, applianceH:{x:228,y:376},   /* せんぷうき・ストーブの前（v1.17.1：冬のこたつと重ならないよう少し左へ） */
   shelf:{x:72,y:295}, cushion:{x:322,y:372},
   playD:{x:254,y:392}, playH:{x:204,y:384},
   /* v1.15.0：おもちゃ箱のそば／ボールを追いかける先／ラグの上／記念写真でならぶ場所（台の手前） */
@@ -2989,7 +3087,7 @@ const home=$('#home'), homeStage=$('#homeStage'), eveningBar=$('#eveningBar'), e
 let HA=null, homeSkip=false, hScale=1;
 
 const hp=ms=>homeSkip?Promise.resolve():pause(ms);
-function hbubOff(x){ clearTimeout(x.bubT); x.bub.classList.remove('on'); }
+function hbubOff(x){ clearTimeout(x.bubT); x.bubLift=0; x.bub.classList.remove('on'); }
 /* 歩きおわったとき、まだ吹き出しが出ていたら置きなおす。それでも だれかの吹き出しと重なるなら、しまう */
 function hmove(a,spot,opt){
   if(homeSkip){ place(a,spot.x,spot.y,0); a.el.classList.remove('walking'); return Promise.resolve(); }
@@ -3006,6 +3104,7 @@ function hsay(a,text,opt){
   const o=(opt && typeof opt==='object') ? opt : {ms:opt};
   const b=a.bub, dur=o.ms || (2000+text.length*95), now=Date.now();
   clearTimeout(a.bubT);
+  a.bubLift=o.lift||0;
   if(HA && a===HA.shada) Snd.bau();
   /* ほかの人の吹き出しは、もう読めたころ（1.2秒たったもの）なら先にしまう。3人が同時に言うセリフ（いただきます）は残る */
   Object.values(HA).forEach(x=>{ if(x!==a && x.bub.classList.contains('on') && now-(x.bubAt||0)>=1200) hbubOff(x); });
@@ -3026,8 +3125,9 @@ function hsay(a,text,opt){
    ・「しっぽの先が、ほかの人の頭のほうに近い」置きかたは、大きく減点する（＝だれのセリフか、まぎらわしい）。 */
 const HB_BASE=TOK*1.12;
 function hBox(a,dir,bottom){
-  const w=a.bub.offsetWidth, h=a.bub.offsetHeight, l=dir==='toL' ? a.x+TOK*.22-w : a.x-TOK*.22, b=(a.y+TOK/2)-bottom;
-  return {l, r:l+w, t:b-h, b, dir, bottom};
+  const extra=a.bubLift||0;
+  const w=a.bub.offsetWidth, h=a.bub.offsetHeight, l=dir==='toL' ? a.x+TOK*.22-w : a.x-TOK*.22, b=(a.y+TOK/2)-(bottom+extra);
+  return {l, r:l+w, t:b-h, b, dir, bottom:bottom+extra};
 }
 const hFace=o=>({l:o.x-TOK/2, r:o.x+TOK/2, t:o.y-TOK/2, b:o.y+TOK/2});
 const hOv=(p,q,m)=>Math.min(p.r,q.r)-Math.max(p.l,q.l)>-m && Math.min(p.b,q.b)-Math.max(p.t,q.t)>-m;
@@ -3135,6 +3235,94 @@ function dishIcons(r){
   const v=r.need.map(k=>'c-'+k);
   return (r.fridge&&FRIDGE[r.fridge]) ? [v[0],FRIDGE[r.fridge].icon] : v.slice(0,2);
 }
+function ingredientTone(key){
+  const M={
+    tomato:['#de5d55','#f4a08b','#6fae62'], kyuri:['#6fbf73','#b9df93','#f4f7dd'], nasu:['#8c68b8','#d5b4ec','#7fb069'], corn:['#f2c84b','#fff2a8','#88b45f'],
+    jagaimo:['#d7b37a','#f3dfb4','#8caf64'], tamanegi:['#e8d7ac','#f6eed1','#9fc07c'], soramame:['#7fb069','#cfe8a6','#f5f0cb'], ninjin:['#ef8a3c','#ffd28a','#7fb069'],
+    satsumaimo:['#8c4f78','#f3d36e','#c6875c'], satoimo:['#d7c2ad','#f2e5d1','#9eaf7d'], kabocha:['#f0a744','#ffd58a','#6a9350'], horenso:['#4c9860','#a7d5a8','#f2f2d9'],
+    hakusai:['#d8f0a6','#f8f5d4','#8db26e'], negi:['#72b57f','#edf7dc','#c5d388'], daikon:['#f7f6ef','#d0e6b8','#93b371'], ichigo:['#e66072','#ffd0d6','#7fb069'],
+    takenoko:['#d1b57b','#f0e0b3','#93a96b'], piman:['#4f9b52','#c6e7a1','#f4f0d0'], shiitake:['#8f6a55','#d9c2ad','#6f9153'], renkon:['#d8c1a1','#f3ead8','#9c875f'],
+    chicken:['#d6b07d','#f6e0bc','#7f9d63'], pork:['#d68489','#f4c8cf','#8eaf72'], fish:['#7fa9c8','#d7e8f4','#88b59b'], egg:['#f0d662','#fff3b5','#e19b55']
+  };
+  const t=M[key]||['#d8c6a6','#f0e6d1','#8fb26f'];
+  return {main:t[0], sub:t[1], leaf:t[2]};
+}
+function dishKind(r){
+  const n=r.name;
+  if(/ジャム/.test(n)) return 'jam';
+  if(/ミルク/.test(n)) return 'drink';
+  if(/パンケーキ/.test(n)) return 'pancake';
+  if(/プリン/.test(n)) return 'pudding';
+  if(/茶わん蒸し/.test(n)) return 'cup';
+  if(/焼きいも/.test(n)) return 'roastSweetPotato';
+  if(/大学いも/.test(n)) return 'candiedSweetPotato';
+  if(/スイートポテト/.test(n)) return 'sweetPotato';
+  if(/ごはん/.test(n)) return 'rice';
+  if(/カレー/.test(n)) return 'curry';
+  if(/オムレツ|たまご焼き/.test(n)) return 'omelet';
+  if(/ミルフィーユ鍋/.test(n)) return 'millefeuille';
+  if(/鍋/.test(n)) return 'nabe';
+  if(/ポタージュ/.test(n)) return 'potage';
+  if(/みそ汁|豚汁|けんちん汁|芋煮|スープ|煮|汁|アクアパッツァ/.test(n)) return 'soup';
+  if(/グラタン/.test(n)) return 'gratin';
+  if(/かき揚げ/.test(n)) return 'fritter';
+  if(/ねぎま/.test(n)) return 'skewer';
+  if(/肉詰め|はさみ焼き/.test(n)) return 'stuffed';
+  if(/チップス/.test(n)) return 'chips';
+  if(/浅漬け|おひたし|ごま和え|酢のもの|サラダ|バンバンジー|南蛮漬け/.test(n) || r.tag==='fresh') return 'salad';
+  if(/きんぴら/.test(n)) return 'kinpira';
+  if(/炒|しりしり/.test(n)) return 'stirfry';
+  if(/焼|ホイル|しょうが焼き/.test(n) || r.tag==='grill') return 'grill';
+  if(r.tag==='sweet') return 'sweet';
+  return 'simmer';
+}
+function dishPalette(r){
+  const a=ingredientTone(r.need[0]), b=ingredientTone(r.need[1]||r.fridge||r.need[0]);
+  return {main:a.main, sub:b.main, light:a.sub, leaf:(a.leaf||b.leaf), accent:ingredientTone(r.fridge||r.need[0]).sub};
+}
+function mealArt(r){
+  const k=dishKind(r), p=dishPalette(r), n=r.name;
+  const hot=!/^(salad|drink|jam|pudding|pancake|sweet|roastSweetPotato|candiedSweetPotato|sweetPotato|chips)$/.test(k);
+  const steam=hot?'<g fill="none" stroke="#cfc6b9" stroke-width="2.4" stroke-linecap="round"><path d="M38 22 q-5 -4.5 0 -9"/><path d="M75 18 q0 -5 0 -10"/><path d="M112 22 q5 -4.5 0 -9"/></g>':'';
+  const greens='<g fill="'+p.leaf+'"><circle cx="49" cy="48" r="3.6"/><circle cx="101" cy="39" r="3.2"/></g>';
+  let art='';
+  if(k==='salad') art='<g><ellipse cx="75" cy="47" rx="35" ry="13" fill="#fbf8ef"/><path d="M45 48 C54 29 97 30 105 47 C95 59 55 59 45 48Z" fill="'+p.leaf+'"/><g fill="'+p.main+'"><circle cx="58" cy="41" r="5.6"/><circle cx="74" cy="37" r="5.4"/><circle cx="91" cy="42" r="5.2"/></g><g fill="'+p.sub+'"><ellipse cx="65" cy="49" rx="8" ry="3.8"/><ellipse cx="85" cy="48" rx="8" ry="3.8"/></g><path d="M57 36 C66 39 82 39 92 36" fill="none" stroke="#fffaf4" stroke-width="2" stroke-linecap="round"/></g>';
+  else if(k==='kinpira') art='<g><ellipse cx="75" cy="47" rx="35" ry="13" fill="#f6ebdc"/><g stroke-width="3" stroke-linecap="round"><path d="M51 42 L94 48" stroke="'+p.main+'"/><path d="M53 47 L96 41" stroke="'+p.sub+'"/><path d="M56 44 L89 51" stroke="'+p.leaf+'"/></g><g fill="#f2e5c3"><circle cx="61" cy="38" r="1.5"/><circle cx="87" cy="50" r="1.5"/><circle cx="75" cy="45" r="1.5"/></g></g>';
+  else if(k==='grill') art='<g><ellipse cx="75" cy="46" rx="36" ry="12" fill="#f4ead7"/><g fill="'+p.main+'" stroke="#8a5a38" stroke-width="1.2"><ellipse cx="58" cy="45" rx="14" ry="8" transform="rotate(-12 58 45)"/><ellipse cx="76" cy="42" rx="14" ry="8" transform="rotate(8 76 42)"/><ellipse cx="92" cy="46" rx="14" ry="8" transform="rotate(-8 92 46)"/></g><g stroke="#6f4b34" stroke-width="1.5" stroke-linecap="round"><path d="M49 42 L64 47"/><path d="M67 39 L82 44"/><path d="M83 43 L99 48"/></g>'+greens+'</g>';
+  else if(k==='stirfry') art='<g><ellipse cx="75" cy="46" rx="37" ry="13" fill="#f6ece0"/><g stroke-linecap="round"><path d="M50 47 C60 34 90 34 101 46" stroke="'+p.main+'" stroke-width="8" fill="none"/><path d="M52 44 L97 49" stroke="'+p.sub+'" stroke-width="5"/><path d="M56 50 L92 39" stroke="'+p.leaf+'" stroke-width="4"/></g><path d="M60 36 L89 52" stroke="#f4e5bc" stroke-width="2" stroke-dasharray="1 5"/></g>';
+  else if(k==='stuffed') art='<g><ellipse cx="75" cy="47" rx="37" ry="13" fill="#f5eadb"/><g><path d="M48 48 C49 35 63 33 69 43 C71 54 55 58 48 48Z" fill="'+p.leaf+'"/><path d="M72 44 C73 33 87 32 93 41 C95 53 79 57 72 44Z" fill="'+p.leaf+'"/><path d="M92 48 C93 35 107 34 112 43 C114 54 99 58 92 48Z" fill="'+p.leaf+'"/><ellipse cx="59" cy="46" rx="6.5" ry="4.7" fill="'+p.main+'"/><ellipse cx="83" cy="43" rx="6.5" ry="4.7" fill="'+p.main+'"/><ellipse cx="103" cy="46" rx="6.5" ry="4.7" fill="'+p.main+'"/></g></g>';
+  else if(k==='fritter') art='<g><ellipse cx="75" cy="47" rx="37" ry="13" fill="#f5ebdc"/><g fill="#e2b356" stroke="#c38b34" stroke-width="1.1"><path d="M55 49 C45 40 54 31 66 35 C76 27 88 31 86 43 C95 49 89 56 77 54 C70 59 60 56 55 49Z"/><path d="M84 45 C76 37 82 30 92 33 C100 30 108 34 107 42 C114 47 108 54 98 53 C91 56 86 53 84 45Z"/></g><g fill="'+p.leaf+'"><circle cx="67" cy="39" r="2.3"/><circle cx="95" cy="42" r="2.3"/></g></g>';
+  else if(k==='sweet') art='<g><ellipse cx="75" cy="47" rx="31" ry="11" fill="#f6e9cf"/><ellipse cx="75" cy="43" rx="24" ry="9" fill="'+p.sub+'"/><ellipse cx="75" cy="40" rx="18" ry="7" fill="'+p.main+'"/><path d="M62 34 C69 28 81 28 88 34" fill="none" stroke="#fff7ef" stroke-width="3" stroke-linecap="round"/><circle cx="88" cy="31" r="3.4" fill="#e0524f"/></g>';
+  else if(k==='pudding') art='<g><ellipse cx="75" cy="48" rx="31" ry="10" fill="#f5ecd8"/><path d="M54 47 C55 34 95 34 96 47 C93 56 57 56 54 47Z" fill="#f2d169" stroke="#d4a45b" stroke-width="1.3"/><path d="M57 41 C65 36 85 36 93 41" fill="#8f5228"/><ellipse cx="75" cy="34" rx="12" ry="4" fill="#fff7ef"/><circle cx="91" cy="31" r="3.2" fill="#dc5a59"/></g>';
+  else if(k==='pancake') art='<g><ellipse cx="75" cy="48" rx="33" ry="10" fill="#f3ead8"/><ellipse cx="75" cy="45" rx="23" ry="7.5" fill="#e8b96a"/><ellipse cx="75" cy="40" rx="21" ry="6.8" fill="#efc57a"/><ellipse cx="75" cy="35" rx="19" ry="6" fill="#f4cf86"/><path d="M64 34 C70 31 81 31 87 34" fill="none" stroke="#fff9f1" stroke-width="3" stroke-linecap="round"/><path d="M61 40 C68 44 83 44 89 40" fill="none" stroke="#9d6534" stroke-width="2.5" stroke-linecap="round"/></g>';
+  else if(k==='jam') art='<g><ellipse cx="75" cy="49" rx="29" ry="9" fill="#f6ecde"/><rect x="60" y="27" width="30" height="21" rx="6" fill="#fbfbfb" stroke="#d6d0c4" stroke-width="1.4"/><rect x="58" y="23" width="34" height="7" rx="3" fill="#dcb88e"/><rect x="63" y="31" width="24" height="13" rx="5" fill="#d85d72"/><path d="M68 38 C73 34 79 34 83 38" fill="none" stroke="#f9ced6" stroke-width="2" stroke-linecap="round"/></g>';
+  else if(k==='drink') art='<g><ellipse cx="75" cy="51" rx="26" ry="7.5" fill="#f6ebdd"/><path d="M62 25 H88 L84 49 H66 Z" fill="#f8f5f3" stroke="#d2cbc0" stroke-width="1.3"/><path d="M66 30 H84 L81 46 H69 Z" fill="#f0b2c1"/><path d="M82 24 L88 14" stroke="#da6f85" stroke-width="2.5" stroke-linecap="round"/><circle cx="78" cy="34" r="2.1" fill="#fff8f1"/></g>';
+  else if(k==='roastSweetPotato') art='<g><ellipse cx="75" cy="48" rx="34" ry="10" fill="#f2e6d8"/><path d="M48 46 C53 36 67 34 77 40 C68 49 57 54 48 46Z" fill="#7d4971"/><path d="M73 42 C83 35 98 36 103 47 C94 54 82 51 73 42Z" fill="#8d547f"/><path d="M56 43 C62 39 67 39 71 42 C66 47 61 49 56 43Z" fill="#f1d068"/><path d="M81 41 C87 38 92 39 97 45 C90 48 85 48 81 41Z" fill="#f3d56f"/></g>';
+  else if(k==='candiedSweetPotato') art='<g><ellipse cx="75" cy="48" rx="33" ry="10" fill="#f6ecde"/><g fill="#b26a6f" stroke="#8b4b53" stroke-width="1"><rect x="54" y="39" width="12" height="9" rx="2.2" transform="rotate(-12 54 39)"/><rect x="69" y="35" width="12" height="9" rx="2.2" transform="rotate(8 69 35)"/><rect x="84" y="40" width="12" height="9" rx="2.2" transform="rotate(-8 84 40)"/></g><g fill="#f4e5b3"><circle cx="59" cy="43" r="1.3"/><circle cx="73" cy="39" r="1.3"/><circle cx="89" cy="44" r="1.3"/></g></g>';
+  else if(k==='sweetPotato') art='<g><ellipse cx="75" cy="49" rx="31" ry="9" fill="#f6ecde"/><path d="M53 47 C57 34 93 34 97 47 C92 53 58 53 53 47Z" fill="#e8bc67" stroke="#c48d40" stroke-width="1.2"/><path d="M58 44 C67 37 82 37 91 44" fill="none" stroke="#f6e9ae" stroke-width="2.2" stroke-linecap="round"/></g>';
+  else if(k==='rice') art='<g><ellipse cx="75" cy="47" rx="37" ry="13" fill="#f2e8d5"/><path d="M48 48 C49 34 101 34 102 48 C95 57 55 57 48 48Z" fill="#fffdf7" stroke="#ddd7cc" stroke-width="1.2"/><g fill="'+p.main+'"><ellipse cx="65" cy="42" rx="6.5" ry="4.3"/><ellipse cx="79" cy="45" rx="6.5" ry="4.3"/><ellipse cx="90" cy="40" rx="5.6" ry="3.8"/></g><path d="M58 39 C70 47 83 47 95 39" fill="none" stroke="'+p.leaf+'" stroke-width="2.2" stroke-linecap="round"/></g>';
+  else if(k==='omelet') art=/たまご焼き/.test(n)
+    ? '<g><ellipse cx="75" cy="48" rx="34" ry="10" fill="#f4ead6"/><rect x="52" y="36" width="46" height="15" rx="7" fill="#f2d45b" stroke="#d0a24a" stroke-width="1.2"/><path d="M57 43 H93" stroke="#e8c24a" stroke-width="2"/><g fill="'+p.leaf+'"><circle cx="53" cy="49" r="3.2"/><circle cx="97" cy="40" r="3.2"/></g></g>'
+    : '<g><ellipse cx="75" cy="47" rx="34" ry="12" fill="#f4ead6"/><path d="M48 47 C54 34 96 34 102 47 C95 56 55 56 48 47Z" fill="#f1d45e" stroke="#d0a24a" stroke-width="1.4"/><path d="M59 45 C67 42 84 42 92 45" fill="none" stroke="#de6b5d" stroke-width="2.4" stroke-linecap="round"/><g fill="'+p.leaf+'"><circle cx="52" cy="48" r="4"/><circle cx="97" cy="41" r="4"/></g></g>';
+  else if(k==='curry') art='<g><ellipse cx="75" cy="47" rx="37" ry="13" fill="#f4ead6"/><path d="M48 48 C50 36 77 35 82 47 C82 56 53 57 48 48Z" fill="#fffdf7" stroke="#ddd7cc" stroke-width="1.2"/><path d="M72 39 C89 34 103 39 103 46 C103 55 83 57 72 53 C69 49 68 43 72 39Z" fill="#9e6532"/><g fill="'+p.main+'"><circle cx="82" cy="44" r="4"/><circle cx="94" cy="47" r="4"/></g></g>';
+  else if(k==='nabe') art='<g><ellipse cx="75" cy="47" rx="37" ry="13" fill="#d6dde4"/><ellipse cx="75" cy="45" rx="33" ry="11" fill="'+p.light+'"/><g fill="'+p.main+'"><circle cx="61" cy="43" r="5"/><circle cx="75" cy="40" r="5"/><circle cx="89" cy="44" r="5"/></g><g fill="'+p.leaf+'"><ellipse cx="56" cy="49" rx="8" ry="4"/><ellipse cx="94" cy="49" rx="8" ry="4"/></g><path d="M44 42 H38 M112 42 H106" stroke="#8799a6" stroke-width="3" stroke-linecap="round"/></g>';
+  else if(k==='millefeuille') art='<g><ellipse cx="75" cy="47" rx="37" ry="13" fill="#d6dde4"/><ellipse cx="75" cy="45" rx="33" ry="11" fill="#f5f0df"/><path d="M49 40 H101 M49 44 H101 M49 48 H101" stroke="#e8dcbf" stroke-width="3.2" stroke-linecap="round"/><path d="M52 37 H98 M52 47 H98" stroke="#d9bfbe" stroke-width="2.2" stroke-linecap="round"/><g fill="'+p.leaf+'"><circle cx="57" cy="51" r="3"/><circle cx="93" cy="38" r="3"/></g><path d="M44 42 H38 M112 42 H106" stroke="#8799a6" stroke-width="3" stroke-linecap="round"/></g>';
+  else if(k==='potage') art='<g><ellipse cx="75" cy="49" rx="34" ry="11" fill="#ece6dd"/><path d="M46 48 C47 36 103 36 104 48 C99 56 51 56 46 48Z" fill="'+p.main+'"/><path d="M60 44 C68 39 82 39 90 44" fill="none" stroke="#fff3d3" stroke-width="2.8" stroke-linecap="round"/><circle cx="92" cy="44" r="2.2" fill="#f8f0d7"/></g>';
+  else if(k==='soup') art=/ふろふき大根|大根/.test(n)
+    ? '<g><ellipse cx="75" cy="49" rx="34" ry="11" fill="#efe7db"/><path d="M46 48 C47 36 103 36 104 48 C99 56 51 56 46 48Z" fill="#d5ae6f"/><g fill="#f5f1e8" stroke="#d6cab7" stroke-width="1"><circle cx="61" cy="45" r="6.2"/><circle cx="76" cy="42" r="6.2"/><circle cx="90" cy="47" r="6.2"/></g><path d="M75 37 C77 34 82 34 84 37" fill="none" stroke="'+p.leaf+'" stroke-width="2" stroke-linecap="round"/></g>'
+    : /アクアパッツァ/.test(n)
+    ? '<g><ellipse cx="75" cy="49" rx="35" ry="11" fill="#efe8dd"/><path d="M46 48 C47 36 103 36 104 48 C99 56 51 56 46 48Z" fill="#dce8ef"/><path d="M58 45 C62 38 79 37 88 43 C79 49 64 50 58 45Z" fill="#9db9cf" stroke="#7692a8" stroke-width="1.2"/><circle cx="84" cy="43" r="1.4" fill="#fff"/><circle cx="84" cy="43" r=".7" fill="#4b5e6c"/><g fill="'+p.main+'"><circle cx="57" cy="48" r="3.2"/><circle cx="94" cy="47" r="3.2"/></g></g>'
+    : '<g><ellipse cx="75" cy="49" rx="34" ry="11" fill="#efe7db"/><path d="M46 48 C47 36 103 36 104 48 C99 56 51 56 46 48Z" fill="'+(/みそ汁|豚汁/.test(n)?'#b68657':p.light)+'"/><g fill="'+p.main+'"><circle cx="60" cy="45" r="5.2"/><circle cx="75" cy="41" r="5.2"/><circle cx="89" cy="46" r="5.2"/></g><g fill="'+p.leaf+'"><ellipse cx="56" cy="49" rx="7" ry="3.3"/><ellipse cx="93" cy="49" rx="7" ry="3.3"/></g></g>';
+  else if(k==='gratin') art='<g><path d="M46 38 H104 L98 53 H52 Z" fill="#d7c5b5" stroke="#baa28b" stroke-width="1.4"/><path d="M50 40 H100 L95 50 H55 Z" fill="#f1cd73"/><path d="M55 42 C64 37 86 37 95 43" fill="none" stroke="#d49742" stroke-width="2.5" stroke-linecap="round"/><g fill="'+p.leaf+'"><circle cx="61" cy="47" r="3.1"/><circle cx="89" cy="45" r="3.1"/></g></g>';
+  else if(k==='skewer') art='<g><ellipse cx="75" cy="48" rx="34" ry="10" fill="#f4ead6"/><path d="M52 41 L96 48" stroke="#b98a5a" stroke-width="3.2" stroke-linecap="round"/><g><circle cx="59" cy="42" r="6" fill="'+p.main+'"/><circle cx="73" cy="44" r="6" fill="'+p.leaf+'"/><circle cx="86" cy="46" r="6" fill="'+p.main+'"/></g></g>';
+  else if(k==='chips') art='<g><ellipse cx="75" cy="48" rx="34" ry="10" fill="#f5ebdb"/><g fill="#e9cf8f" stroke="#d7b56f" stroke-width="1"><ellipse cx="60" cy="45" rx="6" ry="4.5" transform="rotate(-18 60 45)"/><ellipse cx="74" cy="40" rx="6" ry="4.5"/><ellipse cx="88" cy="45" rx="6" ry="4.5" transform="rotate(18 88 45)"/></g><g fill="#cdb38e"><circle cx="60" cy="45" r=".8"/><circle cx="74" cy="40" r=".8"/><circle cx="88" cy="45" r=".8"/></g></g>';
+  else if(k==='cup') art='<g><ellipse cx="75" cy="49" rx="29" ry="9" fill="#f3eadc"/><path d="M58 31 C58 26 63 23 69 23 H81 C87 23 92 26 92 31 V44 C92 49 87 53 81 53 H69 C63 53 58 49 58 44 Z" fill="#f6f0e4" stroke="#d3c7b6" stroke-width="1.4"/><ellipse cx="75" cy="31" rx="16" ry="5" fill="#e7d2a4"/><g fill="'+p.main+'"><circle cx="69" cy="29" r="3"/><circle cx="79" cy="31" r="3"/></g><path d="M65 27 C71 34 78 34 85 27" fill="none" stroke="'+p.leaf+'" stroke-width="2" stroke-linecap="round"/></g>';
+  else art='<g><ellipse cx="75" cy="48" rx="37" ry="13" fill="#f4ead6"/><path d="M46 47 C50 31 100 31 104 47 C98 57 52 57 46 47Z" fill="'+p.light+'"/><g fill="'+p.main+'"><circle cx="58" cy="43" r="6"/><circle cx="74" cy="39" r="6"/><circle cx="90" cy="44" r="6"/></g><g fill="'+p.sub+'"><ellipse cx="67" cy="49" rx="8" ry="4"/><ellipse cx="86" cy="49" rx="8" ry="4"/></g></g>';
+  return steam+art;
+}
+function mealPlate(r){
+  return '<svg class="plate" viewBox="0 0 150 84" aria-hidden="true"><ellipse cx="75" cy="64" rx="62" ry="15" fill="#e9dfcd"/><ellipse cx="75" cy="60" rx="62" ry="15" fill="#fffdf8" stroke="#d9d0c3" stroke-width="2"/><ellipse cx="75" cy="60" rx="44" ry="9" fill="#f4ecdd"/>'+mealArt(r)+'</svg>';
+}
 /* 取り皿の上の料理（3人ぶん）。ids＝料理のしるし（null で からにする） */
 const PORTION_AT=[[209,334],[315,335],[262,328]];   /* 取り皿の場所（#g-setting の3枚と同じ。えり・しゃだはる・ほまれ の前） */
 function setPortions(ids){
@@ -3143,6 +3331,23 @@ function setPortions(ids){
   g.innerHTML=PORTION_AT.map(([x,y])=> ids.length>1
     ? '<use href="#'+ids[0]+'" x="'+(x-10.5)+'" y="'+(y-11.5)+'" width="11.5" height="11.5"/><use href="#'+ids[1]+'" x="'+(x-.5)+'" y="'+(y-10.5)+'" width="11.5" height="11.5"/>'
     : '<use href="#'+ids[0]+'" x="'+(x-6.5)+'" y="'+(y-12)+'" width="13" height="13"/>').join('');
+}
+function portionFood(kind,p,x,y){
+  if(kind==='salad') return '<g><ellipse cx="'+x+'" cy="'+y+'" rx="6.8" ry="2.8" fill="'+p.leaf+'"/><circle cx="'+(x-2.5)+'" cy="'+(y-1.6)+'" r="2.2" fill="'+p.main+'"/><circle cx="'+(x+2.2)+'" cy="'+(y-1.2)+'" r="2.1" fill="'+p.sub+'"/></g>';
+  if(kind==='drink') return '<g><rect x="'+(x-3.6)+'" y="'+(y-6.8)+'" width="7.2" height="8.5" rx="1.6" fill="#f1bfd0" stroke="#d9d0c3" stroke-width=".7"/><path d="M'+(x+1.6)+' '+(y-6.8)+' L'+(x+4.9)+' '+(y-10.5)+'" stroke="#d36e84" stroke-width="1"/></g>';
+  if(kind==='jam') return '<g><rect x="'+(x-4)+'" y="'+(y-5.5)+'" width="8" height="7.2" rx="1.7" fill="#d95c73" stroke="#d9d0c3" stroke-width=".7"/><rect x="'+(x-4.6)+'" y="'+(y-7.3)+'" width="9.2" height="2" rx="1" fill="#dcb88e"/></g>';
+  if(kind==='pancake' || kind==='pudding' || kind==='sweet' || kind==='roastSweetPotato' || kind==='candiedSweetPotato' || kind==='sweetPotato') return '<g><ellipse cx="'+x+'" cy="'+y+'" rx="7" ry="3" fill="#f4ead6"/><ellipse cx="'+x+'" cy="'+(y-1.4)+'" rx="4.8" ry="2.5" fill="'+p.main+'"/></g>';
+  if(kind==='nabe' || kind==='millefeuille' || kind==='soup' || kind==='potage' || kind==='curry' || kind==='cup' || kind==='gratin' || kind==='simmer') return '<g><ellipse cx="'+x+'" cy="'+y+'" rx="7" ry="3" fill="'+p.light+'"/><circle cx="'+(x-2)+'" cy="'+(y-1.3)+'" r="2" fill="'+p.main+'"/><circle cx="'+(x+2.3)+'" cy="'+(y-1)+'" r="2" fill="'+p.leaf+'"/></g>';
+  if(kind==='rice' || kind==='omelet') return '<g><ellipse cx="'+x+'" cy="'+y+'" rx="7" ry="3" fill="#f4ead6"/><ellipse cx="'+x+'" cy="'+(y-1.2)+'" rx="5" ry="2.6" fill="'+p.main+'"/></g>';
+  if(kind==='skewer') return '<g><path d="M'+(x-4.7)+' '+(y+1.8)+' L'+(x+4.7)+' '+(y-2)+'" stroke="#b98a5a" stroke-width="1.1"/><circle cx="'+(x-2.5)+'" cy="'+(y+.8)+'" r="1.8" fill="'+p.main+'"/><circle cx="'+x+'" cy="'+y+'" r="1.8" fill="'+p.leaf+'"/><circle cx="'+(x+2.4)+'" cy="'+(y-1)+'" r="1.8" fill="'+p.main+'"/></g>';
+  if(kind==='chips') return '<g><ellipse cx="'+(x-2.1)+'" cy="'+y+'" rx="2.6" ry="1.9" fill="#e9cf8f"/><ellipse cx="'+(x+1.8)+'" cy="'+(y-1.2)+'" rx="2.6" ry="1.9" fill="#edd9a4"/></g>';
+  return '<g><ellipse cx="'+x+'" cy="'+y+'" rx="7" ry="3" fill="#f4ead6"/><ellipse cx="'+(x-2.4)+'" cy="'+(y-1.1)+'" rx="3.8" ry="2.1" fill="'+p.main+'"/><ellipse cx="'+(x+2.4)+'" cy="'+(y-1.2)+'" rx="3.8" ry="2.1" fill="'+p.sub+'"/></g>';
+}
+function setMealPortions(r){
+  const g=$('#hPortions'); if(!g) return;
+  if(!r){ g.innerHTML=''; return; }
+  const kind=dishKind(r), p=dishPalette(r);
+  g.innerHTML=PORTION_AT.map(([x,y])=>portionFood(kind,p,x,y)).join('');
 }
 function updatePhoto(pop){
   const ph=S.photo, ids=ph ? (Array.isArray(ph.icons)&&ph.icons.length ? ph.icons : (ph.need||[]).map(k=>'c-'+k)).slice(0,2) : [];
@@ -3499,7 +3704,7 @@ const SEASONAL_SCENE={
     hsay(E,'そうだ。風鈴、つるしてみたよ。',{mood:'smile'});
     await hp(1600);
     const g=$('#g-furin'); g.style.display=''; if(!reduceMotion&&!homeSkip) g.classList.add('popIn');
-    if(!homeSkip) Snd.play('furin'); hfxText('チリン',{x:252,y:92});
+    if(!homeSkip) Snd.play('furin'); hfxText('リーン',{x:250,y:90});
     await hp(1700);
     hmood(D,'happy',1900);
     hsay(D,'ちりんちりん、ばう。');
@@ -3633,7 +3838,7 @@ async function homeEvening(cands){
     isNew=!S.recipes[dish.name]; S.recipes[dish.name]=true;
     const fItem=dish.fridge?FRIDGE[dish.fridge]:null;
     $('#hBasketItems').innerHTML=dish.need.slice(0,2).map((k,j)=>'<svg style="left:'+(4+j*15)+'px;top:'+(6-j*3)+'px" aria-hidden="true"><use href="#c-'+k+'"/></svg>').join('');
-    $('#hDish').innerHTML=plateSVG(dishIcons(dish));
+    $('#hDish').innerHTML=mealPlate(dish);
     const main=vegName(dish.need[0]);
     hsay(E,dish.eri||(fItem ? '冷蔵庫に'+fItem.name+'があるから、'+dish.name+'にしよっか。' : '今日の'+main+'、'+dish.name+'にしてみよっか。'),{mood:'smile'});
     await hp(fItem?1800:1400);
@@ -3721,7 +3926,7 @@ async function homeEvening(cands){
     hhush();
     await Promise.all([hwork(E),hwork(H),hwork(D)]); hfxText('もぐもぐ',{x:D.x,y:D.y-34}); if(!homeSkip) Snd.play('eat'); await Promise.all([hwork(E),hwork(H),hwork(D)]);
     /* 料理は、食べているあいだも見せたままにする（v1.12.0。前は、ここで すぐ うすくしていた）。3人の取り皿にも、少しずつ よそう */
-    $('#hDish').classList.add('eating'); setPortions(dishIcons(dish));
+    $('#hDish').classList.add('eating'); setMealPortions(dish);
     /* 食べたときのひとことは、日によって2とおり */
     yumH=pick(['美味しい！','美味しいなぁ！']); yumD=pick(['おいしいばう！','おいしすぎるばう！']);
     hmood(H,'happy',2800);
@@ -3774,6 +3979,11 @@ async function homeEvening(cands){
       hsay(H,pick(['えりちゃんの料理は、最高だなあ。','畑のとれたては、ちがうね。','おかわりある？','えりちゃん、ごちそうさま。']));
       await hp(1500);
     }
+    hhush();
+    hsay(E,'ごちそうさまでした。',{mood:'smile'});
+    hsay(H,'ごちそうさまでした。',{lift:12});
+    hsay(D,'ごちそうさまでした。');
+    await hp(1850);
     /* ごちそうさま：なごみ度がふえる。お皿は、ここで からになる */
     hNagomi(isNew?2:1,{x:(E.x+D.x)/2,y:E.y-40});
     await hp(900);
@@ -3952,7 +4162,7 @@ async function homeMorning(){
   /* ほまれくんは、あいさつのあとに ひとこと（v1.13.2。依頼者が「日がわりで3つ」をえらんだ）。天気のひとことは、雨・雪になる日だけ言いかえる */
   const hLines=['よくねむれた？', dull?(season()===3?'今日は、雪になりそうだね。':'今日は、雨になりそうだね。'):'今日もいい天気だね。', '今日も畑、たのしんできてね。'];
   const hk=pick([0,1,2].filter(i=>i!==S.mornH)); S.mornH=hk;
-  hsay(H,'おはよう。'+hLines[hk]);
+  hsay(H,'おはよう。'+hLines[hk],{lift:16});
   await pause(2300);
   wake(D); await pause(300);
   /* しゃだはる君は、日によって「おはようばう。」か「ばう。」（v1.13.2。依頼者の指定） */
@@ -4194,9 +4404,9 @@ const EVENTS=[
       await moveTo(A.shada,spotOf(i,shadaSide(i)));
       await work(A.shada,i,'i-drop');
       p.watered=true; p.dry=false; renderPlots();
-      say('shada','ここ、かわいてるばう。');
+      say('shada',fieldLine('helpWaterS'));
       log('しゃだはる君が、ひとマスだけ水やりをしてくれました。');
-      if(rnd()<.5){ await pause(900); say('eri','しゃだはる、ありがとう。',0,'smile'); }
+      if(rnd()<.5){ await pause(900); say('eri',fieldLine('helpThanksE'),0,'smile'); }
     }},
   { id:'bug', w:{helpful:2,goofy:1,sleepy:.4}, k:()=>BUG_EVENT_K[season()], can:()=>BUG_EVENT_K[season()]>0 && !S.raining && growingPlots().length>0,
     async run(){
@@ -4205,14 +4415,14 @@ const EVENTS=[
       p.bug=true; renderPlots();
       await moveTo(A.shada,spotOf(i,shadaSide(i)));
       await pause(500);
-      say('shada','むし、いるばう！');
+      say('shada',fieldLine('helpBugS'));
       await work(A.shada,i); await work(A.shada,i);
       p.bug=false; renderPlots();
       fx('i-bug',{x:c.x+16,y:c.y-4},'away',820); Snd.play('shoo');
       p.growth=Math.min(totalOf(p),p.growth+60);
       renderPlots();
       log('しゃだはる君が虫を追いはらってくれました。'+CROPS[p.crop].name+'が元気になりました。');
-      if(rnd()<.5){ await pause(700); say('eri','しゃだはる、ありがとう。',0,'smile'); }
+      if(rnd()<.5){ await pause(700); say('eri',fieldLine('helpThanksE'),0,'smile'); }
     }},
   { id:'stone', w:{helpful:.6,goofy:.6,sleepy:.3}, can:()=>true,
     async run(){
@@ -4271,7 +4481,7 @@ const EVENTS=[
       await moveTo(A.shada,SPOT.basket);
       shadaMode('nap'); A.shada.napUntil=Math.min(DAY_END,S.clock+180);
       setMood('shada','sleepy');
-      say('shada','……ばう。');
+      say('shada',fieldLine('napS'));
       setMood('eri','smile',2200);
       addNagomi(2,A.shada);
       log('しゃだはる君は、収穫かごにすっぽり入ってお昼寝しています。');
@@ -4404,6 +4614,7 @@ async function maybeEvent(resting,forceId){
   }
   if(SEASONAL_EV[e.id]){ const se2=seasonEv(); se2.seen=true; se2.day=S.day; }
   S.eventsToday+=1; S.sinceEvent=0;
+  cancelFieldReply();
   await pause(350);
   peekStart();
   await e.run();
@@ -4438,12 +4649,12 @@ function plateSVG(ids){
 async function endDay(){
   hush();
   say('eri', S.clock>=DAY_END ? 'そろそろ帰ろっか。' : '今日はここまでにしよっか。',0,'smile');
-  await pause(600);
+  await pause(900);
   cancelErrand(); wakeShada(false); stopWatch();
   if(A.shada.mode==='hide'){ shadaMode('follow'); setMood('shada','normal'); }
   say('shada','また明日ばう。');
   focusRange(40,330);
-  await Promise.all([moveTo(A.eri,SPOT.homeEri), sleep(reduceMotion?0:150).then(()=>moveTo(A.shada,SPOT.homeShada))]);
+  await Promise.all([moveTo(A.eri,SPOT.homeEri,{ms:1500}), sleep(reduceMotion?0:240).then(()=>moveTo(A.shada,SPOT.homeShada,{ms:1580}))]);
   await pause(300);
   hush();
   S.clock=DAY_END; weatherTick(true); wxQueue=[]; renderHUD(); renderSky();
@@ -4519,7 +4730,7 @@ function placeFrost(){
 }
 async function morning(info){
   info=info||{};
-  busy=true;
+  busy=true; hush();
   cancelErrand(); shadaMode('follow'); A.shada.watchPlot=null;
   setMood('eri','normal'); setMood('shada','normal');
   place(A.eri,SPOT.homeEri.x,SPOT.homeEri.y,0);
@@ -4560,24 +4771,30 @@ async function morning(info){
     A.homare.el.classList.remove('on');
     await pause(300);
   }
+  /* v1.18.0：まず声かけに返事をしてから、天気の話・見回り・いつものひとことへ。 */
+  hush();
+  if(info.first) await moveTo(A.eri,SPOT.morningEri);
+  /* 声かけのあいだは横に並ぶ。えりちゃんの吹き出しを、しゃだはるの頭の上へ押し上げない。 */
+  await moveTo(A.shada,{x:SPOT.morningEri.x+62,y:SPOT.morningEri.y+6});
+  say('eri',info.changed?SEASONS[season()]+'だね。今日もよろしくね。':(info.first?'おはよう、しゃだはる。今日もよろしくね。':'しゃだはる、今日もよろしくね。'),0,'smile');
+  await sleep(1800);
+  hush();
+  if(S.mood==='sleepy'){ setMood('shada','sleepy',2000); say('shada',fieldLine('morningSleepy')); }
+  else{ setMood('shada','happy',1800); say('shada',fieldLine('morningReply')); }
+  await sleep(2000);
+  hush();
   if(S.weather==='rain'){
     A.shada.el.classList.add('lookup');
     fx(season()===3?'i-snow':'i-rain',{x:A.shada.x+4,y:A.shada.y-44},'pop',1500);
     setTimeout(()=>A.shada.el.classList.remove('lookup'),1900);
-    say('shada',season()===3?'ゆき、くるばう。':'あめ、くるばう。');
+    say('shada',fieldLine(season()===3?'snowHintS':'rainHintS'));
     log('しゃだはる君が空を見上げて、そわそわしています。'+(S.wx&&S.wx.kind==='storm'?'午後は、夕立がきそうです。':'今日は水やりをしなくても大丈夫そうです。'));
   }else if(info.droopy!=null && S.plots[info.droopy].crop){
     await moveTo(A.shada,spotOf(info.droopy,'R'));
-    say('shada','元気ないばう……');
+    say('shada',fieldLine('droopyS'));
     log(CROPS[S.plots[info.droopy].crop].name+'が少し元気がないみたい。お水をあげれば、また育ちます。');
-  }else say('shada',pick(info.first?LINES.morningS:LINES.morningS2));
-  await pause(700);
-  if(info.first) await moveTo(A.eri,SPOT.morningEri);
-  say('eri',info.changed?SEASONS[season()]+'だね。今日もよろしくね。':(info.first?'おはよう、しゃだはる。今日もよろしくね。':'しゃだはる、今日もよろしくね。'),0,'smile');
-  /* しゃだはる君のお返事（日によって2とおり。ねむい日は、あくびまじり） */
-  await pause(1500);
-  if(S.mood==='sleepy'){ setMood('shada','sleepy',2000); say('shada','ふわぁ……がんばるばう。'); }
-  else{ setMood('shada','happy',1600); say('shada',pick(LINES.morningReply)); }
+  }else say('shada',fieldLine('morningS2'));
+  await sleep(1800);
   if(info.sprouted){
     await pause(1500);
     await moveTo(A.shada,{x:SPOT.shadaPlot.x+30,y:SPOT.shadaPlot.y-22});
@@ -4589,7 +4806,7 @@ async function morning(info){
   }
   if(S.plots.some(p=>p.frost)){
     await pause(1500);
-    say('shada','つち、こおってるばう。');
+    say('shada',fieldLine('frostHintS'));
     log('畑に霜がおりています。こおったマスは、朝9時ごろにとけます。タップすると、霜柱をふんでとかせます。');
   }
   await pause(400);
@@ -4788,7 +5005,7 @@ async function boot(){
 }
 /* しらべる用：アドレスの最後に #debug をつけたときだけ使える */
 if(location.hash.indexOf('debug')>=0){
-  window.__hatake={ get S(){return S;}, get busy(){return busy;}, A, homeEvening, pickPre, dishCandidates, makeRequest, get HA(){return HA;}, advance, maybeEvent, renderAll, addHarvest, checkUnlocks, nextMorning, Store, CROPS, RECIPES, UNLOCKS, EVENTS, FRIDGE, rollFridge, rollWeather, placeFrost, weatherScenes, importSave, exportSave, normalize, Snd, GIFTS, planVisit, visitDue, fitVisit,
+  window.__hatake={ say, morning, LINES, fieldLine, harvestTalk, inviteNapHelper, playerAction, shadaMode, wakeShada, get S(){return S;}, get busy(){return busy;}, A, homeEvening, pickPre, dishCandidates, makeRequest, get HA(){return HA;}, advance, maybeEvent, renderAll, addHarvest, checkUnlocks, nextMorning, Store, CROPS, RECIPES, UNLOCKS, EVENTS, FRIDGE, rollFridge, rollWeather, placeFrost, weatherScenes, importSave, exportSave, normalize, Snd, GIFTS, planVisit, visitDue, fitVisit,
     visit:async()=>{ if(busy) return false; busy=true; renderButtons(); S.oji={sy:Math.floor((S.day-1)/SEASON_DAYS),day:S.day,at:S.clock,done:false}; await visitScene(); busy=false; renderButtons(); return true; },
     force:async id=>{ if(busy) return false; busy=true; renderButtons(); S.sinceEvent=9; const r=await maybeEvent(false,id); await checkUnlocks(); busy=false; renderButtons(); return r; } };
 }
