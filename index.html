@@ -175,6 +175,11 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 #actors .actor.oji.on{display:block;animation:fadeIn .4s ease-out}
 .actor.oji .carry{left:50%;top:58%;width:32px;height:32px;margin-left:-16px}
 #actors .actor.eri .carry{left:50%;top:50%;width:30px;height:30px;margin-left:-15px}
+/* 手わたし（v1.18.0）：おじさんが箱をさし出し（offer）、えりちゃんが すぐ前で受けとる（receive＝受けとる瞬間の箱の場所）。
+   ふたりの箱が同じ場所でかさなった瞬間に持ち主がかわり、えりちゃんの手もとへ引きよせる。箱は宙に出ない */
+#actors .actor .carry{transition:transform .42s ease-in-out}
+#actors .actor.oji.offer .carry{transform:translate(31px,-6px)}
+#actors .actor.eri.receive .carry{transform:translate(-31px,6px);transition:none}
 #actors .actor.homare{display:none}
 #actors .actor.homare.on{display:block;animation:fadeIn .4s ease-out}
 .actor .shadow{position:absolute;left:16%;right:16%;bottom:-5%;height:15%;border-radius:50%;background:rgba(60,44,24,.25)}
@@ -241,8 +246,13 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 .bubble.on{opacity:1;transform:none}
 .bubble span{display:inline-block;max-width:100%}
 .bubble::after{content:"";position:absolute;bottom:-6px;width:10px;height:10px;background:#fff;border-right:1px solid var(--border);border-bottom:1px solid var(--border);transform:rotate(45deg)}
-.bubble.toL{right:28%}.bubble.toL::after{right:12px}
-.bubble.toR{left:28%}.bubble.toR::after{left:12px}
+/* --bs＝吹き出しを横へずらす量（おうちの hsay の fit。しっぽは、話している人の上にのこす）。ふだんは 0 */
+.bubble.toL{right:calc(28% - var(--bs,0px))}.bubble.toL::after{right:calc(12px + var(--bs,0px))}
+.bubble.toR{left:calc(28% + var(--bs,0px))}.bubble.toR::after{left:calc(12px - var(--bs,0px))}
+/* 3人そろって言うセリフ（ごちそうさまでした。）の、ひとつにまとめた吹き出し。しっぽ（i）は人数ぶん（v1.18.0） */
+.bubble.chorus{left:0;top:0;bottom:auto;z-index:520;text-align:center}
+.bubble.chorus::after{display:none}
+.bubble.chorus i{position:absolute;bottom:-6px;width:10px;height:10px;margin-left:-5px;background:#fff;border-right:1px solid var(--border);border-bottom:1px solid var(--border);transform:rotate(45deg)}
 
 .fx{position:absolute;left:0;top:0;z-index:60;pointer-events:none}
 .fx>span{display:block;width:26px;height:26px;transform:translate(-50%,-50%)}
@@ -867,7 +877,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 <div class="game" id="game">
   <div class="head">
     <h1>えりとしゃだはるの ちいさな畑</h1>
-    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.17.0</span></span>
+    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.18.0</span></span>
   </div>
 
   <div class="hud">
@@ -1497,8 +1507,10 @@ const Snd=(()=>{
     ice:(c,o,t)=>{ tone(c,o,t,{f:2300,dur:.05,vol:.05}); tone(c,o,t+.07,{f:2900,dur:.09,vol:.045}); },
     lamp:(c,o,t)=>{ hiss(c,o,t,{freq:1500,q:1.5,dur:.03,vol:.12}); tone(c,o,t+.004,{f:540,f2:340,type:'triangle',dur:.07,vol:.1}); },
     /* 風鈴（v1.17.0）：ガラスの高い音を2回（チリ…リン）。高い倍音は短く、もとの音は長くのこす */
-    furin:(c,o,t)=>{ [[2637,.028,1.3],[4186,.012,.8],[7040,.006,.4]].forEach(([f,v,d])=>tone(c,o,t,{f,dur:d,vol:v,attack:.004}));
-                     [[2794,.02,1.1],[4435,.009,.6]].forEach(([f,v,d])=>tone(c,o,t+.24,{f,dur:d,vol:v,attack:.004})); }   /* 高い音は耳につきやすいので、小さめ（いちばん強い0.1秒の大きさ 約0.017。「氷」0.011 と「きらっ」0.023 のあいだ） */
+    /* 風鈴（v1.18.0で作りなおし。依頼者「もう少し、リーンという高い音がよい」）：高い音が1回、長くのこる（チ・リーン）。
+       すぐとなりの高さ（+4.5Hz）を小さく重ねて、ゆっくりした ゆらぎ（うなり）を出す。はじめの「チ」は、ごく短い、もっと高い音。
+       前は 2637Hz と 2794Hz を2回、0.5秒ほどで消えていた（チリン） */
+    furin:(c,o,t)=>{ [[3520,.024,3.2],[3524.5,.011,3.0],[8480,.005,1.2],[10200,.004,.2]].forEach(([f,v,d])=>tone(c,o,t,{f,dur:d,vol:v,attack:.003})); }
   };
   function build(){
     if(ctx || !AC) return;
@@ -1703,7 +1715,7 @@ function newGame(){
     plots, shadaPlot:{phase:'none',crop:null,growth:0,appearDay:0},
     totals:{}, total:0, today:{}, pantry:{}, recipes:{}, nagomi:0, stones:0, acorns:0, frogs:0, snowman:false,
     unlocked:{}, decor:{}, request:null, photo:null, newToday:[], basketToday:[], held:null, lastSeed:null,
-    eventsToday:0, sinceEvent:0, petsToday:0, log:[], intro:false, sound:'all', oji:null, giftToday:[], gifts:0, preSeen:{}, nagomiDay:0, joyN:0, mornH:-1, seasonEv:null, wetSeen:null, shelterDay:0, rewards:null, rewardAt:null, omiyageN:0, seasonal:null
+    eventsToday:0, sinceEvent:0, petsToday:0, log:[], intro:false, sound:'all', oji:null, giftToday:[], gifts:0, preSeen:{}, nagomiDay:0, joyN:0, mornH:-1, seasonEv:null, wetSeen:null, shelterDay:0, rewards:null, rewardAt:null, omiyageN:0, seasonal:null, ojiN:null
   };
 }
 const season=()=>Math.floor((S.day-1)/SEASON_DAYS)%4;
@@ -2433,6 +2445,10 @@ const visitDue=()=>{ const v=S.oji; return !!v && !v.done && v.day===S.day && S.
 const VISIT={ oji:{x:250,y:402}, eri:{x:346,y:396}, shada:{x:398,y:408}, pat:{x:298,y:416}, from:{x:36,y:418}, basket:{x:262,y:262} };
 /* しゃだはる君が気づくときのひとこと（日によって2とおり） */
 const VISIT_CALL=['だれか、きたばう！','えりちゃん、おきゃくさんばう！'];
+/* おじさんの、あいさつと ひとこと（v1.18.0。依頼者の希望「毎回同じではなく、2パターンほど」）。来るたびに入れかわる（S.ojiN＝何回めか）：
+   あいさつは1回ごと、ひとことは2回ごとに かわるので、4回で4とおりの組みあわせになる。それぞれ1つめが、前からのセリフ */
+const VISIT_HELLO=['やあ、えりちゃん。今日も、せいが出るね。','やあ、えりちゃん。いい畑になってきたね。'];
+const VISIT_OFFER=['うちでとれたんだ。よかったら食べてね。','たくさんとれたから、おすそわけだよ。'];
 async function visitScene(){
   const key=GIFT_BY_SEASON[season()], g=GIFTS[key], O=A.oji, withS=A.shada.mode==='follow';
   S.oji.done=true;
@@ -2450,18 +2466,29 @@ async function visitScene(){
   hush(); say('eri','あ、おじさん。こんにちは。',0,'smile');
   await walkIn;
   await pause(600);
-  hush(); say('oji','やあ、えりちゃん。今日も、せいが出るね。',0,'happy');
+  if(S.ojiN==null) S.ojiN=(S.gifts||0)>0?1:0;   /* 前から遊んでいるセーブは、新しいほうのあいさつから */
+  const vn=S.ojiN++;
+  hush(); say('oji',VISIT_HELLO[vn%2],0,'happy');
   await pause(2900);
-  hush(); say('oji','うちでとれたんだ。よかったら食べてね。');
+  hush(); say('oji',VISIT_OFFER[(vn>>1)%2]);
   await pause(2700);
-  /* 箱を手わたす（投げない。まっすぐ、ゆっくり） */
+  /* 箱を手わたす（v1.18.0。依頼者「野菜が少し宙を飛んでいる。もう少しだけ丁寧に」「えりちゃんが取りに行って、もとの位置に戻る」）：
+     おじさんが箱をさし出す → えりちゃんが すぐ前まで受けとりに行く → 手から手へ（箱は宙に出ない）→ お礼を言って、もとの場所へもどる */
   hush();
-  O.el.classList.remove('carrying');
-  await flyStraight('i-crate',{x:O.x,y:O.y+16},{x:A.eri.x,y:A.eri.y+12},520);
-  A.eri.el.classList.add('carrying');
+  O.el.classList.add('offer');
+  await pause(520);
+  await moveTo(A.eri,{x:O.x+62,y:VISIT.eri.y},{ms:640});
+  await pause(260);
+  A.eri.el.classList.add('receive','carrying'); O.el.classList.remove('carrying');
+  void A.eri.el.offsetWidth;
+  O.el.classList.remove('offer'); A.eri.el.classList.remove('receive');
+  await pause(reduceMotion?60:480);
   fx('c-'+key,{x:A.eri.x+2,y:A.eri.y-36},'pop',1300);
   say('eri','わあ、'+g.name+'！ありがとうございます。',0,'happy');
   await pause(2500);
+  hush();
+  await moveTo(A.eri,VISIT.eri,{ms:640});
+  await pause(300);
   /* とれたときの話（季節＝野菜ごと） */
   hush(); say('oji',g.talk,0,'happy');
   await pause(2400);
@@ -2526,8 +2553,10 @@ const LINES={
   plantS:['おおきくなるばう。','たのしみばう。','ばう！'],
   waterE:['お水、気持ちよさそうだね。','たっぷりどうぞ。','のどかわいてたね。'],
   waterS:['いっぱい飲むばう！','ごくごくばう。'],
-  harvE:['わ、できてる。','いい色だね。','今日のごはんにしよっか。'],
-  harvS:['とれたばう！','おいしそうばう！','やったばう！'],
+  /* 収穫のセリフ（v1.18.0でふやした。依頼者「いちばん多い吹き出しなので、いくつかパターンが欲しい」）。はじめの3つずつが、前からのもの。
+     {n}＝野菜の名前。えらぶのは pickFresh＝さいきん出た3つは さける */
+  harvE:['わ、できてる。','いい色だね。','今日のごはんにしよっか。','{n}、とれたよ。','おいしそうにできたね。','うん、食べごろだね。','よく育ったね。','ほまれくん、よろこぶかな。','とれた、とれた。'],
+  harvS:['とれたばう！','おいしそうばう！','やったばう！','{n}ばう！','りっぱばう！','いいにおいばう。','はやく食べたいばう！','ほまれくんに、見せるばう！','えりちゃん、すごいばう！'],
   petS:['ばう♪','もっとなでるばう。','えへへばう。'],
   shooE:['むしさん、あっちいってね。','はい、おひっこしだよ。'],
   morningS:['おはようばう。今日は何するばう？','きょうも育てるばう。','いい朝ばう。','えりちゃん、おはようばう！'],
@@ -2535,6 +2564,13 @@ const LINES={
   /* おうちで「おはよう。」を言ったあとの、畑でのひとこと（v1.13.0。「おはよう」を2回言わないように） */
   morningS2:['今日は何するばう？','きょうも育てるばう。','いい朝ばう。']
 };
+/* 同じセリフが つづかないように えらぶ（v1.18.0）。さいきん出た3つは さける（セーブには残さない） */
+const recentLines={};
+function pickFresh(key,vars){
+  const list=LINES[key], r=recentLines[key]||(recentLines[key]=[]), c=list.filter(x=>r.indexOf(x)<0), v=pick(c.length?c:list);
+  r.push(v); while(r.length>Math.min(3,list.length-1)) r.shift();
+  return v.replace('{n}',(vars&&vars.n)||'');
+}
 function setQueued(i){ queued=i; renderPlots(); }
 function runQueued(){
   const q=queued; queued=null;
@@ -2636,8 +2672,8 @@ async function playerAction(kind,i,seed){
     await work(A.eri,i);
     S.plots[i]=Object.assign(p,{crop:null,growth:0,watered:false,dry:false,soggy:false,bug:false,frost:false});
     Snd.play('harvest');
-    say('eri',pick(LINES.harvE),0,'happy');
-    if(shadaNear) setTimeout(()=>say('shada',pick(LINES.harvS)),420);
+    say('eri',pickFresh('harvE',{n:c.name}),0,'happy');
+    if(shadaNear) setTimeout(()=>say('shada',pickFresh('harvS',{n:c.name})),420);
     if(shadaNear) setMood('shada','happy',1600);
     renderPlots();
     await flyToBasket(key,c0);
@@ -2936,15 +2972,18 @@ const SWEETS={   /* セリフは依頼者が了解ずみ。after＝食べたあ�
 const SEASONAL_AT=50;
 const SEASONAL=[
   {key:'furin',   season:1, name:'夏の風鈴', log:'窓に、風鈴をつるしました。夏のあいだ、ちりんと鳴ります。'},
-  {key:'kotatsu', season:3, name:'冬のこたつ', log:'こたつを出しました。冬のあいだは、ちゃぶ台のかわりに使います。'}
+  {key:'kotatsu', season:3, name:'冬のこたつ', log:'こたつを出しました。冬のあいだは、ちゃぶ台のかわりに使います（ストーブは、しまいました）。'}
 ];
 const seasonalDue=()=>{ const x=SEASONAL.find(q=>q.season===season()); return x && S.nagomi>=SEASONAL_AT && !(S.seasonal&&S.seasonal[x.key]) ? x : null; };
 function seasonalShow(){
   const se=S.seasonal||{}, kt=season()===3 && !!se.kotatsu;
   $('#g-furin').style.display=(season()===1 && se.furin)?'':'none';
   $('#g-kotatsu').style.display=kt?'':'none'; $('#g-chabudai').style.display=kt?'none':''; $('#g-mikan').style.display='';
+  /* こたつの冬は、ストーブをしまう（v1.18.0。こたつぶとんとストーブの絵が重なっていた。依頼者「これだと火事になるよ」） */
+  $('#g-heater').style.display=(season()===3 && !kt)?'':'none';
 }
 const furinOn=()=>season()===1 && S.seasonal && S.seasonal.furin;
+const kotatsuOn=()=>season()===3 && !!(S.seasonal && S.seasonal.kotatsu);
 const rewardOK=r=>!r.cond || r.cond();
 const dueReward=()=>{ const r=nextReward(); return r && S.nagomi>=S.rewardAt[r.key] && rewardOK(r) ? r : null; };
 const TAG_LINES={sweet:'あまくて、しあわせばう。',hot:'あつあつで、ぽかぽかばう。',fresh:'しゃきしゃきばう。',grill:'こうばしいばう。'};
@@ -3008,8 +3047,10 @@ function hsay(a,text,opt){
   clearTimeout(a.bubT);
   if(HA && a===HA.shada) Snd.bau();
   /* ほかの人の吹き出しは、もう読めたころ（1.2秒たったもの）なら先にしまう。3人が同時に言うセリフ（いただきます）は残る */
-  Object.values(HA).forEach(x=>{ if(x!==a && x.bub.classList.contains('on') && now-(x.bubAt||0)>=1200) hbubOff(x); });
-  a.bubAt=now;
+  /* opt.keep＝ほかの人の吹き出しを先にしまわない／opt.fit＝部屋のはしをこえるぶんだけ内がわへずらす／opt.maxW＝はば（v1.18.0。朝の「おはよう。」で使う） */
+  if(!o.keep) Object.values(HA).forEach(x=>{ if(x!==a && x.bub.classList.contains('on') && now-(x.bubAt||0)>=1200) hbubOff(x); });
+  a.bubAt=now; a.bubFit=!!o.fit;
+  b.style.maxWidth=o.maxW?o.maxW+'px':''; b.style.setProperty('--bs','0px');
   b.innerHTML=bubbleHTML(text);
   b.classList.remove('toL','toR'); b.classList.add(o.dir || (a.x<170?'toR':'toL')); b.classList.add('on');
   hLayout(a);
@@ -3026,8 +3067,14 @@ function hsay(a,text,opt){
    ・「しっぽの先が、ほかの人の頭のほうに近い」置きかたは、大きく減点する（＝だれのセリフか、まぎらわしい）。 */
 const HB_BASE=TOK*1.12;
 function hBox(a,dir,bottom){
-  const w=a.bub.offsetWidth, h=a.bub.offsetHeight, l=dir==='toL' ? a.x+TOK*.22-w : a.x-TOK*.22, b=(a.y+TOK/2)-bottom;
-  return {l, r:l+w, t:b-h, b, dir, bottom};
+  const w=a.bub.offsetWidth, h=a.bub.offsetHeight, b=(a.y+TOK/2)-bottom;
+  let l=dir==='toL' ? a.x+TOK*.22-w : a.x-TOK*.22, shift=0;
+  if(a.bubFit){   /* 部屋のはしをこえるぶんだけ、内がわへ（しっぽが吹き出しの外へ出ないところまで） */
+    const lim=Math.max(0,w-40);
+    if(l+w>356) shift=-Math.min(l+w-356,lim); else if(l<4) shift=Math.min(4-l,lim);
+    l+=shift;
+  }
+  return {l, r:l+w, t:b-h, b, dir, bottom, shift};
 }
 const hFace=o=>({l:o.x-TOK/2, r:o.x+TOK/2, t:o.y-TOK/2, b:o.y+TOK/2});
 const hOv=(p,q,m)=>Math.min(p.r,q.r)-Math.max(p.l,q.l)>-m && Math.min(p.b,q.b)-Math.max(p.t,q.t)>-m;
@@ -3072,11 +3119,27 @@ function hLayout(a){
   if(bx.t<2 && bx.bottom>HB_BASE) bx=hBox(a,bx.dir,Math.max(HB_BASE,bx.bottom-(2-bx.t)));
   a.bub.classList.toggle('toL',bx.dir==='toL'); a.bub.classList.toggle('toR',bx.dir==='toR');
   a.bub.style.bottom=bx.bottom>HB_BASE+.5 ? Math.round(bx.bottom)+'px' : '';
+  a.bub.style.setProperty('--bs',Math.round(bx.shift||0)+'px');
   a.bubBox=bx;
 }
 /* 2人の吹き出しが（置いたあとも）重なっているか。これも、決めてある位置でしらべる */
 const hBubClash=(a,x)=>x!==a && x.bub.classList.contains('on') && a.bubBox && x.bubBox && hOv(a.bubBox,x.bubBox,-2);
-function hhush(){ Object.values(HA).forEach(a=>{ clearTimeout(a.bubT); a.bub.classList.remove('on'); }); }
+function hhush(){ Object.values(HA).forEach(a=>{ clearTimeout(a.bubT); a.bub.classList.remove('on'); }); homeStage.querySelectorAll('.bubble.chorus').forEach(b=>b.remove()); }
+/* みんなで そろって言うセリフを、ひとつの吹き出しにまとめる（v1.18.0。依頼者「吹き出しは、ひとつにまとめてもよい」）。
+   吹き出しは みんなの頭の上のまんなかに置き、しっぽを ひとりに1つずつ出す */
+function hchorus(list,text,ms){
+  if(homeSkip) return;
+  hhush();
+  const b=document.createElement('div'); b.className='bubble chorus'; b.innerHTML=bubbleHTML(text);
+  homeStage.appendChild(b);
+  const w=b.offsetWidth, h=b.offsetHeight;
+  const cx=list.reduce((t,a)=>t+a.x,0)/list.length, top=Math.min.apply(null,list.map(a=>a.y-TOK/2));
+  const l=Math.round(clamp(cx-w/2,4,356-w)), t=Math.round(Math.max(2,top-9-h));
+  b.style.left=l+'px'; b.style.top=t+'px';
+  list.forEach(a=>{ const i=document.createElement('i'); i.style.left=Math.round(clamp(a.x-l,14,w-14))+'px'; b.appendChild(i); });
+  void b.offsetWidth; b.classList.add('on');
+  setTimeout(()=>{ b.classList.remove('on'); setTimeout(()=>b.remove(),220); },ms||1900);
+}
 /* みんなで歩きだす前に、もう読めた吹き出し（1.2秒たったもの）はしまう。歩く人の顔の上を、ほかの人の吹き出しが横ぎらないように（v1.11.0） */
 function hwalkAll(list){ const now=Date.now(); Object.values(HA).forEach(x=>{ if(x.bub.classList.contains('on') && now-(x.bubAt||0)>=1200) hbubOff(x); }); return Promise.all(list.map(([a,spot])=>hmove(a,spot))); }
 function hfx(id,pos,cls,ms){
@@ -3175,9 +3238,8 @@ function setupRoom(){
   $('#hMoon').style.display=S.raining?'none':'';
   $('#hMoon').setAttribute('r',season()===2?12:9);
   $('#hStars').style.display=S.raining?'none':'';
-  seasonalShow();
   $('#g-fan').style.display=season()===1?'':'none';
-  $('#g-heater').style.display=season()===3?'':'none';
+  seasonalShow();   /* 風鈴・こたつ。ストーブも ここで（こたつの冬は、しまう） */
   DECOR.forEach(d=>{ const g=document.getElementById(d.g); g.style.display=S.decor&&S.decor[d.key]?'':'none'; g.classList.remove('popIn'); });
   updatePhoto(false);
   $('#g-setting').style.display='none'; setPortions(null);
@@ -3499,7 +3561,7 @@ const SEASONAL_SCENE={
     hsay(E,'そうだ。風鈴、つるしてみたよ。',{mood:'smile'});
     await hp(1600);
     const g=$('#g-furin'); g.style.display=''; if(!reduceMotion&&!homeSkip) g.classList.add('popIn');
-    if(!homeSkip) Snd.play('furin'); hfxText('チリン',{x:252,y:92});
+    if(!homeSkip) Snd.play('furin'); hfxText('チリーン',{x:252,y:92});
     await hp(1700);
     hmood(D,'happy',1900);
     hsay(D,'ちりんちりん、ばう。');
@@ -3771,13 +3833,18 @@ async function homeEvening(cands){
     hsay(E,pick(['よかった。また作るね。','たくさんとれたからね。','しゃだはるのおかげだよ。']),{mood:'happy'});
     await hp(1400);
     if(rnd()<.45){
-      hsay(H,pick(['えりちゃんの料理は、最高だなあ。','畑のとれたては、ちがうね。','おかわりある？','えりちゃん、ごちそうさま。']));
+      hsay(H,pick(['えりちゃんの料理は、最高だなあ。','畑のとれたては、ちがうね。','おかわりある？']));   /* 前は「えりちゃん、ごちそうさま。」も入っていた。すぐ下の「ごちそうさまでした。」と重なるので、はずした（v1.18.0） */
       await hp(1500);
     }
-    /* ごちそうさま：なごみ度がふえる。お皿は、ここで からになる */
+    /* お皿が からになって、3人そろって「ごちそうさまでした。」（v1.18.0。依頼者の希望。吹き出しは ひとつにまとめて、しっぽを3人ぶん）。そのあと、なごみ度がふえる */
+    hhush();
+    $('#hDish').classList.remove('eating'); $('#hDish').classList.add('eaten'); setPortions(null);
+    await hp(450);
+    hmood(E,'smile',1900); hmood(H,'happy',1900); hmood(D,'happy',1900);
+    hchorus([E,H,D],'ごちそうさまでした。',1900);
+    await hp(2050);
     hNagomi(isNew?2:1,{x:(E.x+D.x)/2,y:E.y-40});
     await hp(900);
-    $('#hDish').classList.remove('eating'); $('#hDish').classList.add('eaten'); setPortions(null);
   }else{
     await Promise.all([hmove(E,HSPOT.tableEri), hmove(D,HSPOT.tableShada), hmove(H,HSPOT.tableHomare)]);
     hsay(E,'今日はゆっくり休もうね。',{mood:'smile'});
@@ -3946,13 +4013,14 @@ async function homeMorning(){
   /* えりちゃんから、じゅんばんに起きあがる */
   const wake=a=>{ a.el.classList.remove('inFuton'); hmood(a,'normal'); place(a,a.x,a.y-10,reduceMotion?0:260); };
   wake(E); await pause(350);
-  hsay(E,'おはよう。',{mood:'smile'});
+  hsay(E,'おはよう。',{mood:'smile',ms:3300});
   await pause(1150);
   wake(H); await pause(350);
   /* ほまれくんは、あいさつのあとに ひとこと（v1.13.2。依頼者が「日がわりで3つ」をえらんだ）。天気のひとことは、雨・雪になる日だけ言いかえる */
   const hLines=['よくねむれた？', dull?(season()===3?'今日は、雪になりそうだね。':'今日は、雨になりそうだね。'):'今日もいい天気だね。', '今日も畑、たのしんできてね。'];
   const hk=pick([0,1,2].filter(i=>i!==S.mornH)); S.mornH=hk;
-  hsay(H,'おはよう。'+hLines[hk]);
+  /* えりちゃんの「おはよう。」を消さないように、ほまれくんの吹き出しは右へ流す（v1.18.0。依頼者の希望）。はばを少ししぼって2行にし、右はしをこえるぶんは内がわへ */
+  hsay(H,'おはよう。'+hLines[hk],{dir:'toR',keep:true,fit:true,maxW:158});
   await pause(2300);
   wake(D); await pause(300);
   /* しゃだはる君は、日によって「おはようばう。」か「ばう。」（v1.13.2。依頼者の指定） */
@@ -4026,8 +4094,9 @@ function pickPre(quiet){
     await hp(1400);
     await back(D,H);
   });
-  if(season()===3) add('stove','season',async(E,D,H)=>{ /* 冬：ストーブの前で並んで丸くなる */
-    await Promise.all([hmove(D,HSPOT.appliance), hmove(H,HSPOT.applianceH)]);
+  if(season()===3) add(kotatsuOn()?'kotatsu':'stove','season',async(E,D,H)=>{ /* 冬：ストーブの前で並んで丸くなる。こたつの冬は、こたつで ならんで（v1.18.0。セリフは同じ） */
+    if(kotatsuOn()) await hmove(D,{x:HSPOT.tableHomare.x+42,y:HSPOT.tableShada.y});
+    else await Promise.all([hmove(D,HSPOT.appliance), hmove(H,HSPOT.applianceH)]);
     hmood(D,'sleepy',3200); hmood(H,'sleepy',3200);
     hsay(D,'ぬくぬくばう……');
     await hp(1300);
@@ -4158,7 +4227,7 @@ function pickPre(quiet){
      ・季節／天気の場面（せんぷうき・お月見・ストーブ・雨や雪の窓）は、その季節にまだ出ていなければ優先する（1日目は6割、さいごの日は かならず）。同じ季節に2回は出さない。
      ・それ以外は、いちばん長く出ていないものから（同じなら くじ引き）。S.preSeen＝{場面の名前: さいごに出た日} */
   if(!S.preSeen) S.preSeen={};
-  const seen=e=>S.preSeen[e.id]||0, seasonStart=Math.floor((S.day-1)/SEASON_DAYS)*SEASON_DAYS+1;
+  const seen=e=>Math.max(S.preSeen[e.id]||0, e.id==='kotatsu'?(S.preSeen.stove||0):0), seasonStart=Math.floor((S.day-1)/SEASON_DAYS)*SEASON_DAYS+1;
   const fresh=c.filter(e=>e.kind==='season' && seen(e)<seasonStart);
   let ch=null;
   if(fresh.length && (seasonDay()>=SEASON_DAYS || rnd()<.6)) ch=pick(fresh);
@@ -4176,6 +4245,7 @@ const PRE_INFO={
   moon:{t:'お月見',log:'きれいな月を、みんなでながめました。'},
   fan:{t:'せんぷうきの取り合い',log:'しゃだはる君とほまれくんが、せんぷうきの前を取り合っていました。'},
   stove:{t:'ストーブの前で ぬくぬく',log:'しゃだはる君とほまれくんが、ストーブの前で ならんで ぬくぬくしていました。'},
+  kotatsu:{t:'こたつで ぬくぬく',log:'しゃだはる君とほまれくんが、こたつで ならんで ぬくぬくしていました。'},
   show:{t:'たからものを見せに',log:'しゃだはる君が、見つけた たからものを、ほまれくんに見せに行きました。'},
   plates:{t:'お皿はこび',log:'しゃだはる君が、お皿を ふらふら はこんでくれました。'},
   gaze:{t:'たからものをながめる',log:'しゃだはる君が、たなの たからものを ながめていました。'},
@@ -4437,13 +4507,17 @@ function plateSVG(ids){
 }
 async function endDay(){
   hush();
-  say('eri', S.clock>=DAY_END ? 'そろそろ帰ろっか。' : '今日はここまでにしよっか。',0,'smile');
-  await pause(600);
+  /* 帰り道は、ゆっくり（v1.18.0。依頼者の希望：「帰ろう」のセリフが読めるように）。ふたりのセリフは、立ちどまったまま読めるようにして（約3秒）、しまってから歩きだす。歩く速さも ふだんの6割くらいに */
+  say('eri', S.clock>=DAY_END ? 'そろそろ帰ろっか。' : '今日はここまでにしよっか。',3400,'smile');
+  await pause(1400);
   cancelErrand(); wakeShada(false); stopWatch();
   if(A.shada.mode==='hide'){ shadaMode('follow'); setMood('shada','normal'); }
-  say('shada','また明日ばう。');
+  say('shada','また明日ばう。',2400);
+  await pause(1500);
+  hush();   /* 歩きだす前にしまう（歩きながら・画面が動きながらだと、読みにくく、画面のはしで切れる） */
   focusRange(40,330);
-  await Promise.all([moveTo(A.eri,SPOT.homeEri), sleep(reduceMotion?0:150).then(()=>moveTo(A.shada,SPOT.homeShada))]);
+  const slow=(a,q)=>moveTo(a,q,{ms:Math.round(clamp(Math.hypot(q.x-a.x,q.y-a.y)*3.4,800,2300))});
+  await Promise.all([slow(A.eri,SPOT.homeEri), sleep(reduceMotion?0:150).then(()=>slow(A.shada,SPOT.homeShada))]);
   await pause(300);
   hush();
   S.clock=DAY_END; weatherTick(true); wxQueue=[]; renderHUD(); renderSky();
