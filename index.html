@@ -247,6 +247,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 #d-goza.in{animation:fadeIn .5s ease-out}
 #actors .actor.eri .carry{left:50%;top:50%;width:30px;height:30px;margin-left:-15px}
 #actors .actor.shada.hat .carry{top:-26%;width:26px;height:26px;margin-left:-13px}   /* v1.47.0：かぶの葉の ぼうし */
+#actors .actor.shada.can .carry{top:64%;width:22px;height:22px;margin-left:-11px}   /* v1.49.3（依頼者の希望）：じょうろは 頭の上ではなく 顔の下（口にくわえて ぶらさげている形。首輪にかかる）。石・どんぐり・草は 今までどおり頭の上 */
 /* 手わたし（v1.18.0）：おじさんが箱をさし出し（offer）、えりちゃんが すぐ前で受けとる（receive＝受けとる瞬間の箱の場所）。
    ふたりの箱が同じ場所でかさなった瞬間に持ち主がかわり、えりちゃんの手もとへ引きよせる。箱は宙に出ない */
 #actors .actor .carry{transition:transform .42s ease-in-out}
@@ -424,7 +425,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 .panel{margin-top:10px;display:grid;gap:8px}
 .held{display:none;align-items:center;gap:8px;border:1px solid #a8b394;background:#eef2e7;border-radius:14px;padding:6px 8px 6px 12px;font-size:14px}
 .held.on{display:flex}
-.held svg{width:26px;height:26px;flex:none}
+.held svg{width:26px;height:26px;flex:none;display:inline-block;vertical-align:middle;margin:-4px 0 -4px 5px}   /* v1.49.3：名前のうしろ（同じ行。上下のマイナスの余白で 行の高さを変えない） */
 .held .grow{flex:1}
 .log{border:1px solid var(--border);border-radius:16px;background:#fff;padding:10px 14px}
 .logTitle{font-size:13px;font-weight:700;margin-bottom:2px}
@@ -1184,7 +1185,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 <div class="game" id="game">
   <div class="head">
     <h1>えりとしゃだはるの ちいさな畑</h1>
-    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.49.2</span></span>
+    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.51.0</span></span>
   </div>
 
   <div class="hud">
@@ -1594,8 +1595,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 
   <div class="panel">
     <div class="held" id="held">
-      <svg aria-hidden="true"><use id="heldIcon" href="#c-ichigo"/></svg>
-      <span class="grow">持っている種：<strong id="heldName"></strong></span>
+      <span class="grow">持っている種：<strong id="heldName"></strong><svg aria-hidden="true"><use id="heldIcon" href="#c-ichigo"/></svg></span>   <!-- v1.49.3（依頼者の希望）：野菜の絵は 名前のうしろ -->
       <button class="btn small" id="heldChange" type="button">かえる</button>
       <button class="btn small" id="heldClear" type="button">しまう</button>
     </div>
@@ -2299,6 +2299,8 @@ function fixup(){
   if(S.decor && S.decor.bookshelf && !(S.books>0)) S.books=9;   /* v1.35.5：前からのセーブで もう本だながある人は 9冊のまま（新しくもらう人は 3冊から） */
   /* v1.35.5：窓べは1つまで。前からのセーブで 花びんと金魚ばちが両方出ていたら、古いほうを おしいれへ（次の季節の模様がえで 入れかわる） */
   if(S.decor && S.decor.vase && S.decor.fishbowl && !inCloset('vase') && !inCloset('fishbowl')){ if(!S.closet) S.closet=[]; if(!S.shownAt) S.shownAt={}; const old=((S.shownAt.vase||0)<=(S.shownAt.fishbowl||0))?'vase':'fishbowl'; S.closet.push(old); }
+  /* v1.51.0：じゃすたくんの絵を 置き場（窓のまわり）に入れた。前からのセーブで もらっていれば S.decor に立てる（ウクレレと両方 出ていれば、次の季節の模様がえで 古いほうを しまう。床の4つめも同じ） */
+  if(S.jdraw && S.decor && !S.decor.jdraw){ S.decor.jdraw=true; if(!S.shownAt) S.shownAt={}; if(!S.shownAt.jdraw) S.shownAt.jdraw=S.jdraw; }
   /* v1.20.0：外にならべてある たからもの（S.tline。新しいものが うしろ）。前の版のセーブは、石→どんぐりの順に6こまで。あまりは たからばこに */
   if(!Array.isArray(S.tline)){
     S.tline=[]; const ns=S.stones||0, na=S.acorns||0;
@@ -2607,7 +2609,7 @@ function shadaMode(m){
   c.toggle('sleeping',m==='nap'); c.toggle('watching',m==='watch'); c.toggle('scared',m==='hide');
   shadaCarry();
 }
-/* 頭の上に持っているもの（v1.22.0）：おつかい中は石・どんぐり、そうでなければ じょうろ（S.canOut。昼寝中は見せない） */
+/* 持っているもの（v1.22.0）：おつかい中は石・どんぐり（頭の上）、そうでなければ じょうろ（S.canOut。v1.49.3 から 顔の下。昼寝中は見せない） */
 let carryItem=null;   /* v1.40.0：たいひ運びで くわえているもの（i-grass など） */
 function shadaCarry(){
   if(!A||!A.shada||!S) return;
@@ -2615,6 +2617,7 @@ function shadaCarry(){
   if(!errand) slot.innerHTML=carryItem?icon(carryItem):(S.canOut?icon('i-can'):'');
   el.classList.toggle('carrying', errand || !!carryItem || (!!S.canOut && A.shada.mode!=='nap'));
   el.classList.toggle('hat', carryItem==='i-kabuha');   /* v1.47.0：かぶの葉の ぼうし */
+  el.classList.toggle('can', !errand && !carryItem && !!S.canOut);   /* v1.49.3：じょうろは 顔の下（CSS .shada.can .carry） */
 }
 /* しゃだはる君の歩きかた（v1.22.0。依頼者の希望「いつも一緒だけど、えりちゃんの邪魔はしない」）：
    まっすぐ行くと えりちゃんの上を横ぎるときは、えりちゃんの うしろ（上がわ。おくに見える）をまわる。上に場所がなければ 下をまわる。それ以外は今までどおり */
@@ -4321,7 +4324,7 @@ async function birthdayNight(E,D,H,preview,pat){
     /* ⑩ 記録：なごみ度+3、マフラー、行事の回数、できごと欄 */
     if(!preview){
       hNagomi(3,{x:D.x,y:D.y-34});
-      if(gift==='scarf') S.scarf=S.day; else if(gift==='jdraw') S.jdraw=S.day;   /* 石は、場面の中で たからものに足してある */
+      if(gift==='scarf') S.scarf=S.day; else if(gift==='jdraw'){ S.jdraw=S.day; if(!S.decor) S.decor={}; S.decor.jdraw=true; if(!S.shownAt) S.shownAt={}; S.shownAt.jdraw=S.day; }   /* 石は、場面の中で たからものに足してある。v1.51.0：絵は 窓のまわりの置き場へ（その夜は ウクレレと両方。次の季節の模様がえで 古いほうを しまう） */
       if(!S.gyoji) S.gyoji={}; if(!S.gyojiN) S.gyojiN={};
       S.gyoji.bday=syOf(S.day); S.gyojiN.bday=(S.gyojiN.bday||0)+1;
       log(gift==='scarf'?G.log:gift==='jdraw'?'しゃだはる君の誕生日。じゃすたくんが来て、絵をもらいました。':'しゃだはる君の誕生日。じゃすたくんが来て、きれいな石をもらいました。'); S.sinceEvent=0; saveSoon();
@@ -4929,7 +4932,7 @@ async function afterAction(resting){
   S.sinceEvent+=1;
   await weatherScenes(resting);
   await checkUnlocks();
-  if(visitDue()){ await bgWait(); await visitScene(); } else if(gyojiDue()){ await bgWait(); await gyojiScene(gyojiDue()); } else await maybeEvent(resting);   /* v1.27.0：季節の行事。v1.37.2：おじさん・行事の前は、うしろの場面を待つ */
+  if(visitDue()){ await bgWait(); await visitScene(); } else if(gyojiDue()){ await bgWait(); await gyojiScene(gyojiDue()); } else { const ev=await maybeEvent(resting); if(!ev) maybeRemind(false); }   /* v1.27.0：季節の行事。v1.37.2：おじさん・行事の前は、うしろの場面を待つ。v1.50.0：出来事が出なければ 見のがしの知らせ */
   await checkUnlocks();
   if(S.clock>=DAY_END || (resting && S.clock>=DUSK)){ await bgWait(); await endDay(); }   /* v1.37.2：夜の場面と重ならないように待つ */   /* v1.35.5：ひとやすみで夕暮れ（17:00）をすぎたら、その場で1日を終える（依頼者の希望） */
 }
@@ -5191,9 +5194,76 @@ function workLeft(){
 }
 let idleTicks=0;
 function autoRestTick(){
-  if(!S || !S.intro || busy || modal || bg || queued!=null || home.classList.contains('on') || S.clock>=DAY_END || workLeft()){ idleTicks=0; return; }   /* v1.37.2：bg */
+  if(!S || !S.intro || busy || modal || bg || queued!=null || home.classList.contains('on') || S.clock>=DAY_END){ idleTicks=0; remindIdle=0; return; }   /* v1.37.2：bg */
+  if(workLeft()){ idleTicks=0; if(!otherWorkLeft() && remindList().length){ remindIdle+=1; maybeRemind(true); } else remindIdle=0; return; }   /* v1.50.0：のこった やることが 木・温室の実りだけ（自動のひとやすみが始まらない）なら、しゃだはる君が教える */
+  remindIdle=0;
   if(++idleTicks<2) return;
   idleTicks=0; rest(true);
+}
+/* v1.50.0（依頼者の希望）：見のがしの知らせ。小屋の「つるせる／干せる」・3本の木の「収穫できる」・温室（バジル「つめる」・ぶどう「収穫できる」・野菜「収穫できる」）の
+   しるしが出たまま しばらく そのままなら、しゃだはる君が その場で ぴょんと はねて教える（依頼者がえらんだ 1-1。画面は動かない。うしろで流す＝えりちゃんは行動できる）。
+   ・行動のあと：しるしを見てから 3行動（90分）で1回。それでも そのままなら さらに4行動（120分）あとに もう1回（1つにつき 1日2回まで）。
+   ・何もしていないとき：やることが 木・温室の実りだけで（自動のひとやすみは workLeft で止まる）、6秒ほど何もしなければ1回、そのあと24秒で もう1回（朝の知らせで言ったものは 24秒のほう）。
+   S.remind＝{key:{day, at:しるしを見た時刻, n:教えた回数, last:さいごに教えた時刻}}（しるしが消えたら消す）。
+   木・ぶどう・バジルのセリフは 朝の知らせと同じ（了解ずみ）。小屋・温室の野菜のセリフは 私の案（依頼者に見せてある） */
+const REMIND_AFTER=90, REMIND_AGAIN=120, REMIND_IDLE=7, REMIND_IDLE2=30;   /* 分・分・tick（0.8秒）・tick */
+let remindIdle=0;
+function remindList(){
+  const out=[]; if(!S) return out;
+  const c=hangCan();
+  if(c) out.push({key:'shed:'+c, shada:c==='onion'?'えりちゃん、たまねぎ、つるせるばう！':'えりちゃん、だいこん、ほせるばう！', eri:'ほんとだ。あとで、小屋に行こうね。',
+    log:c==='onion'?'小屋で、たまねぎを つるせます。小屋をタップして、つるしましょう。':'小屋で、大根を 干せます。小屋をタップして、干しましょう。'});
+  Object.keys(TREES).forEach(k=>{ const T=TREES[k], g=S[T.st]; if(S.unlocked[T.unlock] && g && g.fruit) out.push({key:'tree:'+k, shada:FRUITS[k].noticeS, eri:FRUITS[k].noticeE, log:FRUITS[k].noticeLog}); });
+  for(const i of [12,13]){ const p=S.plots[i]; if(!p||!p.unlocked||!p.tilled) continue;
+    if(p.crop){ if(isRipe(p)){ const nm=CROPS[p.crop].name; out.push({key:'gh:'+i, shada:'えりちゃん、おんしつの'+nm+'、できてるばう！', eri:'ほんとだ。あとで、とりに行こうね。', log:'温室の'+nm+'が、収穫できます。タップして、とりましょう。'}); } }
+    else if(i===12 && S.basil && S.basil.ready) out.push({key:'basil', shada:'えりちゃん、バジル、そだったばう！', eri:'ほんとだ。あとで、つんでおこうね。', log:'温室のバジルが育っています。タップして、つみましょう。'});
+    else if(i===13 && S.vine && S.vine.fruit) out.push({key:'vine', shada:FRUITS.budou.noticeS, eri:FRUITS.budou.noticeE, log:FRUITS.budou.noticeLog});
+  }
+  return out;
+}
+/* しるしの出はじめを おぼえる（朝、行動のあと、何もしていないとき）。消えたしるしの記録は消す */
+function remindScan(){
+  if(!S) return []; if(!S.remind) S.remind={};
+  const list=remindList(), keys=list.map(t=>t.key);
+  Object.keys(S.remind).forEach(k=>{ if(keys.indexOf(k)<0 || S.remind[k].day!==S.day) delete S.remind[k]; });
+  list.forEach(t=>{ if(!S.remind[t.key]) S.remind[t.key]={day:S.day, at:S.clock, n:0, last:-9999}; });
+  return list;
+}
+/* workLeft から、木・温室の実り（しるし）を のぞいた やること（何もしていないときの知らせは、これが無いときだけ） */
+function otherWorkLeft(){
+  if(!S) return true;
+  for(let i=0;i<14;i++){ const p=S.plots[i]; if(!p||!p.unlocked) continue;
+    if(i===12 && p.tilled && !p.crop){ if(!S.basil) return true; continue; }
+    if(i===13 && p.tilled && !p.crop){ if(!S.vine) return true; continue; }
+    if(!p.tilled || !p.crop || p.frost || p.frog) return true;
+    if(isGH(i) && isRipe(p)) continue;
+    if(isRipe(p) || !p.watered || p.parched || p.bug) return true;
+  }
+  if(S.shadaPlot && S.shadaPlot.phase==='ripe') return true;
+  if(S.shadaPlot2 && S.shadaPlot2.phase==='ripe') return true;
+  for(const k in TREES){ const T=TREES[k]; if(S.unlocked[T.unlock] && !S[T.st]) return true; }
+  return false;
+}
+/* 朝の知らせで もう言ったものは「1回教えた」あつかい（その日は あと1回だけ。朝のすぐあとに 同じことを言わないように） */
+function remindTold(key){ if(!S) return; if(!S.remind) S.remind={}; const r=S.remind[key]; if(r && r.day===S.day && r.n===0){ r.n=1; r.last=S.clock; } }
+/* 知らせを出すか（idle＝何もしていないときの tick から）。出したら true */
+function maybeRemind(idle){
+  if(!S || !S.intro || bg || modal || home.classList.contains('on') || A.shada.mode!=='follow' || S.clock>=DAY_END) return false;   /* 行動のあと（busy のまま）からも呼ばれる */
+  const list=remindScan(); if(!list.length) return false;
+  const ok=t=>{ const r=S.remind[t.key]; if(r.n>=2) return false;
+    if(idle) return r.n===0 ? remindIdle>=REMIND_IDLE : remindIdle>=REMIND_IDLE2;
+    return r.n===0 ? S.clock-r.at>=REMIND_AFTER : S.clock-r.last>=REMIND_AGAIN; };
+  const c=list.filter(ok).sort((a,b)=>S.remind[a.key].at-S.remind[b.key].at); if(!c.length) return false;
+  const t=c[0], r=S.remind[t.key]; r.n+=1; r.last=S.clock; remindIdle=0; saveSoon();
+  bgStart('event',null,async()=>{
+    await pause(idle?250:550);
+    setMood('shada','happy',1800); hopShada(); say('shada',t.shada);
+    await pause(1700);
+    if(!busy) say('eri',t.eri,0,'happy',true);   /* もう動きだしていたら、えりちゃんの返事は出さない */
+    log(t.log);
+    await pause(1300);
+  });
+  return true;
 }
 function pet(){
   if(busy||modal||!S) return;
@@ -5228,16 +5298,18 @@ const DECOR=[
   {at:190,key:'clock',   slot:'wall',  g:'g-clock',    name:'はと時計', short:'はと時計'},
   {at:205,key:'fishbowl',slot:'window', g:'g-fishbowl', name:'金魚ばち', short:'金魚ばち'},   /* v1.35.5：小物 → 窓べ */
   {at:220,key:'mirror',  slot:'wall',  g:'g-mirror',   name:'かがみ', short:'かがみ'},
-  /* v1.33.0：ウクレレ＝小物（かべに かける）、ゆりいす＝床 */
-  {at:235,key:'ukulele', slot:'small', g:'g-ukulele',  name:'ほまれくんのウクレレ', short:'ウクレレ'},
-  {at:250,key:'chair',   slot:'floor', g:'g-chair',    name:'ゆりいす', short:'ゆりいす'}
+  /* v1.33.0：ウクレレ＝窓のまわり（かべに かける。v1.51.0 までは小物）、ゆりいす＝床 */
+  {at:235,key:'ukulele', slot:'winside', g:'g-ukulele',  name:'ほまれくんのウクレレ', short:'ウクレレ'},
+  {at:250,key:'chair',   slot:'floor', g:'g-chair',    name:'ゆりいす', short:'ゆりいす'},
+  /* v1.51.0（依頼者の希望 2-1）：じゃすたくんのかいた絵（誕生日の2回めのプレゼント。S.jdraw＝もらった日）も 置き場に入れて、ウクレレと季節ごとに入れかわる。ごほうびではないので at は無い */
+  {key:'jdraw',   slot:'winside', g:'g-jdraw',    name:'じゃすたくんのかいた絵', short:'じゃすたくんの絵'}
 ];
 /* おうちの中の整理（v1.25.0。⑥。依頼者の希望「イベントが増えて、ものが増えすぎた時は、上手く整理するように」）：
-   置き場（slot）ごとに上限 SLOT_MAX（壁の絵2・小物3・床の大きなもの4）。上限をこえるものが来たら、その置き場で いちばん長く出ているものを「おしいれ」（S.closet）にしまう。
+   置き場（slot）ごとに上限 SLOT_MAX（かべ1・小物3・床3・窓べ1・窓のまわり1。v1.51.0）。上限をこえるものが来たら、その置き場で いちばん長く出ているものを「おしいれ」（S.closet）にしまう。
    季節が変わる朝は、おしいれに何かあれば、置き場ごとに1つ入れかえる（模様がえ）。にっきの一覧には「（おしいれ）」と出る。いまの9つ＋風鈴・こたつは上限ちょうどなので、見た目は変わらない。
    S.closet＝しまってあるもの（key の配列。古いものが前）、S.shownAt＝{key: 出した日} */
 /* v1.32.0（依頼者の希望「上のほうは もう少しすっきり」）：かべは1つずつ（畑の絵・しゃだはる君の絵・はと時計・かがみ が季節ごとに入れかわる）。上限が下がった古いセーブは、次の季節の模様がえで しまう */
-const SLOT_MAX={wall:1,small:3,floor:4,window:1};   /* v1.35.5：窓べ（花びん・金魚ばち）は1つまで（依頼者の希望） */
+const SLOT_MAX={wall:1,small:3,floor:3,window:1,winside:1};   /* v1.35.5：窓べ（花びん・金魚ばち）は1つまで（依頼者の希望）。v1.51.0（依頼者の希望）：床は 4→3（おもちゃ箱・ラグ・観葉植物・ゆりいす から3つ）、窓のまわり（ウクレレ・じゃすたくんの絵）は1つ。上限が下がった古いセーブは 次の季節の模様がえで しまう（seasonSwap） */
 const inCloset=k=>!!(S.closet && S.closet.indexOf(k)>=0);
 const decorShown=k=>!!(S.decor && S.decor[k]) && !inCloset(k);
 function slotItems(slot){ return DECOR.filter(d=>d.slot===slot && S.decor && S.decor[d.key]).map(d=>d.key); }
@@ -5252,7 +5324,7 @@ function makeRoomFor(key){
   return outs;
 }
 /* 季節が変わる朝の模様がえ：置き場ごとに、おしいれの いちばん古いものを出し、出ているもので いちばん長いものをしまう。もどり値＝[[出したもの, しまったもの], …] */
-function seasonSwap(){
+function seasonSwap(prevSeason){   /* v1.51.0：prevSeason＝きのうまでの季節（マフラーを しまう朝の判定に使う） */
   if(!S.closet) S.closet=[]; if(!S.shownAt) S.shownAt={};
   const swaps=[];   /* [出したもの|null, しまったもの|null] */
   Object.keys(SLOT_MAX).forEach(slot=>{
@@ -5268,11 +5340,15 @@ function seasonSwap(){
     let outKey=null; if(shown.length>=SLOT_MAX[slot]){ outKey=shown[0]; S.closet.push(outKey); }
     swaps.push([inKey,outKey]);
   });
+  /* v1.51.0（依頼者の希望 2-2）：じゃすたくんのマフラーは 冬だけ 柱にかける。冬になる朝に出し、春になる朝にしまう（見た目は setupRoom。ここは 記録と できごと欄のため） */
+  if(S.scarf){ if(season()===3) swaps.push(['scarf',null]); else if(prevSeason===3) swaps.push([null,'scarf']); }
+  /* v1.51.0（依頼者の希望 2-3）：たなの石・どんぐりは SHELF_MAX こまで。多いときは、出す3つを ならべかえる（S.shelfOff＝出しはじめの番号） */
+  { const all=(S.stones||0)+(S.acorns||0); if(all>SHELF_MAX){ S.shelfOff=((S.shelfOff||0)+SHELF_MAX)%all; swaps.shelf=true; } }
   /* その夜の おうちのできごと「模様がえ」のために おぼえておく（told＝話した） */
   if(swaps.length) S.moyou={day:S.day, in:swaps.map(x=>x[0]).filter(Boolean), out:swaps.map(x=>x[1]).filter(Boolean)};
   return swaps;
 }
-const decorName=k=>{ const d=DECOR.find(x=>x.key===k); return d?d.short||d.name:k; };
+const decorName=k=>{ const d=DECOR.find(x=>x.key===k); return d?d.short||d.name:(k==='scarf'?'マフラー':k); };   /* v1.51.0：マフラーは DECOR に入れず、名前だけ */
 /* なごみ度のごほうび（v1.15.0。依頼者の希望「たまると どんな良いことがあるのか、おうちの中で見えるように」）。
    15ごとに、その夜 1つ。kind:'item'＝おうちのものがふえる（DECOR の key）／'night'＝とくべつな夜（REWARD_NIGHT の key）。
    S.rewards＝{key:true}（もらった）、S.rewardAt＝{key:なごみ度}（そのセーブでの、出るなごみ度。rewardSetup が決める）。
@@ -5715,7 +5791,7 @@ function setupRoom(){
   }
   Object.values(HA).forEach(a=>{ a.el.classList.remove('sleeping','walking','working','tumble','carrying','wobble','holding','offer','show','jumping','wag','scarf','lookupR','rocking','lookupL'); a.el.dataset.mood='normal'; a.bub.classList.remove('on'); });
   bdayCleanup();
-  { const g=document.getElementById('g-scarf'); if(g) g.style.display=S.scarf?'':'none'; }   /* 柱のマフラー（v1.31.0）：もらった次の日から。おうちでは かけてある */
+  { const g=document.getElementById('g-scarf'); if(g) g.style.display=(S.scarf && season()===3)?'':'none'; }   /* 柱のマフラー（v1.31.0）：もらった次の日から。おうちでは かけてある。v1.51.0：冬だけ（ほかの季節は おしいれ。依頼者の希望） */
   /* せまい画面では部屋ごと少し縮める */
   hScale=Math.min(1,vp.clientWidth/360);
   homeStage.style.transform=hScale<1?'scale('+hScale.toFixed(3)+')':'';
@@ -5743,14 +5819,16 @@ function setupRoom(){
   $('#roomTable').style.display=''; $('#futonBack').style.display='none'; $('#futonFront').style.display='none'; $('#hSun').style.display='none'; $('#hMornBeam').style.display='none';
   Object.values(HA).forEach(a=>a.el.classList.remove('inFuton'));
   $('#hBlanket').classList.remove('on');
-  { const g=document.getElementById('g-jdraw'); if(g){ g.style.display=S.jdraw?'':'none'; g.classList.remove('popIn'); } }   /* じゃすたくんのかいた絵（v1.31.1） */
+  /* じゃすたくんのかいた絵（v1.31.1）は、v1.51.0 から DECOR（窓のまわり）の並びで 上と同じに出す（S.decor.jdraw。誕生日でもらった夜と fixup で立てる） */
   renderTreasures();
   setupRoomRest();
 }
 /* たなの上：しゃだはる君のたからもの（v1.31.1 で関数に。誕生日の石も ここで出す） */
+const SHELF_MAX=3;   /* v1.51.0（依頼者の希望 2-3）：たなの上は 3こまで（前は5）。多いときは 季節が変わる朝の模様がえで、出す3つが 順に入れかわる（S.shelfOff） */
 function renderTreasures(){
-  let t=''; const ns=Math.min(S.stones||0,5), na=Math.min(S.acorns||0,5-ns);
-  for(let k=0;k<ns+na;k++) t+='<svg style="left:'+(k*16)+'px'+(k<ns?';filter:hue-rotate('+((k*67)%360)+'deg)':'')+'" aria-hidden="true"><use href="#'+(k<ns?'i-stone':'i-acorn')+'"/></svg>';
+  const all=[]; for(let k=0;k<(S.stones||0);k++) all.push({kind:'stone',hue:(k*67)%360}); for(let k=0;k<(S.acorns||0);k++) all.push({kind:'acorn'});
+  const cnt=Math.min(all.length,SHELF_MAX), off=all.length?((S.shelfOff||0)%all.length):0; let t='';
+  for(let k=0;k<cnt;k++){ const it=all[(off+k)%all.length]; t+='<svg style="left:'+(k*16)+'px'+(it.kind==='stone'?';filter:hue-rotate('+it.hue+'deg)':'')+'" aria-hidden="true"><use href="#'+(it.kind==='stone'?'i-stone':'i-acorn')+'"/></svg>'; }
   $('#hTreasures').innerHTML=t;
 }
 function setupRoomRest(){
@@ -7759,9 +7837,11 @@ async function nextMorning(){
   const changed=season()!==prevSeason;
   if(changed) S.held=null;
   /* おうちの模様がえ（v1.25.0）：季節が変わる朝、おしいれに何かあれば入れかえる */
-  const swaps=changed?seasonSwap():[];
-  if(swaps.length){ const ins=swaps.map(x=>x[0]).filter(Boolean).map(decorName), outs=swaps.map(x=>x[1]).filter(Boolean).map(decorName);
-    log('季節が変わったので、ほまれくんが おうちの模様がえをしました：'+(ins.length?ins.join('・')+'を出して':'')+(outs.length?outs.join('・')+'をしまいました':'')+'。'); }
+  const swaps=changed?seasonSwap(prevSeason):[];
+  if(swaps.length || swaps.shelf){ const ins=swaps.map(x=>x[0]).filter(Boolean).map(decorName), outs=swaps.map(x=>x[1]).filter(Boolean).map(decorName);
+    let text=(ins.length?ins.join('・')+'を出して':'')+(outs.length?outs.join('・')+'をしまいました':'');
+    if(swaps.shelf) text+=text?'。たなの石も、ならべかえました':'たなの石を、ならべかえました';   /* v1.51.0 */
+    log('季節が変わったので、ほまれくんが おうちの模様がえをしました：'+text+'。'); }
   let melted=false;
   if(season()!==3 && S.snowman){ S.snowman=false; melted=true; }
   S.bigDay=null;   /* v1.24.0 */
@@ -7808,6 +7888,7 @@ async function morning0(info){
   busy=true;
   cancelErrand(); shadaMode('follow'); A.shada.watchPlot=null;
   setMood('eri','normal'); setMood('shada','normal');
+  remindScan();   /* v1.50.0：しるしの出はじめ（朝の実り）を おぼえる */
   place(A.eri,SPOT.homeEri.x,SPOT.homeEri.y,0);
   place(A.shada,SPOT.morningShada.x,SPOT.morningShada.y,0);
   place(A.homare,SPOT.doorHomare.x,SPOT.doorHomare.y,0);
@@ -7935,10 +8016,12 @@ async function morning0(info){
       const f=FRUITS[info.fruit];
       await pause(1500); setMood('shada','happy',1600); say('shada',f.noticeS);
       await pause(1500); say('eri',f.noticeE,0,'happy',true); log(f.noticeLog);
+      remindTold(info.fruit==='budou'?'vine':'tree:'+info.fruit);   /* v1.50.0 */
     }
     if(info.basil){   /* v1.23.0：バジルがつめる朝も、しゃだはる君が気づく */
       await pause(1500); setMood('shada','happy',1600); say('shada','えりちゃん、バジル、そだったばう！');
       await pause(1500); say('eri','ほんとだ。あとで、つんでおこうね。',0,'happy',true); log('温室のバジルが育っています。タップして、つみましょう。');
+      remindTold('basil');   /* v1.50.0 */
     }
     if(info.hoshi){   /* v1.28.0：大根が干しあがった朝 */
       await pause(1500); setMood('shada','happy',1600); say('shada','えりちゃん、だいこん、ほせたばう！');
@@ -8304,7 +8387,7 @@ if(location.hash.indexOf('gyoji')>=0){
 { const v=document.querySelector('.ver'); let taps=[];
   if(v) v.addEventListener('click',e=>{ e.stopPropagation(); const t=Date.now(); taps=taps.filter(x=>t-x<3000); taps.push(t); if(taps.length>=5){ taps=[]; openGyojiMenu(); } }); }
 if(location.hash.indexOf('debug')>=0){
-  window.__hatake={ get camN(){return camStack.length;}, camWho, bubSeen, say, year2Event, y2Suika, y2Snap, y2Kabu, y2Broccoli, Y2_LOG, seedOpen, allowedSeed, openSeeds, SEEDS2_AT, TSUKIMI, get bg(){return bg;}, bgWait, set forceWait(v){forceWait=v;}, gyojiPat, GYOJI_LEAD, birthdayNight, get gyojiStep(){return gyojiStep;}, rollWeather, pickPre, gyojiNightDue, nightOn, nightOff, nightOuting, fwLaunch, senkoOn, HANABI, hangCan, hangScene, hangMorning, renderShed, shedTap, nextHoshiDish, hoshiReady, morningPlan, morning, GYOJI, GYOJI_SCENE, gyojiDue, gyojiScene, hRoute, hCross, hInB, HTABLE, HSPOT, hmove, get S(){return S;}, get busy(){return busy;}, yearReview, showYearCard, openZukan, zukanShow, openDiary, grow, bigRoll, FLOWER_SIDE, spawnBug, COMPOST_BONUS, weatherTick, actShadaPlot, SPLOT, freeSplot, get yearCardClose(){return yearCardClose;}, A, homeEvening, pickPre, dishCandidates, makeRequest, get HA(){return HA;}, advance, maybeEvent, renderAll, addHarvest, checkUnlocks, nextMorning, Store, CROPS, RECIPES, UNLOCKS, EVENTS, FRIDGE, rollFridge, rollWeather, placeFrost, weatherScenes, importSave, exportSave, normalize, Snd, GIFTS, planVisit, visitDue, fitVisit, DISH, setPortions, shelterAtShed, restAtHome, placeTreasure, rest, FRUITS, plantTree, plantVine, pickFruit, TREES, treeTap, dessertNight, fruitMorning, renderTree, moveShada, shadaSelfWater, selfWaterTarget, returnCan, playerAction, endDay, plantBasil, pickBasil, pickV, judgeBigDay, giftDetour, basilInFridge, SLOT_MAX, makeRoomFor, seasonSwap, fixup, workLeft, decorShown, closetTalk, openFridge, cuckoo, feedFish, mirrorReflect, strum, playUke, sitRock, seasonalDue, seasonalShow, SEASONAL, SEASONAL_SCENE, setupRoom, REWARD_NIGHT, DECOR, REWARDS, rewardSetup, get SW(){return {n:S.swN,day:S.swDay,can:S.canOut};},
+  window.__hatake={ get camN(){return camStack.length;}, camWho, shadaCarry, SHELF_MAX, renderTreasures, inCloset, decorName, fixup, remindList, remindScan, maybeRemind, otherWorkLeft, remindTold, get remindIdle(){return remindIdle;}, bubSeen, say, year2Event, y2Suika, y2Snap, y2Kabu, y2Broccoli, Y2_LOG, seedOpen, allowedSeed, openSeeds, SEEDS2_AT, TSUKIMI, get bg(){return bg;}, bgWait, set forceWait(v){forceWait=v;}, gyojiPat, GYOJI_LEAD, birthdayNight, get gyojiStep(){return gyojiStep;}, rollWeather, pickPre, gyojiNightDue, nightOn, nightOff, nightOuting, fwLaunch, senkoOn, HANABI, hangCan, hangScene, hangMorning, renderShed, shedTap, nextHoshiDish, hoshiReady, morningPlan, morning, GYOJI, GYOJI_SCENE, gyojiDue, gyojiScene, hRoute, hCross, hInB, HTABLE, HSPOT, hmove, get S(){return S;}, get busy(){return busy;}, yearReview, showYearCard, openZukan, zukanShow, openDiary, grow, bigRoll, FLOWER_SIDE, spawnBug, COMPOST_BONUS, weatherTick, actShadaPlot, SPLOT, freeSplot, get yearCardClose(){return yearCardClose;}, A, homeEvening, pickPre, dishCandidates, makeRequest, get HA(){return HA;}, advance, maybeEvent, renderAll, addHarvest, checkUnlocks, nextMorning, Store, CROPS, RECIPES, UNLOCKS, EVENTS, FRIDGE, rollFridge, rollWeather, placeFrost, weatherScenes, importSave, exportSave, normalize, Snd, GIFTS, planVisit, visitDue, fitVisit, DISH, setPortions, shelterAtShed, restAtHome, placeTreasure, rest, FRUITS, plantTree, plantVine, pickFruit, TREES, treeTap, dessertNight, fruitMorning, renderTree, moveShada, shadaSelfWater, selfWaterTarget, returnCan, playerAction, endDay, plantBasil, pickBasil, pickV, judgeBigDay, giftDetour, basilInFridge, SLOT_MAX, makeRoomFor, seasonSwap, fixup, workLeft, decorShown, closetTalk, openFridge, cuckoo, feedFish, mirrorReflect, strum, playUke, sitRock, seasonalDue, seasonalShow, SEASONAL, SEASONAL_SCENE, setupRoom, REWARD_NIGHT, DECOR, REWARDS, rewardSetup, get SW(){return {n:S.swN,day:S.swDay,can:S.canOut};},
     visit:async()=>{ if(busy) return false; busy=true; renderButtons(); S.oji={sy:Math.floor((S.day-1)/SEASON_DAYS),day:S.day,at:S.clock,done:false}; await visitScene(); busy=false; renderButtons(); return true; },
     force:async id=>{ if(busy) return false; busy=true; renderButtons(); S.sinceEvent=9; const r=await maybeEvent(false,id); await checkUnlocks(); busy=false; renderButtons(); return r; } };
 }
