@@ -323,6 +323,12 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 .bubble.toL{right:calc(28% - var(--bs,0px))}.bubble.toL::after{right:calc(12px + var(--bs,0px))}
 .bubble.toR{left:calc(28% + var(--bs,0px))}.bubble.toR::after{left:calc(12px - var(--bs,0px))}
 /* 3人そろって言うセリフ（ごちそうさまでした。）の、ひとつにまとめた吹き出し。しっぽ（i）は人数ぶん（v1.18.0） */
+/* v1.49.2：真下に立っているときの吹き出しは、顔のよこ（right/left は .actor の箱からはかる。しっぽは横から話す人へ） */
+.bubble.side{bottom:auto!important;top:50%!important;left:calc(100% + 10px)!important;right:auto!important;transform:translate(0,-58%) translateY(4px);text-wrap:auto}
+.bubble.side.on{transform:translate(0,-58%)}
+.bubble.side::after{left:-6px;right:auto;bottom:auto;top:calc(58% - 5px);border-right:none;border-top:none;border-left:1px solid var(--border);border-bottom:1px solid var(--border)}
+.bubble.side.sideL{left:auto!important;right:calc(100% + 10px)!important}
+.bubble.side.sideL::after{left:auto;right:-6px;border-left:none;border-bottom:none;border-right:1px solid var(--border);border-top:1px solid var(--border)}
 .bubble.chorus{left:0;top:0;bottom:auto;z-index:520;text-align:center}
 .bubble.chorus::after{display:none}
 .bubble.chorus i{position:absolute;bottom:-6px;width:10px;height:10px;margin-left:-5px;background:#fff;border-right:1px solid var(--border);border-bottom:1px solid var(--border);transform:rotate(45deg)}
@@ -705,6 +711,9 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 .vp.night .basketFront{z-index:27}
 .vp.night .ngauge,.vp.night .pan,.vp.night .peek{display:none}
 .vp.night .scroller{overflow-x:hidden}
+/* v1.49.0：場面のあいだ、画面を固定（camOn〜camOff）：指のスクロールを止め、PC の矢印はうすくして きかなくする */
+.vp.camlock .scroller{overflow-x:hidden}
+.vp.camlock .pan{opacity:.35;pointer-events:none}
 #game .vp.night #actors .actor.eri .hat-summer,#game .vp.night #actors .actor.eri .hat-winter{display:none}
 #game .vp.night #actors .actor.eri .bubble{bottom:112%}
 #nightVeil{position:absolute;left:0;top:0;width:100%;height:100%;z-index:28;pointer-events:none;background-color:rgba(14,22,60,.6);display:none;transition:background-color .25s}
@@ -1175,7 +1184,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 <div class="game" id="game">
   <div class="head">
     <h1>えりとしゃだはるの ちいさな畑</h1>
-    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.48.0</span></span>
+    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.49.2</span></span>
   </div>
 
   <div class="hud">
@@ -1412,7 +1421,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
           <g id="g-ukulele" style="display:none"><circle cx="335" cy="94.6" r="1.6" fill="#6b5232"/><path d="M335 96 V99.4" stroke="#6b5232" stroke-width="1"/><rect x="331.3" y="99" width="7.4" height="8.4" rx="2" fill="#7a5230"/><g fill="#e9e2d2"><circle cx="330.4" cy="101.6" r="1"/><circle cx="330.4" cy="104.8" r="1"/><circle cx="339.6" cy="101.6" r="1"/><circle cx="339.6" cy="104.8" r="1"/></g><rect x="333" y="106.6" width="4" height="21.4" fill="#8f6a44"/><g stroke="#6b5232" stroke-width=".8"><path d="M333 112 h4 M333 117 h4 M333 122 h4"/></g><path d="M335 126.5 c-5 0 -7.6 3 -7.6 6.6 c0 2.4 1.6 3.9 1.6 5.4 c0 2.6 -2.6 4.4 -2.6 8 c0 5 4 8 8.6 8 c4.6 0 8.6 -3 8.6 -8 c0 -3.6 -2.6 -5.4 -2.6 -8 c0 -1.5 1.6 -3 1.6 -5.4 c0 -3.6 -2.6 -6.6 -7.6 -6.6Z" fill="#d9a76a" stroke="#a87c4e" stroke-width="1.2"/><circle cx="335" cy="141.4" r="2.8" fill="#6b4a2c"/><rect x="332.4" y="147" width="5.2" height="2" rx=".6" fill="#6b4a2c"/><g stroke="#f6efd9" stroke-width=".55"><path d="M333.6 106.6 V147 M334.5 106.6 V147 M335.5 106.6 V147 M336.4 106.6 V147"/></g></g>
           <!-- 秋のどんぐりのリース（v1.34.0。季節のもの。窓の右のかべ、ウクレレの上） -->
           <g id="g-wreath" style="display:none"><circle cx="335" cy="50.4" r="1.5" fill="#6b5232"/><path d="M335 51.6 V55" stroke="#6b5232" stroke-width="1"/><circle cx="335" cy="66" r="9.6" fill="none" stroke="#8fa06a" stroke-width="5.4"/><ellipse cx="344.6" cy="66.0" rx="3.4" ry="1.9" fill="#7f9a5a" transform="rotate(90 344.6 66.0)"/><ellipse cx="342.8" cy="71.6" rx="3.4" ry="1.9" fill="#a3b06f" transform="rotate(126 342.8 71.6)"/><ellipse cx="338.0" cy="75.1" rx="3.4" ry="1.9" fill="#7f9a5a" transform="rotate(162 338.0 75.1)"/><ellipse cx="332.0" cy="75.1" rx="3.4" ry="1.9" fill="#a3b06f" transform="rotate(198 332.0 75.1)"/><ellipse cx="327.2" cy="71.6" rx="3.4" ry="1.9" fill="#7f9a5a" transform="rotate(234 327.2 71.6)"/><ellipse cx="325.4" cy="66.0" rx="3.4" ry="1.9" fill="#a3b06f" transform="rotate(270 325.4 66.0)"/><ellipse cx="327.2" cy="60.4" rx="3.4" ry="1.9" fill="#7f9a5a" transform="rotate(306 327.2 60.4)"/><ellipse cx="332.0" cy="56.9" rx="3.4" ry="1.9" fill="#a3b06f" transform="rotate(342 332.0 56.9)"/><ellipse cx="338.0" cy="56.9" rx="3.4" ry="1.9" fill="#7f9a5a" transform="rotate(378 338.0 56.9)"/><ellipse cx="342.8" cy="60.4" rx="3.4" ry="1.9" fill="#a3b06f" transform="rotate(414 342.8 60.4)"/><ellipse cx="341.8" cy="74.0" rx="2.2" ry="2.8" fill="#c98f52"/><path d="M339.1 72.6 q2.7 -2.8 5.4 0 v1.2 h-5.4Z" fill="#8a6a3a"/><path d="M341.8 70.8 v-1.4" stroke="#8a6a3a" stroke-width=".9" stroke-linecap="round"/><ellipse cx="328.2" cy="74.0" rx="2.2" ry="2.8" fill="#c98f52"/><path d="M325.5 72.6 q2.7 -2.8 5.4 0 v1.2 h-5.4Z" fill="#8a6a3a"/><path d="M328.2 70.8 v-1.4" stroke="#8a6a3a" stroke-width=".9" stroke-linecap="round"/><ellipse cx="328.2" cy="60.4" rx="2.2" ry="2.8" fill="#c98f52"/><path d="M325.5 59.0 q2.7 -2.8 5.4 0 v1.2 h-5.4Z" fill="#8a6a3a"/><path d="M328.2 57.2 v-1.4" stroke="#8a6a3a" stroke-width=".9" stroke-linecap="round"/><ellipse cx="341.8" cy="60.4" rx="2.2" ry="2.8" fill="#c98f52"/><path d="M339.1 59.0 q2.7 -2.8 5.4 0 v1.2 h-5.4Z" fill="#8a6a3a"/><path d="M341.8 57.2 v-1.4" stroke="#8a6a3a" stroke-width=".9" stroke-linecap="round"/><path d="M331.6 57.4 l3.4 -2.2 l3.4 2.2 l-3.4 2.4Z" fill="#c9776c"/><path d="M335 55.2 l-4.6 -1.6 l-.4 3.4Z M335 55.2 l4.6 -1.6 l.4 3.4Z" fill="#d9958a"/></g>
-          <!-- 台所のうしろのカウンター（v1.34.3：かべぎわ。手前の戸棚より奥なので、引き出しは上の1だんだけ見える。上に 電子レンジ（ビストロ・黒）・炊飯器（象印・白）。実物の大きさ比（v1.35.2：木の箸立ては消した。v1.48.0：まん中のノンフライヤーは消した（依頼者の指定））＝約1px/cm） -->
+          <!-- 台所のうしろのカウンター（v1.34.3：かべぎわ。手前の戸棚より奥なので、引き出しは上の1だんだけ見える。上に 電子レンジ（ビストロ・黒）・炊飯器（象印・白。v1.49.0：電子レンジのとなり）。実物の大きさ比（v1.35.2：木の箸立ては消した。v1.48.0：まん中のノンフライヤーは消した（依頼者の指定））＝約1px/cm） -->
           <g id="g-backCounter">
             <rect x="12" y="182" width="140" height="24" fill="#cdc4b8" stroke="#aaa093" stroke-width="1.5"/>
             <rect x="14" y="185" width="136" height="19" rx="1.2" fill="#d8d0c5" stroke="#b3a99c" stroke-width="1"/><path d="M17 187.5 h130" stroke="#fff" stroke-opacity=".55" stroke-width="1" stroke-linecap="round"/><path d="M75 197 h14" stroke="#9d9387" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>
@@ -1422,8 +1431,8 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
             <rect x="17" y="145" width="33" height="26" rx="1.5" fill="#1e2024"/><rect x="19.5" y="149" width="28" height="19" rx="1" fill="#33383f"/><path d="M22 152 h10" stroke="#5a616b" stroke-width="1" stroke-linecap="round" opacity=".7"/><path d="M19 146.6 H48" stroke="#6a6a6e" stroke-width="1.6" stroke-linecap="round"/>
             <rect x="52.5" y="145" width="8.5" height="26" rx="1" fill="#26262a"/><rect x="54" y="147.5" width="5.5" height="6" rx=".8" fill="#4f6b7c"/><path d="M55 149.5 h3.5 M55 151.5 h2" stroke="#9fd3ec" stroke-width=".8" stroke-linecap="round"/><circle cx="56.75" cy="157.5" r="1" fill="#6b6b70"/><circle cx="56.75" cy="161" r="1" fill="#6b6b70"/><rect x="55" y="165" width="3.5" height="2.2" rx=".6" fill="#8a8a90"/>
             <rect x="16" y="175" width="4" height="1.8" rx=".6" fill="#111"/><rect x="57" y="175" width="4" height="1.8" rx=".6" fill="#111"/>
-            <!-- 炊飯器（象印・白）：まるい箱、ふたの線、上の小さなパネル。v1.35.2：箸立てを消したぶん 右へ10 -->
-            <g transform="translate(10 0)"><rect x="103" y="155" width="23" height="21" rx="5" fill="#f1eee7" stroke="#c8c2b8" stroke-width="1.2"/><path d="M104.5 165 Q114.5 167.5 124.5 165" fill="none" stroke="#a49e94" stroke-width="1.1" stroke-linecap="round"/>
+            <!-- 炊飯器（象印・白）：まるい箱、ふたの線、上の小さなパネル。v1.35.2：箸立てを消したぶん 右へ10。v1.49.0：電子レンジのとなり（x70〜93。消したノンフライヤーの場所）へ（依頼者の指定） -->
+            <g transform="translate(-33 0)"><rect x="103" y="155" width="23" height="21" rx="5" fill="#f1eee7" stroke="#c8c2b8" stroke-width="1.2"/><path d="M104.5 165 Q114.5 167.5 124.5 165" fill="none" stroke="#a49e94" stroke-width="1.1" stroke-linecap="round"/>
             <rect x="108" y="156.6" width="13" height="4.2" rx="1.2" fill="#dedbd3"/><circle cx="111" cy="158.7" r=".9" fill="#8d8780"/><circle cx="114.5" cy="158.7" r=".9" fill="#8d8780"/><rect x="117" y="157.8" width="2.6" height="1.8" rx=".5" fill="#8fb3c9"/>
             <path d="M122.5 168 h2 M122.5 170 h2 M122.5 172 h2" stroke="#c3bdb4" stroke-width=".8" stroke-linecap="round"/></g>
           </g>
@@ -2223,6 +2232,7 @@ let S=null, busy=false, modal=false, queued=null;
    bgWait()＝彼がかかわる行動（1日を終える・ひとやすみ・天気の場面・おじさん・行事・しゃだはる畑・彼が使っているマス）の前に、残りを早送り（hurry）して終わるのを待つ。
    えりちゃんの行動の吹き出しは、彼の吹き出しが出ているあいだは出さない（say）。出来事の中の えりちゃんの返事（keep）は出す */
 let bg=null;
+let camStack=[];   /* v1.49.0：画面の固定（「カメラ」の見出しの camOn〜camOff）。中身は {who:[追う人…]} */
 function bgStart(kind,plot,fn){
   if(A.shada.mode==='follow') shadaMode('event');
   const done=(async()=>{ try{ await fn(); }catch(e){ try{ console.error(e); }catch(_){} } finally { if(A.shada.mode==='event') shadaMode('follow'); if(bg && bg.done===done) bg=null; hurry=false; renderButtons(); } })();
@@ -2688,6 +2698,7 @@ function place(a,x,y,ms){
   a.el.style.transitionDuration=(ms||0)+'ms';
   a.el.style.transform='translate('+x+'px,'+y+'px)';
   a.el.style.zIndex=Math.max(1,Math.round(y));
+  if(camStack.length && camWho().indexOf(a)>=0) camFollow();   /* v1.49.0：追っている人が動くときは、画面もついていく */
 }
 function moveTo(a,spot,opt){
   const dist=Math.hypot(spot.x-a.x,spot.y-a.y);
@@ -2727,31 +2738,62 @@ function bubFitX(a){
   let sh=0; if(r.left<v.left+2) sh=Math.min(lim,(v.left+2)-r.left); else if(r.right>v.right-2) sh=Math.max(-lim,(v.right-2)-r.right);
   b.style.setProperty('--bs',Math.round(sh)+'px');
 }
-function say(who,text,ms,mood,keep){
+/* v1.49.1（依頼者の希望）：吹き出しは「見えているあいだだけ」時間がへる。画面の外や はしで切れている（見切れ）あいだは そのまま残し、見えるようになってから ふつうに消える。
+   おうちの中・早送り（hurry）のときは、見えているものとして数える */
+const BUB_CUT=10;   /* これより多く画面のはしで切れていたら「見えていない」 */
+function bubSeen(b){ if(hurry || home.classList.contains('on')) return true; const r=b.getBoundingClientRect(), v=scroller.getBoundingClientRect(); return Math.max(v.left-r.left, r.right-v.right, 0)<=BUB_CUT; }
+function bubLife(a,ms){
+  let left=ms, last=performance.now();
+  const tick=()=>{ const now=performance.now(); if(bubSeen(a.bub)) left-=now-last; last=now; if(left<=0){ a.bub.classList.remove('on'); return; } a.bubT=setTimeout(tick,Math.min(150,Math.max(20,left))); };
+  a.bubT=setTimeout(tick,Math.min(150,ms));
+}
+const BUB_WAIT=3000;   /* v1.49.1：②で相手の吹き出しを消すとき、相手のが出たばかりなら 読めるまで（のこり時間、長くても これだけ）待ってから 自分のを出す */
+function say(who,text,ms,mood,keep,retry){   /* retry＝待ってから出しなおすときの、これまでに待った時間（ms） */
   if(who==='eri' && !keep && bg && A.shada.bub.classList.contains('on')) return;   /* v1.37.2：うしろで流れる場面のあいだ、えりちゃんは しゃべらない（返事は keep で出す） */
   const a=A[who], o=A[who==='eri'?'shada':'eri'], b=a.bub;
+  if(!retry && a.sayT){   /* v1.49.2：待っている行があるうちに 同じ人の次の行が来た → 待っている行を いま出し、この行は少しあとに（待っている行が消えないように） */
+    clearTimeout(a.sayT); const pd=a.sayPend; a.sayT=null; a.sayPend=null;
+    if(pd) say(pd.who,pd.text,pd.ms,pd.mood,pd.keep,BUB_WAIT);
+    a.sayPend={who,text,ms,mood,keep}; a.sayT=setTimeout(()=>{ a.sayT=null; a.sayPend=null; say(who,text,ms,mood,keep,BUB_WAIT); },1200);
+    return;
+  }
   clearTimeout(a.bubT);
-  if(who==='shada') Snd.bau();
-  if(mood) setMood(who,mood,Math.min(ms || (1900+text.length*95), MOOD_MS[mood]||1700));
   b.innerHTML=bubbleHTML(text);
   b.style.setProperty('--bs','0px');
   let dir=who==='eri'?'toL':'toR';
   const sx=a.x-scroller.scrollLeft, vw=scroller.clientWidth, need=Math.min(190,vw*.48)+8;
   if(dir==='toL' && sx<need && vw-sx>sx) dir='toR';
   if(dir==='toR' && vw-sx<need && sx>vw-sx) dir='toL';
-  b.classList.remove('toL','toR');
+  b.classList.remove('toL','toR','side','sideL');
   b.classList.add(dir);
   b.classList.add('on');
+  /* v1.49.2（依頼者の希望）：相手の真下に立っているとき（x がほぼ同じで、自分が下）は、上に持ち上げると しっぽが相手の頭の上に来るので、顔のよこに出す（右にすきまが無ければ左。どちらも無ければ 今までどおり） */
+  b.style.maxWidth='';
+  if(Math.abs(a.x-o.x)<30 && a.y>o.y+30){
+    const v=scroller.getBoundingClientRect(), ar=a.el.getBoundingClientRect(), maxW=parseFloat(getComputedStyle(b).maxWidth)||190;
+    const roomR=(v.right-2)-(ar.right+10), roomL=(ar.left-10)-(v.left+2), left=roomL>roomR, room=left?roomL:roomR;   /* 広いほうへ。せまいときは幅をちぢめて折り返す */
+    if(room>=96){ b.classList.remove('toL','toR'); b.classList.add('side'); if(left) b.classList.add('sideL'); if(room<maxW){ b.style.maxWidth=Math.floor(room)+'px'; b.innerHTML=b.innerHTML.replace(/<span>([^<]*)<\/span>/g,(m,t)=>t.split(/ +/).map(w=>'<span>'+w+'</span>').join(' ')); } }   /* 幅をちぢめたときは、空白のところでも折れるように（ことばの途中で折れないように） */
+  }
   layoutBubbles(A.eri,A.shada,world,1);
-  /* v1.48.0：相手の吹き出しと縦に並べて 画面の上から出るなら、①2つを たがいに外がわへ向けて横に並べる（左右をこえるぶんは内がわへ）②それでも出るなら 相手のを先にしまう */
-  if(o.bub.classList.contains('on') && (bubTooHigh(b) || bubTooHigh(o.bub))){
-    const away=(p,q)=>q.x>p.x?'toL':'toR';
+  /* v1.48.0：相手の吹き出しと縦に並べて 画面の上から出るなら、①2つを たがいに外がわへ向けて横に並べる（左右をこえるぶんは内がわへ）②それでも出るなら 相手のを先にしまう
+     v1.49.1：①で ふたりの x が同じ（真下に立っている）ときは、えりちゃんを左・しゃだはる君を右に。真下で 横に並べても持ち上がるときと、②で消すときは、相手の吹き出しが読めるまで（のこり時間・長くても BUB_WAIT）待ってから この吹き出しを出す */
+  const sameX=o.bub.classList.contains('on') && Math.abs(a.x-o.x)<30, lifted=()=>!!(b.style.bottom || o.bub.style.bottom);
+  if(!b.classList.contains('side') && !o.bub.classList.contains('side') && o.bub.classList.contains('on') && (bubTooHigh(b) || bubTooHigh(o.bub) || sameX)){   /* v1.49.2：横に出しているときは、この置きなおしは しない */
+    const away=(p,q)=>(q.x>p.x || (q.x===p.x && p===A.eri))?'toL':'toR';
     b.classList.remove('toL','toR'); b.classList.add(away(a,o)); o.bub.classList.remove('toL','toR'); o.bub.classList.add(away(o,a));
     bubFitX(a); bubFitX(o);
     layoutBubbles(A.eri,A.shada,world,1);
-    if(bubTooHigh(b) || bubTooHigh(o.bub)){ clearTimeout(o.bubT); o.bub.classList.remove('on'); layoutBubbles(A.eri,A.shada,world,1); }
+    /* 真下に立っていて、横に並べても どちらかを持ち上げるとき（しっぽが 相手の頭の上に来て、相手のセリフに見える）も、順番に出す */
+    if(bubTooHigh(b) || bubTooHigh(o.bub) || (sameX && lifted())){
+      const rem=(o.bubMs||0)-(performance.now()-(o.bubAt||0)), waited=retry||0;   /* 相手の吹き出しの のこり時間。waited＝これまでに待った時間（合わせて BUB_WAIT まで） */
+      if(rem>150 && waited<BUB_WAIT){ const wt=Math.min(rem,BUB_WAIT-waited); b.classList.remove('on'); b.style.setProperty('--bs','0px'); layoutBubbles(A.eri,A.shada,world,1); a.sayPend={who,text,ms,mood,keep}; a.sayT=setTimeout(()=>{ a.sayT=null; a.sayPend=null; say(who,text,ms,mood,keep,waited+wt); },wt); return; }
+      clearTimeout(o.bubT); o.bub.classList.remove('on'); layoutBubbles(A.eri,A.shada,world,1);
+    }
   }
-  a.bubT=setTimeout(()=>b.classList.remove('on'), ms || (1900+text.length*95));
+  if(who==='shada') Snd.bau();
+  if(mood) setMood(who,mood,Math.min(ms || (1900+text.length*95), MOOD_MS[mood]||1700));
+  a.bubAt=performance.now(); a.bubMs=ms || (1900+text.length*95);
+  bubLife(a, a.bubMs);
 }
 /* 吹き出しが、相手の吹き出しや相手の顔にかぶるときは、かぶらない高さまで持ち上げる */
 function layoutBubbles(e,s,box,scale){
@@ -2770,7 +2812,7 @@ function layoutBubbles(e,s,box,scale){
     liftAbove(a, on(o) ? Math.min(R(o.bub).t, o.y-TOK/2) : o.y-TOK/2);
   });
 }
-function hush(){ [A.eri,A.shada,A.homare,A.oji].forEach(a=>{ if(bg && a===A.shada) return; clearTimeout(a.bubT); a.bub.classList.remove('on'); });   /* v1.37.2：うしろで流れる場面のあいだ、彼の吹き出しは えりちゃんの行動で消さない */ layer.querySelectorAll('.bubble.chorus').forEach(b=>b.remove()); }
+function hush(){ [A.eri,A.shada,A.homare,A.oji].forEach(a=>{ if(bg && a===A.shada) return; clearTimeout(a.bubT); clearTimeout(a.sayT); a.sayT=null; a.sayPend=null; a.bub.classList.remove('on'); });   /* v1.37.2：うしろで流れる場面のあいだ、彼の吹き出しは えりちゃんの行動で消さない */ layer.querySelectorAll('.bubble.chorus').forEach(b=>b.remove()); }
 /* 3人で そろって言うセリフを、ひとつの吹き出しに（畑用。v1.37.0。おうちの hchorus と同じ考え：みんなの頭の上のまんなかに置き、しっぽを ひとりに1つずつ） */
 function chorus(list,text,ms){
   hush();
@@ -2860,9 +2902,25 @@ function focusPlot(i){
   const r=plotRect(i); focusRange(r.x-60,r.x+r.s+60);
 }
 const inView=(x,m)=>x>=scroller.scrollLeft+(m||0) && x<=scroller.scrollLeft+scroller.clientWidth-(m||0);
+/* v1.49.0：場面のあいだ、画面を そこに固定する（依頼者の希望：出来事の途中で画面を動かすと、出来事が見えなくなってしまう）。
+   camOn(who)〜camOff(t) のあいだは、指のスクロール・PCの矢印・マウスのドラッグが きかない（.vp.camlock）。withCam(who,fn) は その両方を まとめたもの。
+   who＝追う人（コマの配列）：その人が歩きだすたび（place）に 画面に入るよう動かす（camFollow）。場面が自分で画面を動かすもの（おじさん・行事・雷・雨やどり・朝と夕方の道 など）は who を空にして、スクロールだけ止める。
+   追う場面が終わったら camBack：えりちゃんが画面の外なら、えりちゃんのところへ もどす。早送り（hurry）のあいだは動かさない */
+const camWho=()=>camStack.length?camStack[camStack.length-1].who:[];
+function camOn(who){ const t={who:who||[]}; camStack.push(t); vp.classList.add('camlock'); if(t.who.length) camFollow(); else if(!hurry && !home.classList.contains('on') && !inView(A.eri.x,24)) focus(A.eri.x); return t; }
+/* えりちゃんの行動（マスをタップ・地面をタップ）が始まったら、うしろで流れている出来事の「追う」をやめる（画面は行動のほうへ。出来事は「！」で知らせる） */
+function camRelease(){ for(let i=camStack.length-1;i>=0;i--) if(camStack[i].who.length) camStack.splice(i,1); if(!camStack.length) vp.classList.remove('camlock'); }
+function camOff(t){ const i=camStack.indexOf(t); if(i>=0) camStack.splice(i,1); if(!camStack.length) vp.classList.remove('camlock'); }
+async function withCam(who,fn){ const t=camOn(who); try{ return await fn(); } finally { camOff(t); } }
+function camFollow(){
+  const who=camWho(); if(!who.length || hurry) return;
+  const xs=who.map(a=>a.x);
+  focusRange(Math.min(...xs)-64,Math.max(...xs)+64);
+}
+function camBack(){ if(camStack.length || hurry || home.classList.contains('on')) return; if(!inView(A.eri.x,24)) focus(A.eri.x); }
 let peekOn=false, peekT=0;
 function peekUpdate(){
-  if(!peekOn || inView(A.shada.x,12)){ peek.classList.remove('on'); return; }
+  if(!peekOn || camWho().length || inView(A.shada.x,12)){ peek.classList.remove('on'); return; }   /* v1.49.0：追っているあいだは出さない */
   const left=A.shada.x<scroller.scrollLeft;
   peek.classList.add('on'); peek.classList.toggle('left',left); peek.classList.toggle('right',!left);
 }
@@ -2874,11 +2932,11 @@ scroller.addEventListener('scroll',()=>{
   if(rafScroll) return;
   rafScroll=requestAnimationFrame(()=>{ rafScroll=0; far.style.transform='translateX('+(scroller.scrollLeft*.35).toFixed(1)+'px)'; peekUpdate(); });
 },{passive:true});
-$('#panL').addEventListener('click',()=>focus(scroller.scrollLeft+scroller.clientWidth/2-scroller.clientWidth*.7));
-$('#panR').addEventListener('click',()=>focus(scroller.scrollLeft+scroller.clientWidth/2+scroller.clientWidth*.7));
+$('#panL').addEventListener('click',()=>{ if(camStack.length) return; focus(scroller.scrollLeft+scroller.clientWidth/2-scroller.clientWidth*.7); });   /* v1.49.0：固定のあいだは きかない */
+$('#panR').addEventListener('click',()=>{ if(camStack.length) return; focus(scroller.scrollLeft+scroller.clientWidth/2+scroller.clientWidth*.7); });
 /* マウスのときだけ、つかんで横に動かせるようにする（スマホは指でそのままスクロール） */
 let drag=null, dragged=false;
-scroller.addEventListener('pointerdown',e=>{ if(e.pointerType==='mouse' && e.button===0) drag={x:e.clientX,left:scroller.scrollLeft,moved:false}; });
+scroller.addEventListener('pointerdown',e=>{ if(camStack.length) return; if(e.pointerType==='mouse' && e.button===0) drag={x:e.clientX,left:scroller.scrollLeft,moved:false}; });   /* v1.49.0：固定のあいだは つかめない */
 window.addEventListener('pointermove',e=>{
   if(!drag) return;
   const dx=e.clientX-drag.x;
@@ -2968,7 +3026,8 @@ function spawnBug(d){
   log(CROPS[S.plots[i].crop].name+'に、虫がついています。タップすると、追いはらえます。');
 }
 /* 天気が変わったときの、ちいさな場面 */
-async function weatherScenes(resting){   /* resting＝ひとやすみの直後（つづけて雨やどりへは行かない） */
+async function weatherScenes(resting){ if(!wxQueue.length) return; await withCam([],()=>weatherScenes0(resting)); }   /* v1.49.0：天気の場面のあいだは固定 */
+async function weatherScenes0(resting){   /* resting＝ひとやすみの直後（つづけて雨やどりへは行かない） */
   if(wxQueue.length) await bgWait();   /* v1.37.2：天気の場面（雨やどり・雷 など）は 彼もかかわるので、うしろの場面を待ってから */
   while(wxQueue.length){
     const ev=wxQueue.shift(), k=S.wx?S.wx.kind:null, follow=A.shada.mode==='follow';
@@ -2999,11 +3058,13 @@ async function weatherScenes(resting){   /* resting＝ひとやすみの直後�
     else if(typeof ev==='string' && ev.indexOf('parch:')===0){   /* v1.41.0：日照り（セリフは了解ずみ。時間は進まない） */
       const n=+ev.split(':')[1];
       log(n?'日照りで、畑の土がかわきました。「かわいた」マスに もう一回 水をあげると、午後も育ちます。':'日照りで、土がかわきました。');
-      if(follow){
+      if(A.shada.mode!=='hide'){   /* v1.49.1（依頼者の希望）：昼寝・見張り中でも ひとこと。画面の外にいるなら 彼のところへ → えりちゃんのところへ */
         await pause(800);
+        if(!inView(A.shada.x,40)){ focusRange(A.shada.x-70,A.shada.x+70); await pause(500); }
         setMood('shada','sleepy',1800); say('shada','つち、かわいたばう……'); fx('i-drop',{x:A.shada.x+22,y:A.shada.y-26},'pop',900);
-        if(n){ await pause(1400); say('eri','日照りだね。もう一回、お水をあげよう。',0,'smile',true); }
+        if(n){ await pause(1400); if(!inView(A.eri.x,40)){ focusRange(A.eri.x-70,A.eri.x+70); await pause(500); } say('eri','日照りだね。もう一回、お水をあげよう。',0,'smile',true); }
         await pause(1300);
+        if(!inView(A.eri.x,24)) focus(A.eri.x);
       }
     }
   }
@@ -3077,7 +3138,8 @@ function wakeShada(talk){
 function stopWatch(){ if(A.shada.mode==='watch'){ shadaMode('follow'); A.shada.watchPlot=null; } }
 let errandId=0;
 function cancelErrand(){ errandId++; flushPending(); carryItem=null; if(A.shada.mode==='errand') shadaMode('follow'); shadaCarry(); }
-async function carryStone(kind){
+async function carryStone(kind){ const t=camOn([A.shada]); try{ await carryStone0(kind); } finally { camOff(t); camBack(); } }   /* v1.49.0：運ぶあいだも画面がついていく */
+async function carryStone0(kind){
   const id=++errandId;
   await pause(1100);
   if(id!==errandId) return;
@@ -3093,7 +3155,8 @@ async function carryStone(kind){
   await placeTreasure(kind==='acorn'?'acorn':'stone');   /* v1.20.0：7こめからは、古いものを たからばこへ */
   peekEnd();
 }
-async function watchDone(){
+async function watchDone(){ await withCam([A.shada],watchDone0); }   /* v1.49.0 */
+async function watchDone0(){
   const p=S.plots[A.shada.watchPlot], c=p&&p.crop?CROPS[p.crop]:null;
   shadaMode('follow'); A.shada.watchPlot=null;
   if(!c) return;
@@ -3123,7 +3186,8 @@ function addHarvest(key,n,big){   /* v1.39.0：big＝大きな野菜。かご（
   if(S.basketToday.length>6) S.basketToday.splice(0,S.basketToday.length-6);
   renderWorld();
 }
-async function checkUnlocks(){
+async function checkUnlocks(){ if(!unlockPending()) return; await withCam([],checkUnlocks0); }   /* v1.49.0：見せているあいだは固定 */
+async function checkUnlocks0(){
   for(const u of UNLOCKS){
     if(S.unlocked[u.key] || S.total<u.at) continue;
     if(isSapling(u.key) && S.saplingDay===S.day) continue;   /* v1.35.0：苗木は1日に1本 */
@@ -3188,7 +3252,8 @@ const VISIT_SETS=[
   ['やあ、えりちゃん。畑しごと、おつかれさま。','これ、ほまれくんと、どうぞ。']
 ];
 const visitClash=(k,se)=>(se===2&&k===0)||(se===1&&k===1);
-async function visitScene(){
+async function visitScene(){ await withCam([],visitScene0); }   /* v1.49.0：場面は自分で画面を動かすので、スクロールだけ止める */
+async function visitScene0(){
   const key=GIFT_BY_SEASON[season()], g=GIFTS[key], O=A.oji, withS=A.shada.mode==='follow';
   S.oji.done=true;
   hush();
@@ -3327,7 +3392,8 @@ async function shedTap(){
   await hangScene(c);
   busy=false; renderButtons(); saveSoon(); runQueued();
 }
-async function hangScene(kind){
+async function hangScene(kind){ await withCam([],()=>hangScene0(kind)); }   /* v1.49.0 */
+async function hangScene0(kind){
   const key=kind==='onion'?'tamanegi':'daikon', e=SPOT.shedEri;
   focusRange(600,792);
   A.eri.el.querySelector('.carry').innerHTML=icon('c-'+key); A.eri.el.classList.add('carrying');
@@ -3420,7 +3486,8 @@ async function gyojiCard(G){   /* v1.35.3 から使っていない（カード�
   await gwait(400);
 }
 /* preview＝見るだけ（#gyoji。なごみ度・回数・記録は変えない） */
-async function gyojiScene(key,preview,pat){
+async function gyojiScene(key,preview,pat){ await withCam([],()=>gyojiScene0(key,preview,pat)); }   /* v1.49.0 */
+async function gyojiScene0(key,preview,pat){
   const G=GYOJI[key]; if(!G || !GYOJI_SCENE[key]) return;
   pat=pat||gyojiPat(key);   /* v1.37.0：見るだけの画面からは 番号で。ふつうは 回数から（回数を足す前に決める） */
   if(!preview){ if(!S.gyoji) S.gyoji={}; if(!S.gyojiN) S.gyojiN={}; S.gyoji[key]=syOf(S.day); S.gyojiN[key]=(S.gyojiN[key]||0)+1; }
@@ -4660,6 +4727,7 @@ async function returnCan(){
 async function playerAction(kind,i,seed){
   busy=true; renderButtons();
   if(bg && bg.plot===i) await bgWait();   /* v1.37.2：彼がいま使っているマスなら、その出来事を早送りで終わらせてから */
+  camRelease();   /* v1.49.0：えりちゃんの行動が先。うしろの出来事を追うのは やめる */
   const p=S.plots[i], c0=centerOf(i);
   focusPlot(i);
   const side=eriSide(i);
@@ -4734,8 +4802,8 @@ async function playerAction(kind,i,seed){
     S.plots[i]=Object.assign(p,{crop:null,growth:0,watered:false,dry:false,soggy:false,bug:false,frost:false,big:false,everDry:false,bonus:0,parched:false});
     Snd.play('harvest');
     const y2=year2Event(key,big,shadaNear);   /* v1.47.0：2年目の野菜だけの小さな出来事（その季節に1回。時間は進まない） */
-    if(y2==='suika'){ renderPlots(); await y2Suika(key,c0,follow); }
-    else if(y2==='broccoli'){ renderPlots(); await y2Broccoli(key,c0,follow); }
+    if(y2==='suika'){ renderPlots(); await withCam([],()=>y2Suika(key,c0,follow)); }   /* v1.49.0：小さな出来事のあいだは固定 */
+    else if(y2==='broccoli'){ renderPlots(); await withCam([],()=>y2Broccoli(key,c0,follow)); }
     else{
       if(big){   /* セリフは了解ずみ（日によって A・B） */
         const bp=(S.bigN||0)%2;
@@ -4752,7 +4820,7 @@ async function playerAction(kind,i,seed){
     addHarvest(key,1,big);
     log(big?'大きな'+c.name+'を収穫しました！かごには、2こぶんです。':c.name+'を1こ収穫しました。');
     renderHUD();
-    if(y2==='snap') await y2Snap(follow); else if(y2==='kabu') await y2Kabu(follow);
+    if(y2==='snap') await withCam([],()=>y2Snap(follow)); else if(y2==='kabu') await withCam([],()=>y2Kabu(follow));   /* v1.49.0 */
     if(y2){ log(Y2_LOG[y2]); S.sinceEvent=0; }   /* その回は、しゃだはる君のできごとは出さない（おじさんと同じ考え） */
     /* おてつだい③：転がった野菜をひろってくる */
     if(!y2 && shadaNear && rnd()<(S.mood==='helpful'?.22:.1)){
@@ -4908,7 +4976,7 @@ async function actShadaPlot(k){
 }
 async function walkTo(x,y){
   if(busy||modal||!S) return;
-  busy=true;
+  busy=true; camRelease();   /* v1.49.0 */
   const t={x:clamp(x,30,W-30),y:clamp(y,196,H-22)};
   const dS=Math.hypot(A.shada.x-t.x,A.shada.y-t.y);
   const follow=(!reduceMotion && dS<=NEAR_STAY && distSeg({x:A.eri.x,y:A.eri.y},t,A.shada)>=36) ? Promise.resolve() : shadaFollowTo({x:clamp(t.x+48,30,W-30),y:clamp(t.y+6,196,H-22)});   /* v1.26.0：近くにいるなら、その場で待つ */
@@ -4954,7 +5022,8 @@ const SHED_TALK={
 };
 const SHED_END='よし、つづきしよっか。';
 const useShed=()=>!!S.unlocked.shed && S.wx && S.wx.kind!=='storm' && A.eri.x>460;
-async function shelterAtShed(){
+async function shelterAtShed(){ await withCam([],shelterAtShed0); }   /* v1.49.0 */
+async function shelterAtShed0(){
   const k=(S.wx&&S.wx.kind==='snow')?'snow':'rain', canFollow=A.shada.mode==='follow';
   const back={x:A.eri.x,y:A.eri.y}, backS={x:A.shada.x,y:A.shada.y};
   hush();
@@ -4985,7 +5054,8 @@ async function shelterAtShed(){
   saveSoon();
 }
 /* free＝えりちゃんが自分から帰るとき（weatherScenes から呼ばれる。時間は進めない。おわったら、もとの場所へもどる） */
-async function restAtHome(free){
+async function restAtHome(free){ await withCam([],()=>restAtHome0(free)); }   /* v1.49.0 */
+async function restAtHome0(free){
   const k=(S.wx&&SHELTER[S.wx.kind])?S.wx.kind:(season()===3?'snow':'rain');
   const hiding=A.shada.mode==='hide', canFollow=A.shada.mode==='follow';
   const e=hiding?{x:218,y:258}:SPOT.homeEri;
@@ -5070,6 +5140,8 @@ async function rest(auto){
   const bench=!!S.unlocked.bench;
   const e=bench?SPOT.benchEri:SPOT.restEri, s=bench?SPOT.benchShada:SPOT.restShada;
   if(auto && atSpot(A.eri,e)){ await restLight(); busy=false; renderButtons(); saveSoon(); runQueued(); return; }   /* 2回目からは、その場で（下の restLight） */
+  const camT=camOn([]);   /* v1.49.0：ベンチの場面のあいだは固定 */
+  try{
   if(bench) focusRange(130,340); else focusPlot(0);
   /* ときどき、しゃだはる君を呼んでから休む */
   const call=A.shada.mode==='follow' && rnd()<.3;
@@ -5094,6 +5166,7 @@ async function rest(auto){
   await pause(450);
   if(snack){ snack.style.opacity='0'; setTimeout(()=>snack.remove(),320); }
   log((uchi && sc.uchiLog ? sc.uchiLog : sc.log)+REST_LABEL+'たちました。');
+  } finally { camOff(camT); }
   await advance(REST);
   S.sinceEvent+=2;
   await afterAction(true);
@@ -6748,6 +6821,7 @@ async function homeEvening(cands){
 /* 朝のおうち（v1.13.0。依頼者の希望）：ふとんで目をさまして「おはよう。」→ すぐ外へ（お見送りの場面）。おうちの中なので「。」 */
 const FUTON={eri:{x:172,y:348}, homare:{x:242,y:348}, shada:{x:309,y:354}};
 async function homeMorning(){
+  panelEl.classList.add('atHome');   /* v1.49.0（依頼者の指摘）：朝のおうちの場面のあいだも、持っている種と下のボタンは出さない（homeEvening のおわりで外していたので、ふとんの部屋の下に「持っている種」が見えていた） */
   if(HA) Object.values(HA).forEach(a=>a.el.classList.remove('scarf'));   /* 誕生日の夜にまいたマフラーは、朝には外している（v1.31.0） */
   homeSkip=false;
   setupRoom();
@@ -6792,6 +6866,7 @@ async function homeMorning(){
   home.classList.remove('show');
   await pause(450);
   home.classList.remove('on','morning','dark','deep');
+  panelEl.classList.remove('atHome');   /* v1.49.0 */
   $('#roomTable').style.display=''; $('#futonBack').style.display='none'; $('#futonFront').style.display='none'; $('#hSun').style.display='none'; $('#hMornBeam').style.display='none';
   Object.values(HA).forEach(a=>{ a.el.classList.remove('inFuton','jumping'); hmood(a,'normal'); });
 }
@@ -7365,7 +7440,7 @@ async function maybeEvent(resting,forceId){
   }
   if(SEASONAL_EV[e.id]){ const se2=seasonEv(); se2.seen=true; se2.day=S.day; }
   S.eventsToday+=1; S.sinceEvent=0;
-  const play=async()=>{ await pause(350); peekStart(); await e.run(); peekUpdate(); await pause(800); peekEnd(); };
+  const play=async()=>{ await pause(350); peekStart(); await withCam(EVENT_SOLO[e.id]?[A.shada]:[A.shada,A.eri],()=>e.run()); peekUpdate(); await pause(800); peekEnd(); camBack(); };   /* v1.49.0：出来事のあいだは画面を固定して 彼を追う */
   if(EVENT_SOLO[e.id] && !resting && !forceWait){ bgStart('event',null,play); return true; }   /* v1.37.2：ひとりの出来事は うしろで流す（入力は止めない） */
   await play();
   return true;
@@ -7618,7 +7693,8 @@ async function giftDetour(){
   hush();
   log('たくさんとれたので、帰り道に おじさんへ '+nm+'をおすそわけしました。');
 }
-async function endDay(){
+async function endDay(){ await withCam([],endDay0); }   /* v1.49.0：帰り道のあいだは固定（おうちのあとの朝は morning が自分で固定する） */
+async function endDay0(){
   hush();
   judgeBigDay();
   /* 帰り道は、ゆっくり（v1.18.0。依頼者の希望：「帰ろう」のセリフが読めるように）。ふたりのセリフは、立ちどまったまま読めるようにして（約3秒）、しまってから歩きだす。歩く速さも ふだんの6割くらいに */
@@ -7726,7 +7802,8 @@ function morningPlan(){
   if(thirsty.length) return pickV(['まずは、水やりからだね。','みんなに、お水をあげようね。']);
   return pickV(['畑を、見てまわろっか。','みんなの ようすを、見ようね。']);
 }
-async function morning(info){
+async function morning(info){ await withCam([],()=>morning0(info)); }   /* v1.49.0 */
+async function morning0(info){
   info=info||{};
   busy=true;
   cancelErrand(); shadaMode('follow'); A.shada.watchPlot=null;
@@ -7893,7 +7970,8 @@ async function morning(info){
   if(info.first || info.zabuton){ await talk(); await pause(400); busy=false; renderButtons(); saveSoon(); runQueued(); }
   else { busy=false; renderButtons(); saveSoon(); runQueued(); bgStart('morning',null,talk); }
 }
-async function intro(){
+async function intro(){ await withCam([],intro0); }   /* v1.49.0 */
+async function intro0(){
   busy=true; renderAll();
   place(A.eri,spotOf(0,'L').x,spotOf(0,'L').y,0);
   place(A.shada,spotOf(0,'R').x,spotOf(0,'R').y,0);
@@ -8027,6 +8105,7 @@ function openZukan(){
     Object.keys(CROPS).filter(k=>CROPS[k].season===sn).forEach(k=>{ const n=S.totals[k]||0, lock=!seedOpen(k); html+='<button class="zcell'+(n?'':' none')+(lock?' lock':'')+'" type="button" data-crop="'+k+'">'+(lock?ZQ_SVG:icon('c-'+k))+'<b'+(!lock&&CROPS[k].name.length>=8?' class="xlong"':!lock&&CROPS[k].name.length>=6?' class="long"':'')+'>'+(lock?'？？？':esc(CROPS[k].name))+'</b><span>'+(lock?SEEDS2_AT+'こで':n?n+'こ':'？')+'</span>'+(S.bigBy&&S.bigBy[k]?'<i class="zbig">大 '+S.bigBy[k]+'</i>':'')+'</button>'; });   /* v1.39.0：大きな野菜の印。v1.42.0：とどいていない2年目の種は ？？？ */
     html+='</div><div class="zdetail" data-sn="'+sn+'"></div>';
   }
+  if(S.unlocked.green){ const rs=RECIPES.filter(r=>r.need&&r.need.indexOf('basil')>=0), made=rs.filter(r=>S.recipes[r.name]); html+='<p class="sub" style="margin-top:10px">温室のバジルの料理（'+made.length+'／'+rs.length+'品）：'+(made.length?made.map(r=>'<span class="nw">'+esc(r.name)+'</span>').join('、'):'まだありません')+'</p>'; }   /* v1.49.1：バジルの料理は 野菜の欄に入らないものがあるので、下に一覧 */
   html+='<div class="rowEnd" style="margin-top:12px"><button class="btn small" type="button" id="zukanBack">にっきにもどる</button><button class="btn primary" type="button" data-close>とじる</button></div>';
   openSheet(html,{center:true,kind:'zukan'});
   $('#zukanBack').addEventListener('click',()=>{ Snd.play('pick'); openDiary(); });
@@ -8034,7 +8113,7 @@ function openZukan(){
 }
 function zukanShow(k){
   const c=CROPS[k]; if(!c) return;
-  const n=S.totals[k]||0, rs=RECIPES.filter(r=>r.need&&r.need.indexOf(k)>=0), made=rs.filter(r=>S.recipes[r.name]);
+  const n=S.totals[k]||0, rs=RECIPES.filter(r=>r.need&&(r.need.indexOf(k)>=0 || (k==='daikon' && r.need.indexOf('hoshidaikon')>=0))), made=rs.filter(r=>S.recipes[r.name]);   /* v1.49.1：大根の欄には、小屋の干し大根の料理も */
   sheetCard.querySelectorAll('.zcell').forEach(b=>b.classList.toggle('sel',b.dataset.crop===k));
   sheetCard.querySelectorAll('.zdetail').forEach(d=>{ const on=+d.dataset.sn===c.season; d.classList.toggle('on',on); if(!on) d.innerHTML=''; });
   const d=sheetCard.querySelector('.zdetail[data-sn="'+c.season+'"]'); if(!d) return;
@@ -8042,7 +8121,7 @@ function zukanShow(k){
   let h='<div class="zt">'+icon('c-'+k)+esc(c.name)+'<small>（'+SEASONS[c.season]+'・'+esc(SPEED[c.speed].label)+'）</small></div>';
   if(!n) h+='<p>まだ収穫していません。'+SEASONS[c.season]+'に、種がまけます。</p>';
   else h+='<p>収穫した数：'+n+'こ'+(S.bigBy&&S.bigBy[k]?'（大きな'+esc(c.name)+' '+S.bigBy[k]+'こ）':'')+'</p>'+(S.firstAt&&S.firstAt[k]?'<p>はじめて収穫したのは '+dayStr(S.firstAt[k])+'</p>':'');
-  h+='<p>作った料理（'+made.length+'／'+rs.length+'品）：'+(made.length?made.map(r=>'<span class="nw">'+esc(r.name)+'</span>').join('、'):'まだありません')+'</p>';
+  h+='<p>作った料理（'+made.length+'／'+rs.length+'品'+(k==='daikon'?'。干し大根の料理も入れて':'')+'）：'+(made.length?made.map(r=>'<span class="nw">'+esc(r.name)+'</span>').join('、'):'まだありません')+'</p>';
   d.innerHTML=h;
   try{ d.scrollIntoView({block:'nearest'}); }catch(e){}
 }
@@ -8225,7 +8304,7 @@ if(location.hash.indexOf('gyoji')>=0){
 { const v=document.querySelector('.ver'); let taps=[];
   if(v) v.addEventListener('click',e=>{ e.stopPropagation(); const t=Date.now(); taps=taps.filter(x=>t-x<3000); taps.push(t); if(taps.length>=5){ taps=[]; openGyojiMenu(); } }); }
 if(location.hash.indexOf('debug')>=0){
-  window.__hatake={ year2Event, y2Suika, y2Snap, y2Kabu, y2Broccoli, Y2_LOG, seedOpen, allowedSeed, openSeeds, SEEDS2_AT, TSUKIMI, get bg(){return bg;}, bgWait, set forceWait(v){forceWait=v;}, gyojiPat, GYOJI_LEAD, birthdayNight, get gyojiStep(){return gyojiStep;}, rollWeather, pickPre, gyojiNightDue, nightOn, nightOff, nightOuting, fwLaunch, senkoOn, HANABI, hangCan, hangScene, hangMorning, renderShed, shedTap, nextHoshiDish, hoshiReady, morningPlan, morning, GYOJI, GYOJI_SCENE, gyojiDue, gyojiScene, hRoute, hCross, hInB, HTABLE, HSPOT, hmove, get S(){return S;}, get busy(){return busy;}, yearReview, showYearCard, openZukan, zukanShow, openDiary, grow, bigRoll, FLOWER_SIDE, spawnBug, COMPOST_BONUS, weatherTick, actShadaPlot, SPLOT, freeSplot, get yearCardClose(){return yearCardClose;}, A, homeEvening, pickPre, dishCandidates, makeRequest, get HA(){return HA;}, advance, maybeEvent, renderAll, addHarvest, checkUnlocks, nextMorning, Store, CROPS, RECIPES, UNLOCKS, EVENTS, FRIDGE, rollFridge, rollWeather, placeFrost, weatherScenes, importSave, exportSave, normalize, Snd, GIFTS, planVisit, visitDue, fitVisit, DISH, setPortions, shelterAtShed, restAtHome, placeTreasure, rest, FRUITS, plantTree, plantVine, pickFruit, TREES, treeTap, dessertNight, fruitMorning, renderTree, moveShada, shadaSelfWater, selfWaterTarget, returnCan, playerAction, endDay, plantBasil, pickBasil, pickV, judgeBigDay, giftDetour, basilInFridge, SLOT_MAX, makeRoomFor, seasonSwap, fixup, workLeft, decorShown, closetTalk, openFridge, cuckoo, feedFish, mirrorReflect, strum, playUke, sitRock, seasonalDue, seasonalShow, SEASONAL, SEASONAL_SCENE, setupRoom, REWARD_NIGHT, DECOR, REWARDS, rewardSetup, get SW(){return {n:S.swN,day:S.swDay,can:S.canOut};},
+  window.__hatake={ get camN(){return camStack.length;}, camWho, bubSeen, say, year2Event, y2Suika, y2Snap, y2Kabu, y2Broccoli, Y2_LOG, seedOpen, allowedSeed, openSeeds, SEEDS2_AT, TSUKIMI, get bg(){return bg;}, bgWait, set forceWait(v){forceWait=v;}, gyojiPat, GYOJI_LEAD, birthdayNight, get gyojiStep(){return gyojiStep;}, rollWeather, pickPre, gyojiNightDue, nightOn, nightOff, nightOuting, fwLaunch, senkoOn, HANABI, hangCan, hangScene, hangMorning, renderShed, shedTap, nextHoshiDish, hoshiReady, morningPlan, morning, GYOJI, GYOJI_SCENE, gyojiDue, gyojiScene, hRoute, hCross, hInB, HTABLE, HSPOT, hmove, get S(){return S;}, get busy(){return busy;}, yearReview, showYearCard, openZukan, zukanShow, openDiary, grow, bigRoll, FLOWER_SIDE, spawnBug, COMPOST_BONUS, weatherTick, actShadaPlot, SPLOT, freeSplot, get yearCardClose(){return yearCardClose;}, A, homeEvening, pickPre, dishCandidates, makeRequest, get HA(){return HA;}, advance, maybeEvent, renderAll, addHarvest, checkUnlocks, nextMorning, Store, CROPS, RECIPES, UNLOCKS, EVENTS, FRIDGE, rollFridge, rollWeather, placeFrost, weatherScenes, importSave, exportSave, normalize, Snd, GIFTS, planVisit, visitDue, fitVisit, DISH, setPortions, shelterAtShed, restAtHome, placeTreasure, rest, FRUITS, plantTree, plantVine, pickFruit, TREES, treeTap, dessertNight, fruitMorning, renderTree, moveShada, shadaSelfWater, selfWaterTarget, returnCan, playerAction, endDay, plantBasil, pickBasil, pickV, judgeBigDay, giftDetour, basilInFridge, SLOT_MAX, makeRoomFor, seasonSwap, fixup, workLeft, decorShown, closetTalk, openFridge, cuckoo, feedFish, mirrorReflect, strum, playUke, sitRock, seasonalDue, seasonalShow, SEASONAL, SEASONAL_SCENE, setupRoom, REWARD_NIGHT, DECOR, REWARDS, rewardSetup, get SW(){return {n:S.swN,day:S.swDay,can:S.canOut};},
     visit:async()=>{ if(busy) return false; busy=true; renderButtons(); S.oji={sy:Math.floor((S.day-1)/SEASON_DAYS),day:S.day,at:S.clock,done:false}; await visitScene(); busy=false; renderButtons(); return true; },
     force:async id=>{ if(busy) return false; busy=true; renderButtons(); S.sinceEvent=9; const r=await maybeEvent(false,id); await checkUnlocks(); busy=false; renderButtons(); return r; } };
 }
