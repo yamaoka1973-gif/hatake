@@ -35,8 +35,8 @@ button,.plot,.actor,.scroller{touch-action:manipulation}
 .xfer textarea{-webkit-user-select:text;user-select:text}
 button{font:inherit;color:inherit}
 .game{position:relative;width:min(980px,100%);margin:0 auto;padding:max(6px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(28px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
-.head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:nowrap}   /* v1.51.2：折り返さない。入りきらないときは 題名のほうを2行に */
-h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.2;min-width:0;word-break:keep-all}   /* v1.51.2：せまいときは「えりとしゃだはるの／ちいさな畑」の空白で折る（単語の途中では折れない） */
+.head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:nowrap}   /* v1.51.2：折り返さない。v1.51.3：入りきらないときは 題名の字を少し小さくして1行に（fitTitleEn） */
+h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.2;min-width:0;word-break:keep-all}   /* v1.51.3：ふだんは fitTitleEn() が1行にする（white-space:nowrap と 字の大きさ）。とてもせまい画面だけ「えりとしゃだはるの／ちいさな畑」の空白で折る */
 /* 英文サブタイトル（v1.51.1。依頼者が決めた「Days on a Tiny Garden」）：斜体・緑。字間は fitTitleEn() が 日本語の題名と同じ幅になるように合わせる */
 h1 .en{display:block;font-size:.7em;font-weight:400;font-style:italic;color:#8a9a68;line-height:1.25;margin-top:1px;white-space:nowrap}
 .ver{font-size:12px;color:var(--muted)}
@@ -143,6 +143,10 @@ h1 .en{display:block;font-size:.7em;font-weight:400;font-style:italic;color:#8a9
 #d-mikan[data-season="3"][data-fruit="1"] .mikan{display:block}
 .treeBtn{position:absolute;border:0;background:transparent;padding:0;cursor:pointer;border-radius:14px;z-index:9}
 .treeBtn.locked{display:none}
+/* 田んぼ（v1.52.0）：花壇の右（しゃだはる畑2の右どなり）。タップで ようす（いつ田植え・稲刈りか） */
+.paddyBtn{position:absolute;border:0;background:transparent;padding:0;cursor:pointer;border-radius:12px;z-index:9}
+.paddyBtn.locked{display:none}
+.paddyBtn:focus-visible{outline:3px solid rgba(138,154,104,.5);outline-offset:2px}
 .shedBtn{position:absolute;border:0;background:transparent;padding:0;cursor:pointer;border-radius:14px;z-index:9}
 .shedBtn.locked{display:none}
 .shedBtn .pill{position:absolute;left:50%;top:-6px;transform:translateX(-50%);display:none;white-space:nowrap}
@@ -639,6 +643,16 @@ h1 .en{display:block;font-size:.7em;font-weight:400;font-style:italic;color:#8a9
 .home .actor.shada.cream .creamDot{display:block}   /* 顔は SVG なので ::after が使えない。小さな部品を .bob の中に置く */
 .hDish.eating svg use{opacity:1}
 #hPortions use,#hPortions .por{transform-box:fill-box;transform-origin:center;animation:popIn .45s ease-out}
+/* 新米のお茶碗（v1.52.0）：1年目から毎晩。full＝ごはんが入っている、steam＝新米の夜の湯気 */
+#g-rice{display:none}
+#g-rice.on{display:inline}
+#g-rice .rice{display:none}
+#g-rice.full .rice{display:inline}
+#g-rice.full .in{display:none}
+#g-rice.pop .rice{transform-box:fill-box;transform-origin:center bottom;animation:popIn .45s ease-out}
+#g-rice .steam{opacity:0}
+#g-rice.steam .steam{animation:riceSteam 1.9s ease-out 3}
+@keyframes riceSteam{0%{opacity:0;transform:translateY(2px)}35%{opacity:.85}100%{opacity:0;transform:translateY(-5px)}}
 .evening{display:none;border:1px solid var(--border);border-radius:16px;background:#fff;padding:10px 12px}
 .evening.on{display:block}
 .eveInfo{font-size:14px}
@@ -938,6 +952,8 @@ h1 .en{display:block;font-size:.7em;font-weight:400;font-style:italic;color:#8a9
   <symbol id="i-grass" viewBox="0 0 40 40"><path d="M20 36 C18 24 12 18 8 12 M20 36 C20 22 20 14 20 6 M20 36 C22 24 28 18 33 13 M20 36 C17 30 12 27 7 26 M20 36 C23 30 28 27 33 26" fill="none" stroke="#7fb35a" stroke-width="3.2" stroke-linecap="round"/></symbol>   <!-- 草（v1.40.0：たいひ運び） -->
   <symbol id="i-compost" viewBox="0 0 40 40"><ellipse cx="20" cy="33" rx="16" ry="3" fill="rgba(60,44,24,.14)"/><path d="M5 31 C7 20 13 14 20 14 C27 14 33 20 35 31 Z" fill="#6f5334"/><path d="M10 27 q4 -6 9 -5 M21 24 q5 -3 9 2" fill="none" stroke="#8a6a44" stroke-width="1.6" stroke-linecap="round"/><path d="M22 12 q3 -6 8 -3 q-3 1 -8 3z" fill="#8fbf9a"/></symbol>   <!-- たいひ（v1.40.0） -->
   <symbol id="i-frog" viewBox="0 0 40 40"><ellipse cx="20" cy="26.5" rx="13" ry="9.5" fill="#a9d36f" stroke="#6f9c46" stroke-width="1.2"/><ellipse cx="20" cy="30" rx="8" ry="4.2" fill="#dcecb0"/><circle cx="13.5" cy="18.5" r="5" fill="#a9d36f" stroke="#6f9c46" stroke-width="1.2"/><circle cx="26.5" cy="18.5" r="5" fill="#a9d36f" stroke="#6f9c46" stroke-width="1.2"/><circle cx="13.5" cy="18.5" r="3" fill="#fff"/><circle cx="26.5" cy="18.5" r="3" fill="#fff"/><circle cx="14" cy="18.9" r="1.5" fill="#3a3a32"/><circle cx="27" cy="18.9" r="1.5" fill="#3a3a32"/><path d="M15.5 26.5 q4.5 3.2 9 0" fill="none" stroke="#6f9c46" stroke-width="1.2" stroke-linecap="round"/><circle cx="11" cy="25" r="1.6" fill="#f2a29a" opacity=".7"/><circle cx="29" cy="25" r="1.6" fill="#f2a29a" opacity=".7"/><path d="M9.5 34.5 q2 -3.2 5.5 -1.2 M25 33.3 q3.5 -2 5.5 1.2" fill="none" stroke="#6f9c46" stroke-width="1.4" stroke-linecap="round"/></symbol>   <!-- v1.37.1：カエル復活（かたつむりと両方。依頼者の希望） -->
+  <symbol id="i-nae" viewBox="0 0 40 40"><rect x="5" y="25" width="30" height="9" rx="2" fill="#a47a4c" stroke="#7f5c38" stroke-width="1"/><path d="M8 28.5 h24" stroke="#c49a66" stroke-width="1" stroke-linecap="round"/><g stroke="#5aa246" stroke-width="2.2" stroke-linecap="round" fill="none"><path d="M10 26 q-1 -8 -4 -12"/><path d="M14 26 q0 -9 1 -15"/><path d="M19 26 q1 -10 3 -16"/><path d="M24 26 q1 -9 4 -14"/><path d="M29 26 q2 -7 6 -11"/></g><g stroke="#7fc464" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M12 26 q-2 -6 -5 -8"/><path d="M27 26 q1 -6 4 -9"/></g></symbol>   <!-- 苗箱（v1.52.0） -->
+  <symbol id="i-inaba" viewBox="0 0 40 40"><path d="M13 37 L18 23 L10 9 Q15 5.5 20 7.5 Q25 5.5 30 9 L22 23 L27 37 Z" fill="#dcb44c" stroke="#b48b2c" stroke-width="1" stroke-linejoin="round"/><path d="M16 36 L19 24.5 M20 37 V24.5 M24 36 L21 24.5 M15 11 L19 21 M20 9 V21 M25 11 L21 21" stroke="#b48b2c" stroke-width=".8" fill="none"/><rect x="16" y="20.5" width="8" height="3.6" rx="1" fill="#8a6a44"/><g fill="#eec757"><ellipse cx="11" cy="10" rx="2.3" ry="1.6"/><ellipse cx="15.5" cy="7.4" rx="2.3" ry="1.6"/><ellipse cx="20.5" cy="7.8" rx="2.3" ry="1.6"/><ellipse cx="25.5" cy="7.2" rx="2.3" ry="1.6"/><ellipse cx="29.5" cy="10" rx="2.3" ry="1.6"/></g></symbol>   <!-- 稲のたば（v1.52.0） -->
   <symbol id="i-stone" viewBox="0 0 40 40"><path d="M8 26 L13 12 L26 8 L34 18 L30 31 L15 34Z" fill="#9cc7d8"/><path d="M13 12 L20 19 L26 8 M20 19 L34 18 M20 19 L15 34 M20 19 L30 31" stroke="#d9eef5" stroke-width="1.4" fill="none"/><path d="M8 26 L20 19" stroke="#d9eef5" stroke-width="1.4"/></symbol>
   <symbol id="i-crate" viewBox="0 0 40 40"><circle cx="13" cy="15" r="6" fill="#6fa552"/><circle cx="21" cy="12.5" r="6.5" fill="#7fb560"/><circle cx="29" cy="15.5" r="5.5" fill="#6fa552"/><circle cx="25.5" cy="17.5" r="4" fill="#e2574c"/><rect x="4.5" y="18" width="31" height="17" rx="2.2" fill="#c99a5b"/><path d="M4.5 24 H35.5 M4.5 29.5 H35.5 M10 18 V35 M30 18 V35" stroke="#a87c45" stroke-width="1.6"/><path d="M7 20.8 H16" stroke="#e3bd85" stroke-width="1.6" stroke-linecap="round"/></symbol>
   <symbol id="c-takenoko" viewBox="0 0 40 40"><path d="M20 4 C26 10 33 22 31.5 33 Q31 36 28 36 H12 Q9 36 8.5 33 C7 22 14 10 20 4Z" fill="#a9743f"/><path d="M20 4 C23 8 26 13 27.5 18 C24 17 21 18.5 20 21 C19 18.5 16 17 12.5 18 C14 13 17 8 20 4Z" fill="#c8935a"/><path d="M11 24 C15 22.5 18.5 24.5 20 28 C21.5 24.5 25 22.5 29 24 C30.5 27.5 31 30.5 31 33 C27 31 23 32 20 35 C17 32 13 31 9 33 C9 30.5 9.5 27.5 11 24Z" fill="#c8935a"/><path d="M12 36 H28 Q31 36 31.5 33 Q20 38.5 8.5 33 Q9 36 12 36Z" fill="#f3e2b8"/><path d="M19.5 8 C18 11 16.6 13.6 15.9 16" fill="none" stroke="#e3b97f" stroke-width="1.8" stroke-linecap="round"/><path d="M20 4 C21 5.2 21.8 6.4 22.4 7.6 C20.8 7.2 19.2 7.2 17.6 7.6 C18.2 6.4 19 5.2 20 4Z" fill="#8fae5a"/></symbol>
@@ -1170,7 +1186,7 @@ h1 .en{display:block;font-size:.7em;font-weight:400;font-style:italic;color:#8a9
 <div class="game" id="game">
   <div class="head">
     <h1>えりとしゃだはるの ちいさな畑<span class="en" id="titleEn">— Days on a Tiny Garden —</span></h1>
-    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.51.2</span></span>
+    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.52.1</span></span>
   </div>
 
   <div class="hud">
@@ -1270,6 +1286,9 @@ h1 .en{display:block;font-size:.7em;font-weight:400;font-style:italic;color:#8a9
         <button class="treeBtn locked" id="cherryBtn" type="button" style="left:896px;top:118px;width:124px;height:146px" data-stage="-1" data-pill="0" aria-label="さくらんぼの木"><span class="pill till" id="cherryPill"></span></button>
         <svg class="deco locked" id="d-mikan" style="left:1032px;top:126px" width="112" height="128" viewBox="0 0 140 160" data-stage="-1" data-season="0" data-fruit="0" aria-hidden="true"><ellipse cx="70" cy="152" rx="40" ry="5" fill="rgba(60,44,24,.14)"/><g class="tpx"><ellipse cx="70" cy="148" rx="16" ry="5" fill="#b58a5c"/><path d="M70 146 V126" stroke="#c9a36b" stroke-width="3" stroke-linecap="round"/><path d="M62 130 h16" stroke="#c9a36b" stroke-width="2.4" stroke-linecap="round"/></g><g class="tp0"><path d="M70 150 V118" stroke="#8f6a44" stroke-width="4" stroke-linecap="round"/><path d="M70 132 q-9 -8 -14 -2 q6 6 14 2Z M70 124 q9 -8 14 -2 q-6 6 -14 2Z M70 116 q-6 -9 -2 -13 q5 5 2 13Z" fill="#8fc26f"/><path d="M62 150 L76 112" stroke="#c9a36b" stroke-width="2.4" stroke-linecap="round"/><path d="M66 128 h9" stroke="#c9a36b" stroke-width="2" stroke-linecap="round"/></g><g class="tp1"><path d="M70 150 V104" stroke="#8f6a44" stroke-width="6" stroke-linecap="round"/><path class="branch" d="M70 122 q-14 -8 -20 -20 M70 116 q14 -8 18 -22" stroke="#8f6a44" stroke-width="4" stroke-linecap="round" fill="none"/><g class="ts3"><path d="M70 122 q-14 -8 -20 -20 M70 116 q14 -8 18 -22 M70 108 q-4 -10 0 -18 M50 102 q-6 -2 -8 -8 M88 94 q6 -2 8 -8" stroke="#8f6a44" stroke-width="3" stroke-linecap="round" fill="none"/></g><circle class="canopy" cx="52" cy="96" r="15" fill="#7fae5a"/><circle class="canopy" cx="88" cy="92" r="15" fill="#7fae5a"/><circle class="canopy" cx="70" cy="86" r="18" fill="#7fae5a"/><circle class="canopy" cx="70" cy="108" r="14" fill="#7fae5a"/><circle class="canopyHi" cx="63" cy="84" r="9" fill="#9cc46f"/></g><g class="tp2"><path d="M70 150 V88" stroke="#8f6a44" stroke-width="10" stroke-linecap="round"/><path class="branch" d="M70 112 q-20 -10 -30 -30 M70 106 q20 -12 30 -30 M70 100 q-6 -14 -2 -30" stroke="#8f6a44" stroke-width="6" stroke-linecap="round" fill="none"/><circle class="canopy" cx="42" cy="78" r="22" fill="#5f9a4f"/><circle class="canopy" cx="98" cy="76" r="22" fill="#5f9a4f"/><circle class="canopy" cx="70" cy="52" r="26" fill="#5f9a4f"/><circle class="canopy" cx="56" cy="60" r="20" fill="#5f9a4f"/><circle class="canopy" cx="86" cy="58" r="20" fill="#5f9a4f"/><circle class="canopy" cx="70" cy="84" r="24" fill="#5f9a4f"/><circle class="canopyHi" cx="58" cy="50" r="12" fill="#7fb868"/><circle class="canopyHi" cx="90" cy="70" r="8" fill="#7fb868"/><g class="ts0"><g transform="translate(36 68)"><circle cx="0.0" cy="-1.7" r="1.5" fill="#fffdf6"/><circle cx="1.6" cy="-0.5" r="1.5" fill="#fffdf6"/><circle cx="1.0" cy="1.3" r="1.5" fill="#fffdf6"/><circle cx="-1.0" cy="1.3" r="1.5" fill="#fffdf6"/><circle cx="-1.6" cy="-0.5" r="1.5" fill="#fffdf6"/><circle r="0.8" fill="#f2c94c"/></g><g transform="translate(60 44)"><circle cx="0.0" cy="-1.7" r="1.5" fill="#fffdf6"/><circle cx="1.6" cy="-0.5" r="1.5" fill="#fffdf6"/><circle cx="1.0" cy="1.3" r="1.5" fill="#fffdf6"/><circle cx="-1.0" cy="1.3" r="1.5" fill="#fffdf6"/><circle cx="-1.6" cy="-0.5" r="1.5" fill="#fffdf6"/><circle r="0.8" fill="#f2c94c"/></g><g transform="translate(84 40)"><circle cx="0.0" cy="-1.7" r="1.5" fill="#fffdf6"/><circle cx="1.6" cy="-0.5" r="1.5" fill="#fffdf6"/><circle cx="1.0" cy="1.3" r="1.5" fill="#fffdf6"/><circle cx="-1.0" cy="1.3" r="1.5" fill="#fffdf6"/><circle cx="-1.6" cy="-0.5" r="1.5" fill="#fffdf6"/><circle r="0.8" fill="#f2c94c"/></g><g transform="translate(108 72)"><circle cx="0.0" cy="-1.7" r="1.5" fill="#fffdf6"/><circle cx="1.6" cy="-0.5" r="1.5" fill="#fffdf6"/><circle cx="1.0" cy="1.3" r="1.5" fill="#fffdf6"/><circle cx="-1.0" cy="1.3" r="1.5" fill="#fffdf6"/><circle cx="-1.6" cy="-0.5" r="1.5" fill="#fffdf6"/><circle r="0.8" fill="#f2c94c"/></g><g transform="translate(50 96)"><circle cx="0.0" cy="-1.7" r="1.5" fill="#fffdf6"/><circle cx="1.6" cy="-0.5" r="1.5" fill="#fffdf6"/><circle cx="1.0" cy="1.3" r="1.5" fill="#fffdf6"/><circle cx="-1.0" cy="1.3" r="1.5" fill="#fffdf6"/><circle cx="-1.6" cy="-0.5" r="1.5" fill="#fffdf6"/><circle r="0.8" fill="#f2c94c"/></g><g transform="translate(92 94)"><circle cx="0.0" cy="-1.7" r="1.5" fill="#fffdf6"/><circle cx="1.6" cy="-0.5" r="1.5" fill="#fffdf6"/><circle cx="1.0" cy="1.3" r="1.5" fill="#fffdf6"/><circle cx="-1.0" cy="1.3" r="1.5" fill="#fffdf6"/><circle cx="-1.6" cy="-0.5" r="1.5" fill="#fffdf6"/><circle r="0.8" fill="#f2c94c"/></g><g transform="translate(70 78)"><circle cx="0.0" cy="-1.7" r="1.5" fill="#fffdf6"/><circle cx="1.6" cy="-0.5" r="1.5" fill="#fffdf6"/><circle cx="1.0" cy="1.3" r="1.5" fill="#fffdf6"/><circle cx="-1.0" cy="1.3" r="1.5" fill="#fffdf6"/><circle cx="-1.6" cy="-0.5" r="1.5" fill="#fffdf6"/><circle r="0.8" fill="#f2c94c"/></g></g><g class="ts1"><circle cx="42" cy="84" r="3.4" fill="#9dc25a"/><circle cx="68" cy="66" r="3.4" fill="#9dc25a"/><circle cx="98" cy="82" r="3.4" fill="#9dc25a"/><circle cx="56" cy="102" r="3.4" fill="#9dc25a"/><circle cx="86" cy="102" r="3.4" fill="#9dc25a"/><circle cx="76" cy="46" r="3.4" fill="#9dc25a"/></g><g class="ts2"><circle cx="42" cy="84" r="4" fill="#dcc24e"/><circle cx="40.6" cy="82.5" r="1.2" fill="#f3e39a" opacity=".8"/><circle cx="68" cy="66" r="4" fill="#dcc24e"/><circle cx="66.6" cy="64.5" r="1.2" fill="#f3e39a" opacity=".8"/><circle cx="98" cy="82" r="4" fill="#dcc24e"/><circle cx="96.6" cy="80.5" r="1.2" fill="#f3e39a" opacity=".8"/><circle cx="56" cy="102" r="4" fill="#dcc24e"/><circle cx="54.6" cy="100.5" r="1.2" fill="#f3e39a" opacity=".8"/><circle cx="86" cy="102" r="4" fill="#dcc24e"/><circle cx="84.6" cy="100.5" r="1.2" fill="#f3e39a" opacity=".8"/><circle cx="76" cy="46" r="4" fill="#dcc24e"/><circle cx="74.6" cy="44.5" r="1.2" fill="#f3e39a" opacity=".8"/></g><g class="mikan"><circle cx="42" cy="84" r="7.0" fill="#f09a3c"/><circle cx="39.5" cy="81.3" r="2.2" fill="#ffd08a" opacity=".8"/></g><g class="mikan"><circle cx="68" cy="66" r="7.0" fill="#f09a3c"/><circle cx="65.5" cy="63.3" r="2.2" fill="#ffd08a" opacity=".8"/></g><g class="mikan"><circle cx="98" cy="82" r="7.0" fill="#f09a3c"/><circle cx="95.5" cy="79.3" r="2.2" fill="#ffd08a" opacity=".8"/></g><g class="mikan"><circle cx="56" cy="102" r="7.0" fill="#f09a3c"/><circle cx="53.5" cy="99.3" r="2.2" fill="#ffd08a" opacity=".8"/></g><g class="mikan"><circle cx="86" cy="102" r="7.0" fill="#f09a3c"/><circle cx="83.5" cy="99.3" r="2.2" fill="#ffd08a" opacity=".8"/></g><g class="mikan"><circle cx="76" cy="46" r="7.0" fill="#f09a3c"/><circle cx="73.5" cy="43.3" r="2.2" fill="#ffd08a" opacity=".8"/></g></g></svg>
         <button class="treeBtn locked" id="mikanBtn" type="button" style="left:1026px;top:118px;width:124px;height:146px" data-stage="-1" data-pill="0" aria-label="みかんの木"><span class="pill till" id="mikanPill"></span></button>
+        <!-- 田んぼ（v1.52.0。2年目の冬2日目から。絵は renderPaddy が季節とようすで かく） -->
+        <svg class="deco locked" id="d-paddy" style="left:912px;top:320px" width="200" height="80" viewBox="0 0 200 80" aria-hidden="true"></svg>
+        <button class="paddyBtn locked" id="paddyBtn" type="button" style="left:912px;top:316px;width:200px;height:84px" aria-label="田んぼ"></button>
         <svg class="deco locked" id="d-shed" style="left:636px;top:96px" width="116" height="150" viewBox="0 0 116 150" aria-hidden="true">
           <ellipse cx="58" cy="146" rx="54" ry="5" fill="rgba(60,44,24,.16)"/>
           <rect x="10" y="54" width="96" height="92" rx="4" fill="#c99a68" stroke="#a87c4e" stroke-width="2"/>
@@ -1525,6 +1544,7 @@ h1 .en{display:block;font-size:.7em;font-weight:400;font-style:italic;color:#8a9
             <ellipse cx="315" cy="335" rx="11" ry="4" fill="#fffdf8" stroke="#d9d0c3" stroke-width="1.4"/>
             <ellipse cx="262" cy="328" rx="11" ry="4" fill="#fffdf8" stroke="#d9d0c3" stroke-width="1.4"/>
             <g id="hPortions"></g>
+            <g id="g-rice"></g>   <!-- 新米のお茶碗（v1.52.0。riceShow・riceFill） -->
           </g>
         </svg>
         <svg class="roomArt front" id="roomFront" viewBox="0 0 360 440" aria-hidden="true">
@@ -1853,6 +1873,7 @@ const UNLOCKS=[
   {day:11,key:'green',  name:'温室',         eri:'温室ができた！',                   log:'温室ができました。左のマスにはバジル、右のマスには ぶどうを植えられます。'},   /* 2年目の夏 */   /* v1.21.0：右はぶどう、v1.23.0：左はバジル */
   {day:13,key:'cherry', name:'さくらんぼの苗木', eri:'ほまれくんが、さくらんぼの苗木を、買ってきてくれたんだ。梨の木のとなりに植えよう。', log:'さくらんぼの苗木がとどきました。梨の木の右の印をタップして、植えましょう。'},   /* 2年目の秋 */   /* v1.35.0 */
   {day:15,key:'compost',name:'たいひ箱',       eri:'たいひ箱ができた。',                 log:'小屋のよこに、たいひ箱ができました。しゃだはる君が 草や落ち葉を運んでくれます。たまったら 箱をタップして持ち、種まきに使うと はやく育ちます。'},   /* 2年目の冬 */   /* v1.40.0 */
+  {day:16,key:'tanbo',  name:'田んぼ',        eri:'田んぼが、できたね。', log:'花壇の右に、小さな田んぼができました。春になったら 水をはって、田植えをします。'},   /* 2年目の冬2日目（v1.52.0。依頼者の指定） */
   {day:17,key:'mikan',  name:'みかんの苗木',   eri:'ほまれくんが、みかんの苗木を、買ってきてくれたんだ。温室の手前に植えよう。', log:'みかんの苗木がとどきました。温室の左の印をタップして、植えましょう。'},   /* 3年目の春 */   /* v1.35.0 */
   {day:19,key:'shada2', name:'しゃだはる畑が2マスに', eri:'しゃだはる畑、もうひとつ できたね。', log:'花壇の右にも、しゃだはる畑ができました。しゃだはる君が落とした種は、あいているほうで育ちます。'}   /* 3年目の夏 */   /* v1.41.0 */
 ];
@@ -1886,7 +1907,7 @@ const TREES={
   sakuranbo:{st:'cherry',unlock:'cherry',el:'d-cherry',btn:'cherryBtn',pill:'cherryPill',root:{x:958,y:246},eri:'cherryEri',shada:'cherryShada',range:[862,1046],name:'さくらんぼの木',hintGrow:'さくらんぼの木：2つの季節で、木になります',hintWait:'さくらんぼの木：春に、実がなります',plantLog:'さくらんぼの苗木を植えました。2つの季節がすぎると木になり、春に実がなります。',grownLog:'さくらんぼの苗木が、りっぱな木になりました。春になると、実がなります。'},
   mikan:{st:'mikan',unlock:'mikan',el:'d-mikan',btn:'mikanBtn',pill:'mikanPill',root:{x:1088,y:246},eri:'mikanEri',shada:'mikanShada',range:[992,1176],name:'みかんの木',hintGrow:'みかんの木：2つの季節で、木になります',hintWait:'みかんの木：冬に、実がなります',plantLog:'みかんの苗木を植えました。2つの季節がすぎると木になり、冬に実がなります。',grownLog:'みかんの苗木が、りっぱな木になりました。冬になると、実がなります。'}
 };
-const SAPLING_BAU={tree:'なしの木、ばう！',cherry:'さくらんぼの木、ばう！',mikan:'みかんの木、ばう！',compost:'はっぱ、はこぶばう！',shada2:'しゃだはるばたけ、ばう！',seeds2:'あたらしいたね、ばう！'};   /* compost は v1.40.0 */   /* 苗木がとどいたときの しゃだはる君 */
+const SAPLING_BAU={tree:'なしの木、ばう！',cherry:'さくらんぼの木、ばう！',mikan:'みかんの木、ばう！',compost:'はっぱ、はこぶばう！',shada2:'しゃだはるばたけ、ばう！',tanbo:'たんぼ、ばう！',seeds2:'あたらしいたね、ばう！'};   /* compost は v1.40.0 */   /* 苗木がとどいたときの しゃだはる君 */
 const isSapling=k=>k==='tree'||k==='cherry'||k==='mikan';
 /* まだ出していない「できたもの」があるか（苗木は1日に1本まで：前からのセーブで、2本いっぺんに とどかないように） */
 const unlockPending=()=>UNLOCKS.some(u=>unlockDue(u) && !(isSapling(u.key) && S.saplingDay===S.day));   /* v1.48.0：unlockDue */
@@ -2293,6 +2314,7 @@ function newGame(){
     v:1, sd:SEASON_DAYS, day:1, clock:DAY_START, weather:'sun', rainAt:0, raining:false, mood:'helpful',
     wx:null, windy:false, snowCover:false, rainbow:false, frostJoy:false, slipDay:0, fridge:rollFridge(null),
     plots, shadaPlot:{phase:'none',crop:null,growth:0,appearDay:0}, shadaPlot2:{phase:'none',crop:null,growth:0,appearDay:0},   /* shadaPlot2 は v1.41.0（200こ） */
+    tanbo:{taue:0,kari:0,hakobi:0,shinmai:0,tn:0,kn:0,sn:0},   /* v1.52.0：田んぼ（した年と回数） */
     hotDay:0, bigCanDay:0,   /* v1.41.0：日照りの日、3代目のじょうろが かごのそばに出ている日 */
     totals:{}, total:0, today:{}, pantry:{}, recipes:{}, nagomi:0, stones:0, acorns:0, frogs:0, snails:0, snowman:false,   /* snails は v1.37.1（それまでの数は frogs に入ったまま） */
     unlocked:{}, decor:{}, request:null, photo:null, newToday:[], basketToday:[], held:null, lastSeed:null,
@@ -2496,7 +2518,7 @@ function renderWorld(){
   $('#seedDot').classList.toggle('on',S.shadaPlot.phase==='pending');
   $('#seedDot2').classList.toggle('on',!!(S.shadaPlot2 && S.shadaPlot2.phase==='pending'));   /* v1.41.0 */
   { const cb=$('#d-compost'); cb.dataset.n=Math.max(0,Math.min(3,S.compost||0)); const pb=$('#compostBtn'); pb.dataset.pill=(S.unlocked.compost && (S.compost||0)>0 && !S.compostHeld)?1:0; $('#compostPill').textContent='たいひ '+(S.compost||0); pb.setAttribute('aria-label','たいひ箱：'+(S.compost||0)+'こ'); }   /* v1.40.0 */
-  [['bench','d-bench'],['bench','benchBtn'],['flower','d-flower'],['tree','d-tree'],['tree','treeBtn'],['cherry','d-cherry'],['cherry','cherryBtn'],['mikan','d-mikan'],['mikan','mikanBtn'],['shed','d-shed'],['green','d-green'],['compost','d-compost'],['compost','compostBtn']].forEach(([k,id])=>{
+  [['bench','d-bench'],['bench','benchBtn'],['flower','d-flower'],['tree','d-tree'],['tree','treeBtn'],['cherry','d-cherry'],['cherry','cherryBtn'],['mikan','d-mikan'],['mikan','mikanBtn'],['shed','d-shed'],['green','d-green'],['compost','d-compost'],['compost','compostBtn'],['tanbo','d-paddy'],['tanbo','paddyBtn']].forEach(([k,id])=>{
     const e=document.getElementById(id), on=!!S.unlocked[k];
     e.classList.toggle('locked',!on);
     if(on && decoSeen[id]===false) e.classList.add('pop');
@@ -2504,6 +2526,7 @@ function renderWorld(){
   });
   renderTree();
   renderShed();   /* v1.28.0 */
+  renderPaddy();   /* v1.52.0 */
 }
 
 const plotEls=[], plotSig=[];
@@ -3261,7 +3284,7 @@ async function checkUnlocks(){
     if(u.key==='plots12') [3,7,11].forEach(i=>{ S.plots[i].unlocked=true; S.plots[i].tilled=false; });
     if(u.key==='green') [12,13].forEach(i=>{ S.plots[i].unlocked=true; S.plots[i].tilled=true; });
     /* できたものが画面の外なら、いったんそこを見せてから畑にもどる */
-    const look={bench:[130,340],flower:[672,848],tree:[732,916],cherry:[862,1046],mikan:[992,1176],shed:[600,792],green:[1134,1350],compost:[620,812],shada2:[766,926]}[u.key];
+    const look={bench:[130,340],flower:[672,848],tree:[732,916],cherry:[862,1046],mikan:[992,1176],shed:[600,792],green:[1134,1350],compost:[620,812],shada2:[766,926],tanbo:[850,1180]}[u.key];
     if(look){ focusRange(look[0],look[1]); await pause(750); }
     renderAll();
     await pause(400);
@@ -3272,6 +3295,352 @@ async function checkUnlocks(){
     await pause(look?1700:1100);
     if(look){ focusPlot(0); await pause(350); }
   }
+}
+
+/* ================= 田んぼ（v1.52.0。依頼者の希望） =================
+   3年目から、えりちゃん・しゃだはる君で田植え、秋に稲刈り（ほまれくんも手伝いに来る）。田んぼは 花壇の右（しゃだはる畑2の右どなり、さくらんぼ・みかんの木の下）。
+   2年目の冬2日目にできる（水のない田んぼ）→ 春1日目に水をはる → 春2日目の朝いちばんに田植え → 夏は青田 → 秋1日目に きんいろ →
+   秋2日目の朝いちばんに稲刈り（はざかけ）→ その日の夕方、ほまれくんが おうちに運ぶ → その夜から新米。4年目からも毎年（セリフは2回めから少し変わる）。
+   田植えをしなかった年（前からのセーブで 春をすぎていた など）は、稲刈りもない（依頼者「田植えの季節を逃すと稲刈りもない」→ 朝いちばんに かならず）。
+   S.tanbo＝{taue・kari・hakobi・shinmai：それをした年（yearNo）、tn：田植えの回数、kn：稲刈りの回数、sn：新米の夜の回数} */
+const TANBO={x:912,y:320,w:200,h:80,look:[850,1180]};
+const tanboColX=c=>TANBO.x+20+c*16;   /* 列（0〜10）のまんなかの x */
+const TANBO_ORDER=[0,10,1,9,2,8,3,7,4,6,5];   /* 植える・刈る順：えりちゃんは左から、ほまれくんは右から */
+let tanboView=null;   /* 場面のとちゅうの絵（{st,mask,rack}）。null＝S のとおり */
+function tanboT(){ if(!S.tanbo) S.tanbo={taue:0,kari:0,hakobi:0,shinmai:0,tn:0,kn:0,sn:0}; return S.tanbo; }
+/* 田んぼの絵（viewBox 0 0 200 80）。st＝dry（水のない田んぼ）／water（水をはった）／planted（田植えのあと）／green（夏の青田）／gold（秋の実り）／
+   cut（稲刈りのあと）／stubble（切り株）／snow（雪・切り株）／snowDry（雪）。mask＝列のビット（planted は苗のある列、cut は刈った列。null＝ぜんぶ）。
+   rack＝はざかけの稲たば（null＝はざかけなし、0〜12）。sn＝季節（あぜの色） */
+function paddyArt(st,mask,rack,sn){
+  const C=11, ROWS=[23,35,47,59], colX=c=>20+c*16, k=r=>.86+r*.09, f1=n=>(+n).toFixed(1), on=c=>mask==null||((mask>>c)&1)===1;
+  const snow=st==='snow'||st==='snowDry';
+  const ridge=snow?'#f4f7f9':['#a9c878','#94bf64','#c4bb6c','#b3aa8e'][sn||0], edge=snow?'#d3dbe2':'#88a95c';
+  let s='<ellipse cx="100" cy="76.6" rx="97" ry="3.4" fill="rgba(60,44,24,.14)"/>'
+    +'<rect x="2" y="9" width="196" height="67" rx="11" fill="#8b6a45"/>'   /* 手前の土の面 */
+    +'<rect x="2" y="3.5" width="196" height="68.5" rx="11" fill="'+ridge+'" stroke="'+edge+'" stroke-width="1.2"/>';   /* あぜ */
+  if(!snow) s+='<g stroke="'+edge+'" stroke-width="1" stroke-linecap="round" opacity=".7"><path d="M14 6.5 l1 -2.2 M17 6.5 l-.6 -2 M60 6 l1 -2 M122 6.2 l-.8 -2 M158 6.5 l1 -2.2 M186 7 l-1 -2 M8 40 l-2 -.6 M193 30 l2 -.8 M40 70 l.8 -2 M150 70.5 l-.8 -2"/></g>';   /* あぜの草 */
+  const partCut=st==='cut' && mask!=null && mask!==(1<<C)-1;   /* 刈っているとちゅう */
+  const field=partCut?'#d8b765':({dry:'#a98d69',water:'#9cc4c6',planted:'#9cc4c6',green:'#86b566',gold:'#d8b765',cut:'#a0805a',stubble:'#ab967b',snow:'#f0f3f6',snowDry:'#f0f3f6'}[st]||'#a98d69');
+  s+='<rect x="10" y="10" width="180" height="56" rx="7" fill="'+field+'" stroke="#6f5436" stroke-opacity=".4" stroke-width="1"/>'
+    +'<rect x="11" y="11" width="178" height="3.6" rx="1.8" fill="#000" opacity=".07"/>';
+  if(partCut) for(let c=0;c<C;c++) if(on(c)){ const x0=c===0?11:colX(c)-8, x1=c===C-1?189:colX(c)+8; s+='<rect x="'+x0+'" y="11" width="'+(x1-x0)+'" height="54" fill="#a0805a"/>'; }   /* 刈った列の土 */
+  /* 苗：まんなかの葉が高く、左右の葉は 外へ そる */
+  const nae=(x,y,h,w)=>'<path d="M'+x+' '+y+' q'+f1(-w*.1)+' '+f1(-h*.7)+' '+f1(-w*.15)+' '+f1(-h*1.25)
+      +' M'+x+' '+y+' q'+f1(-w*.2)+' '+f1(-h*.6)+' '+f1(-w)+' '+f1(-h*.85)
+      +' M'+x+' '+y+' q'+f1(w*.2)+' '+f1(-h*.6)+' '+f1(w)+' '+f1(-h*.85)+'" stroke="#56a244" stroke-width="1.3" stroke-linecap="round" fill="none"/>';
+  /* 株：ふんすいのように そる葉（夏） */
+  const kabu=(x,y,h,w,c1,c2)=>'<path d="M'+x+' '+y+' C'+f1(x-w*.1)+' '+f1(y-h*.8)+' '+f1(x-w*.7)+' '+f1(y-h*1.05)+' '+f1(x-w*1.25)+' '+f1(y-h*.62)
+      +' M'+x+' '+y+' C'+f1(x+w*.1)+' '+f1(y-h*.8)+' '+f1(x+w*.7)+' '+f1(y-h*1.05)+' '+f1(x+w*1.25)+' '+f1(y-h*.62)+'" stroke="'+c1+'" stroke-width="1.7" stroke-linecap="round" fill="none"/>'
+      +'<path d="M'+x+' '+y+' q'+f1(-w*.15)+' '+f1(-h*.7)+' '+f1(-w*.45)+' '+f1(-h*1.2)+' M'+x+' '+y+' q'+f1(w*.15)+' '+f1(-h*.7)+' '+f1(w*.45)+' '+f1(-h*1.2)+'" stroke="'+c2+'" stroke-width="1.6" stroke-linecap="round" fill="none"/>';
+  /* 実った稲：くきと、たれた穂（つぶつぶ） */
+  const ho=(x,y,h,w,dir)=>{ const tx=x+dir*w*.25, ty=y-h;
+    let g='<path d="M'+x+' '+y+' q'+f1(dir*w*.1)+' '+f1(-h*.6)+' '+f1(dir*w*.25)+' '+f1(-h)+' M'+x+' '+y+' q'+f1(-dir*w*.3)+' '+f1(-h*.45)+' '+f1(-dir*w*.9)+' '+f1(-h*.62)+'" stroke="#b58a34" stroke-width="1.4" stroke-linecap="round" fill="none"/>'
+      +'<path d="M'+f1(tx)+' '+f1(ty)+' q'+f1(dir*w*.9)+' '+f1(-h*.06)+' '+f1(dir*w*1.2)+' '+f1(h*.45)+'" stroke="#d9a93a" stroke-width="1.2" stroke-linecap="round" fill="none"/>';
+    for(let i=0;i<4;i++){ const t=(i+1)/4.2; g+='<ellipse cx="'+f1(tx+dir*w*1.2*Math.sin(t*1.45))+'" cy="'+f1(ty+h*.45*t*t-h*.05*Math.sin(t*3.1))+'" rx="1.35" ry="1.05" fill="'+(i%2?'#f0c85a':'#e7bb45')+'"/>'; }
+    return g; };
+  const stub=(x,y,col,sw)=>'<path d="M'+f1(x-1.6)+' '+(y+1)+' v-2.4 M'+x+' '+(y+1)+' v-3 M'+f1(x+1.6)+' '+(y+1)+' v-2.4" stroke="'+col+'" stroke-width="'+sw+'" stroke-linecap="round"/>';
+  if(st==='dry') s+='<g stroke="#8f7452" stroke-width="1" stroke-linecap="round" fill="none" opacity=".55"><path d="M34 26 l8 5 l-2 7 M92 20 l-6 8 l7 4 M140 40 l9 -4 l4 7 M60 52 l7 -3 M160 22 l-5 6"/></g>';
+  if(st==='water' || st==='planted'){
+    s+='<g stroke="#e4f2f3" stroke-width="1.8" stroke-linecap="round" opacity=".9"><path d="M22 21 h24 M118 27 h36 M52 44 h28 M140 53 h24 M28 59 h16"/></g>';
+    if(st==='planted') for(let c=0;c<C;c++){ if(!on(c)) continue; ROWS.forEach((y,r)=>{ s+='<ellipse cx="'+colX(c)+'" cy="'+(y+.7)+'" rx="'+f1(2.8*k(r))+'" ry=".9" fill="#7fadb0" opacity=".8"/>'+nae(colX(c),y,6.4*k(r),2.6*k(r)); }); }
+  }
+  if(st==='green') for(let c=0;c<C;c++) ROWS.forEach((y,r)=>{ s+=kabu(colX(c),y+2.5,12*k(r),4.2*k(r),(c+r)%2?'#4d9140':'#5a9d47','#79b95e'); });
+  if(st==='gold' || st==='cut') for(let c=0;c<C;c++) ROWS.forEach((y,r)=>{ const x=colX(c);
+    if(st==='cut' && on(c)){ s+=stub(x,y,'#d6bb82',1.2); return; }
+    s+=ho(x,y+2.5,12.5*k(r),4.4*k(r),(c+r)%3===0?-1:1);
+  });
+  if(st==='stubble' || st==='snow') for(let c=0;c<C;c++) ROWS.forEach(y=>{ s+=stub(colX(c),y,st==='snow'?'#bca57d':'#c4b08e',1.1); });
+  if(rack!=null){   /* はざかけ（刈った稲を ほす） */
+    s+='<g stroke="#7f6040" stroke-width="2.2" stroke-linecap="round"><path d="M18 50 L30 11 M30 50 L18 11 M170 50 L182 11 M182 50 L170 11"/></g>'
+      +'<path d="M12 15 H188" stroke="#9a7a50" stroke-width="2.8" stroke-linecap="round"/>';
+    for(let i=0;i<Math.min(12,rack);i++){ const x=33+i*12.2; s+='<path d="M'+f1(x)+' 15 q-4.6 8 -5.4 17 q5.4 2.4 10.8 0 q-.8 -9 -5.4 -17Z" fill="#dcb44c" stroke="#b48b2c" stroke-width=".8"/><path d="M'+f1(x-3.6)+' 20 h7.2" stroke="#8a6a44" stroke-width="1.1" stroke-linecap="round"/>'; }
+    if(rack>0) s+='<ellipse cx="100" cy="52" rx="86" ry="2.2" fill="#000" opacity=".08"/>';
+  }
+  return s;
+}
+function tanboState(){
+  const T=tanboT(), y=yearNo(), sn=season();
+  if(sn===0) return {st:T.taue===y?'planted':'water'};
+  if(sn===1) return {st:T.taue===y?'green':'dry'};
+  if(sn===2){ if(T.kari===y) return T.hakobi===y?{st:'stubble'}:{st:'cut',rack:12}; return {st:T.taue===y?'gold':'dry'}; }
+  const cut=T.kari===y; return {st:S.snowCover?(cut?'snow':'snowDry'):(cut?'stubble':'dry')};
+}
+function renderPaddy(){
+  const el=$('#d-paddy'); if(!el||!S) return;
+  const v=tanboView||tanboState(), sn=season(), sig=v.st+'|'+(v.mask==null?'':v.mask)+'|'+(v.rack==null?'':v.rack)+'|'+sn;
+  if(el.dataset.sig!==sig){ el.innerHTML=paddyArt(v.st,v.mask,v.rack,sn); el.dataset.sig=sig; }
+  const b=$('#paddyBtn'); if(b) b.setAttribute('aria-label','田んぼ：'+paddyHint());
+}
+function paddyHint(){
+  const T=tanboT(), y=yearNo(), sn=season(), last=seasonDay()>=SEASON_DAYS;
+  if(sn===0) return T.taue===y?'秋の2日目の朝に、稲刈りです':last?'きょうは、田植えの日です':'あしたの朝、田植えです';
+  if(sn===1) return T.taue===y?'秋の2日目の朝に、稲刈りです':'春になったら、田植えです';
+  if(sn===2){ if(T.kari===y) return T.hakobi===y?'新米は、おうちに運びました':'はざかけで、ほしています'; if(T.taue===y) return last?'きょうは、稲刈りの日です':'あしたの朝、稲刈りです'; }
+  return '春になったら、田植えです';
+}
+function paddyTap(){
+  if(modal||!S||!S.unlocked.tanbo) return;
+  const t='田んぼ：'+paddyHint();
+  if(reduceMotion){ if(!busy) say('eri',t.replace(/^田んぼ：/,'')+'。',0,'smile'); return; }   /* 動きを減らす端末では 吹き出しで（文字の演出が出ないので） */
+  fxText(t,{x:TANBO.x+100,y:TANBO.y-14},'info');
+}
+/* 田植え（春の2日目）・稲刈り（秋の2日目。その年に田植えをしたときだけ）。その日の朝いちばんに（まにあわなかったら その日のうちに） */
+function tanboDue(){
+  if(!S || !S.unlocked || !S.unlocked.tanbo || S.day<=1 || S.clock>=DAY_END) return null;
+  const T=tanboT(), y=yearNo(), sn=season(), sd=seasonDay();
+  if(sn===0 && sd>=SEASON_DAYS && T.taue!==y) return 'taue';
+  if(sn===2 && sd>=SEASON_DAYS && T.taue===y && T.kari!==y) return 'kari';
+  return null;
+}
+const hakobiDue=()=>{ if(!S||!S.unlocked||!S.unlocked.tanbo) return false; const T=tanboT(); return !!T.kari && T.kari===yearNo() && T.hakobi!==T.kari; };
+const shinmaiDue=()=>{ if(!S||!S.unlocked||!S.unlocked.tanbo) return false; const T=tanboT(); return !!T.hakobi && T.hakobi===yearNo() && T.shinmai!==T.hakobi; };
+/* 田んぼの場面の道具 */
+function tanboKit(){
+  const H=A.homare;
+  const line=async(who,text,mood,ms)=>{ hush(); say(who,text,0,mood); await gwait(ms||(1500+text.length*60)); };
+  const walkMs=(a,p)=>Math.round(clamp(Math.hypot(p.x-a.x,p.y-a.y)*2.3,300,2600));
+  const go=(a,p,ms)=>a===A.shada?moveShada(p,{ms:ms||walkMs(a,p)}):moveTo(a,p,{ms:ms||walkMs(a,p)});
+  const work=async a=>{ if(reduceMotion){ await gwait(260); return; } a.el.classList.add('working'); await sleep(440); a.el.classList.remove('working'); };
+  const E0={x:TANBO.x-14,y:TANBO.y+4}, D0={x:TANBO.x-30,y:TANBO.y+46}, H0={x:TANBO.x+TANBO.w+12,y:TANBO.y+2}, HOUT={x:TANBO.look[0]-44,y:TANBO.y-20};   /* 左のあぜ（えり・しゃだはる）、右のあぜ（ほまれ）、画面の左の外 */
+  return {H,line,go,work,E0,D0,H0,HOUT};
+}
+function tanboPrep(){
+  hush(); shadaCanDown(true);
+  if(A.shada.mode==='nap') wakeShada(false);
+  if(A.shada.mode==='hide'){ shadaMode('follow'); setMood('shada','normal'); }
+  stopWatch(); cancelErrand();
+}
+function tanboEnd(lockedBefore){
+  tanboView=null; shadaCarryItem=null; shadaCarry(); shadaCanDown(false);
+  const H=A.homare; H.el.classList.remove('on','carrying','working'); H.el.querySelector('.carry').innerHTML=icon('i-bento');
+  renderPaddy(); if(lockedBefore) renderWorld();
+}
+/* kind＝taue（田植え）／kari（稲刈り）。pat＝1（1回め）・2（2回めから）。preview＝見るだけ（S は変えない） */
+async function tanboScene(kind,preview,pat){
+  const T=tanboT(), y=yearNo(), taue=kind==='taue';
+  pat=pat||(((taue?T.tn:T.kn)||0)>0?2:1);
+  const {H,line,go,work,E0,D0,H0,HOUT}=tanboKit();
+  const pd=$('#d-paddy'), lockedBefore=pd.classList.contains('locked');
+  tanboPrep(); pd.classList.remove('locked');
+  let ok=true;
+  try{
+    gyojiStep=taue?'田植え：はじまり':'稲刈り：はじまり';
+    tanboView={st:taue?'water':'gold'}; renderPaddy();
+    await line('eri',taue?(pat===1?'今日は、田植えだよ。':'今年も、田植えだよ。'):(pat===1?'今日は、稲刈りだよ。':'今年も、きんいろだね。'),'happy');
+    setMood('shada','happy',1800);
+    await line('shada',taue?'たうえ、ばう！':(pat===1?'きんいろ、ばう！':'いねかり、ばう！'),null,1700);
+    hush();
+    focusRange(TANBO.look[0],TANBO.look[1]);
+    await Promise.all([go(A.eri,E0), go(A.shada,D0)]);
+    /* ほまれくんが 手伝いに来る（依頼者の希望）：画面の左から、田んぼのうしろを通って 右のあぜへ */
+    gyojiStep=(taue?'田植え':'稲刈り')+'：ほまれくん';
+    place(H,HOUT.x,HOUT.y,0); H.el.classList.add('on'); setMood('homare','happy',2200);
+    await go(H,H0,2600);
+    await line('homare','ぼくも、手伝うよ。');
+    setMood('eri','happy',1800); await line('eri','わあ、たすかる。','happy');
+    let mask=0;
+    const eriCol=c=>({x:tanboColX(c)-10,y:TANBO.y+14}), homCol=c=>({x:tanboColX(c)+10,y:TANBO.y+14});   /* ふたりは それぞれ 外がわに立って、まんなかへ すすむ（重ならないように） */
+    if(taue){
+      if(pat===1) await line('eri','苗は、おじさんに、わけてもらったんだ。','smile');
+      shadaCarryItem='i-nae'; shadaCarry(); Snd.play('basket');
+      await line('eri',pat===1?'しゃだはるは、苗を はこんでくれる？':'しゃだはる、今年も、苗を おねがいね。','smile');
+      setMood('shada','happy',1800); await line('shada','まかせるばう！',null,1600);
+      hush();
+      gyojiStep='田植え：植える';
+      for(let i=0;i<TANBO_ORDER.length;i++){
+        const c=TANBO_ORDER[i], left=c<=5, who=left?A.eri:H;
+        await go(who,left?eriCol(c):homCol(c),420);
+        if(left && i>=4) go(A.shada,{x:tanboColX(c)-36,y:TANBO.y+52},420);   /* どろんこになってからは、えりちゃんの となりで 苗を わたす */
+        await work(who);
+        mask|=1<<c; tanboView={st:'planted',mask}; renderPaddy(); Snd.play('plant');
+        if(c===6) await go(H,homCol(9),450);   /* ほまれくんは さいごの列のあと 右へ下がる（まんなかで えりちゃんと重ならないように） */
+        if(i%2===0) fxText('ちゃぷ',{x:tanboColX(c),y:TANBO.y+30});
+        if(i===4){   /* しゃだはる君が 田んぼに入って、どろんこ */
+          gyojiStep='田植え：どろんこ';
+          await go(A.shada,{x:TANBO.x+8,y:TANBO.y+52},900);
+          Snd.play('slip'); fxText('ぬるっ',{x:A.shada.x,y:A.shada.y+30});
+          setMood('shada','scared',1000); await line('shada','あし、ぬるぬるばう！',null,1900);
+          setMood('eri','happy',2000); await line('eri','ふふ。しゃだはる、どろんこだね。','happy');
+          setMood('homare','happy',1600); await line('homare','ははは。',null,1300);
+          hush(); setMood('shada','happy',1400);
+          gyojiStep='田植え：植える';
+        }
+        await gwait(reduceMotion?120:150);
+      }
+      tanboView={st:'planted'}; renderPaddy();
+      shadaCarryItem=null; shadaCarry();
+      gyojiStep='田植え：おわり';
+      await Promise.all([go(A.eri,E0,900), go(H,H0,900), go(A.shada,D0,900)]);
+      setMood('eri','happy',2200);
+      if(pat===1){
+        await line('eri','できた。まっすぐ、ならんだね。','happy');
+        setMood('shada','happy',1600); await line('shada','ならんだばう！',null,1500);
+        setMood('homare','happy',1800); await line('homare','秋が、たのしみだね。');
+        setMood('shada','happy',1600); await line('shada','たのしみばう！',null,1500);
+      }else{
+        await line('eri','今年も、おいしいお米に、なりますように。','smile');
+        setMood('shada','happy',1600); await line('shada','なりますようにばう！',null,1700);
+      }
+      await line('homare','じゃあ、ぼくは、おうちに もどるね。');
+      await line('eri','ありがとう、ほまれくん。','smile');
+    }else{
+      await line('eri',pat===1?'しゃだはるは、たばを はこんでくれる？':'しゃだはる、今年も、たばを おねがいね。','smile');
+      setMood('shada','happy',1800); await line('shada','はこぶばう！',null,1500);
+      hush();
+      gyojiStep='稲刈り：刈る';
+      for(let i=0;i<TANBO_ORDER.length;i++){
+        const c=TANBO_ORDER[i], left=c<=5, who=left?A.eri:H;
+        await go(who,left?eriCol(c):homCol(c),420);
+        await work(who);
+        mask|=1<<c; tanboView={st:'cut',mask}; renderPaddy(); Snd.play('chop');
+        if(c===6) await go(H,homCol(9),450);
+        if(i%2===0) fxText('ざくっ',{x:tanboColX(c),y:TANBO.y+24});
+        if(i===4){   /* しゃだはる君が 刈った たばを はこぶ */
+          gyojiStep='稲刈り：たば';
+          shadaCarryItem='i-inaba'; shadaCarry(); Snd.play('basket');
+          await go(A.shada,{x:TANBO.x+20,y:TANBO.y+52},800);
+          setMood('shada','happy',1600); await line('shada','よいしょ、ばう！',null,1600);
+          setMood('eri','happy',2000); await line('eri','ふふ、力もちだね。','happy');
+          hush();
+          await go(A.shada,D0,700);
+          gyojiStep='稲刈り：刈る';
+        }
+        await gwait(reduceMotion?120:150);
+      }
+      /* はざかけ：ほまれくんが組んで、しゃだはる君が たばを運び、ほまれくんが かける */
+      gyojiStep='稲刈り：はざかけ';
+      await Promise.all([go(A.eri,E0,900), go(H,H0,900)]);
+      await line('homare','はざかけは、ぼくが 組むね。');
+      hush();
+      await go(H,{x:TANBO.x+42,y:TANBO.y+2},1300);
+      await work(H);
+      tanboView={st:'cut',rack:0}; renderPaddy(); Snd.play('basket');
+      await gwait(450);
+      for(let n=1;n<=12;n++){
+        if(n%3===1) await go(A.shada,{x:TANBO.x+30+n*12,y:TANBO.y+50},460);
+        if(n%3===0) await work(H);
+        tanboView={st:'cut',rack:n}; renderPaddy(); if(n%3===0) Snd.play('basket');
+        await gwait(reduceMotion?120:200);
+      }
+      shadaCarryItem=null; shadaCarry();
+      gyojiStep='稲刈り：おわり';
+      await Promise.all([go(H,H0,1300), go(A.shada,D0,900)]);
+      setMood('eri','happy',2200);
+      await line('eri','あとは、ほしたら、新米だね。','happy');
+      setMood('shada','happy',1800); await line('shada','しんまい、ばう！',null,1600);
+      await line('homare','夕方、ぼくが おうちに 運ぶね。');
+      await line('eri','うん。おねがいね。','smile');
+    }
+    hush();
+    await go(H,HOUT,2400);
+    H.el.classList.remove('on');
+  }catch(err){
+    ok=false; gyojiCleanup();
+    log('（'+(taue?'田植え':'稲刈り')+'の場面で問題がおきました。この文を教えてください：'+gyojiStep+'／'+String((err&&err.message)||err).slice(0,140)+'）');
+    try{ console.error(err); }catch(e){}
+  }
+  if(!preview){ if(taue){ T.taue=y; T.tn=(T.tn||0)+1; } else { T.kari=y; T.kn=(T.kn||0)+1; } }   /* 記録は 場面のあと（v1.52.1。とちゅうで アプリが とじられて 開きなおしたら、場面を はじめから）。問題がおきたときも 記録して くり返さない */
+  tanboEnd(lockedBefore);
+  if(!preview){
+    if(ok) log(taue?(pat===1?'ほまれくんも手伝いに来て、3人で田植えをしました。苗は、おじさんに わけてもらいました。秋の2日目の朝は、稲刈りです。':'ほまれくんも手伝いに来て、今年も 3人で田植えをしました。秋の2日目の朝は、稲刈りです。')
+                  :(pat===1?'ほまれくんも手伝いに来て、3人で稲刈りをしました。はざかけで ほして、夕方 ほまれくんが おうちに運びます。':'ほまれくんも手伝いに来て、今年も 3人で稲刈りをしました。夕方、ほまれくんが おうちに運びます。'));
+    addNagomi(2,{x:TANBO.x+100,y:TANBO.y+8});
+    await advance(60);
+    S.sinceEvent=0; saveNow();   /* すぐにセーブ（田植え・稲刈りは 1年に1回なので） */
+  }
+}
+/* 稲刈りの日の夕方：ほまれくんが、はざかけの お米を おうちに運ぶ（依頼者の希望）。帰り道の前（endDay） */
+async function hakobiScene(preview){
+  const T=tanboT();
+  const {H,line,go,E0,D0,HOUT}=tanboKit();
+  const pd=$('#d-paddy'), lockedBefore=pd.classList.contains('locked');
+  tanboPrep(); pd.classList.remove('locked');
+  let ok=true;
+  try{
+    gyojiStep='お米を運ぶ';
+    tanboView={st:'cut',rack:12}; renderPaddy();
+    focusRange(TANBO.look[0],TANBO.look[1]);
+    await Promise.all([go(A.eri,E0), go(A.shada,D0)]);
+    place(H,HOUT.x,HOUT.y,0); H.el.classList.add('on'); setMood('homare','happy',2200);
+    await go(H,{x:TANBO.x+42,y:TANBO.y+2},2000);
+    await line('homare','お米、おうちに 運ぶね。');
+    hush();
+    for(let n=9;n>=0;n-=3){ if(!reduceMotion){ H.el.classList.add('working'); await sleep(300); H.el.classList.remove('working'); } tanboView={st:'cut',rack:n}; renderPaddy(); Snd.play('basket'); await gwait(reduceMotion?120:160); }
+    tanboView={st:'stubble'}; renderPaddy();   /* はざかけも かたづける */
+    H.el.querySelector('.carry').innerHTML=icon('i-inaba'); H.el.classList.add('carrying');
+    await gwait(300);
+    setMood('eri','happy',2200); await line('eri','ありがとう、ほまれくん！','happy');
+    setMood('shada','happy',1800); await line('shada','しんまい、ばう！',null,1600);
+    hush();
+    await go(H,HOUT,2200);
+    H.el.classList.remove('on','carrying');
+  }catch(err){
+    ok=false; gyojiCleanup();
+    log('（お米を運ぶ場面で問題がおきました。この文を教えてください：'+gyojiStep+'／'+String((err&&err.message)||err).slice(0,140)+'）');
+    try{ console.error(err); }catch(e){}
+  }
+  if(!preview) T.hakobi=T.kari;   /* 記録は 場面のあと（とちゅうで とじられたら、1日の終わりに もういちど） */
+  tanboEnd(lockedBefore);
+  if(!preview){ if(ok) log('夕方、ほまれくんが 新米を おうちに運びました。'); saveNow(); }
+}
+/* 新米のお茶碗（v1.52.0）：1年目から、毎晩の夕ごはんに並ぶ（依頼者の希望）。3年目の稲刈りの夜から、そのお米が 新米。
+   取り皿の右どなり（食べる人から見て左＝ごはんの場所）。色は ふとんと同じ：えり＝ピンク、ほまれ＝青、しゃだはる＝黄色（小さめ・肉球） */
+const RICE_BOWLS=[
+  {x:228, y:340, sc:1,    col:'#eeb2bb', dark:'#cf8b97', pat:'dots'},
+  {x:281, y:334, sc:1.06, col:'#a9c1e0', dark:'#7f9dc4', pat:'line'},
+  {x:333, y:341, sc:.86,  col:'#f2d98c', dark:'#cfb159', pat:'paw'}
+];
+function bowlArt(b){
+  const f=n=>(+n).toFixed(1), w=7*b.sc, h=6.6*b.sc, x=b.x, y=b.y, top=y-h;
+  let s='<g class="bowl"><ellipse cx="'+f(x+.6)+'" cy="'+f(y+.9)+'" rx="'+f(w*.8)+'" ry="'+f(1.6*b.sc)+'" fill="rgba(80,55,30,.18)"/>'
+    +'<ellipse class="in" cx="'+f(x)+'" cy="'+f(top)+'" rx="'+f(w*.95)+'" ry="'+f(2*b.sc)+'" fill="#fbf6ec" stroke="'+b.dark+'" stroke-width=".6"/>'
+    +'<g class="rice"><path d="M'+f(x-w*.93)+' '+f(top+.2)+' Q'+f(x)+' '+f(top-6.8*b.sc)+' '+f(x+w*.93)+' '+f(top+.2)+'Z" fill="#fffdf6" stroke="#e5ddcb" stroke-width=".6"/>'
+    +'<g fill="#f1ebdd"><ellipse cx="'+f(x-2*b.sc)+'" cy="'+f(top-2.2*b.sc)+'" rx="1.1" ry=".6"/><ellipse cx="'+f(x+1.6*b.sc)+'" cy="'+f(top-3.2*b.sc)+'" rx="1.1" ry=".6"/><ellipse cx="'+f(x+.2*b.sc)+'" cy="'+f(top-1.1*b.sc)+'" rx="1.1" ry=".6"/></g>'
+    +'<path class="steam" d="M'+f(x-1.5)+' '+f(top-8*b.sc)+' q-1.8 -2.6 0 -5.2 q1.8 -2.6 0 -5.2 M'+f(x+2.2)+' '+f(top-7.4*b.sc)+' q1.6 -2.2 0 -4.4" stroke="#fff" stroke-width="1" stroke-linecap="round" fill="none"/></g>'
+    +'<path d="M'+f(x-w)+' '+f(top)+' Q'+f(x-w*.96)+' '+f(y-h*.12)+' '+f(x-w*.4)+' '+f(y)+' L'+f(x+w*.4)+' '+f(y)+' Q'+f(x+w*.96)+' '+f(y-h*.12)+' '+f(x+w)+' '+f(top)+' Q'+f(x)+' '+f(top+2.3*b.sc)+' '+f(x-w)+' '+f(top)+'Z" fill="'+b.col+'" stroke="'+b.dark+'" stroke-width=".7" stroke-linejoin="round"/>'
+    +'<rect x="'+f(x-w*.38)+'" y="'+f(y-.4)+'" width="'+f(w*.76)+'" height="'+f(1.5*b.sc)+'" rx=".5" fill="'+b.dark+'"/>';
+  if(b.pat==='dots') s+='<g fill="#fff" opacity=".9"><circle cx="'+f(x-3)+'" cy="'+f(top+3.6)+'" r=".9"/><circle cx="'+f(x+.4)+'" cy="'+f(top+4.4)+'" r=".9"/><circle cx="'+f(x+3.6)+'" cy="'+f(top+3.4)+'" r=".9"/></g>';
+  if(b.pat==='line') s+='<path d="M'+f(x-w*.82)+' '+f(top+3.2)+' Q'+f(x)+' '+f(top+5.4)+' '+f(x+w*.82)+' '+f(top+3.2)+'" stroke="#eef3fa" stroke-width="1.1" fill="none" stroke-linecap="round"/>';
+  if(b.pat==='paw') s+='<g fill="#fff8df"><circle cx="'+f(x)+'" cy="'+f(top+4)+'" r="1.25"/><circle cx="'+f(x-1.7)+'" cy="'+f(top+2.4)+'" r=".6"/><circle cx="'+f(x)+'" cy="'+f(top+1.9)+'" r=".6"/><circle cx="'+f(x+1.7)+'" cy="'+f(top+2.4)+'" r=".6"/></g>';
+  return s+'</g>';
+}
+function riceShow(on){ const g=$('#g-rice'); if(!g) return; if(!g.dataset.built){ g.innerHTML=RICE_BOWLS.map(bowlArt).join(''); g.dataset.built=1; } g.classList.toggle('on',!!on); if(!on) g.classList.remove('full','pop','steam'); }
+function riceFill(on,pop){ const g=$('#g-rice'); if(!g) return; g.classList.toggle('full',!!on); g.classList.remove('pop'); if(!on) g.classList.remove('steam'); if(on && pop && !reduceMotion && !homeSkip){ void g.getBoundingClientRect(); g.classList.add('pop'); } }
+/* 新米の夜（その年の はじめての夕ごはん）。preview＝見るだけ（S は変えない） */
+async function shinmaiTalk(E,D,H,preview,pat){
+  const T=tanboT(), first=pat?pat===1:!(T.sn>0);
+  if(!preview){ T.shinmai=T.hakobi; T.sn=(T.sn||0)+1; }
+  const w=ms=>homeSkip?Promise.resolve():sleep(ms);   /* セリフを読む時間は「動きを減らす」でも ちぢめない。「とばす」は早送り */
+  const g=$('#g-rice'); if(g && !reduceMotion && !homeSkip) g.classList.add('steam');
+  hhush();
+  hmood(E,'happy',2200); hsay(E,first?'今日から、新米だよ。':'今年も、新米だよ。',{mood:'happy'}); await w(1900);
+  hmood(H,'happy',2000); hsay(H,first?'わあ、つやつやだ。':'つやつやだね。'); await w(1700);
+  hmood(D,'happy',1800); hsay(D,'しんまい、ばう。'); await w(1600);
+  if(first){ hsay(E,'3人で作った、お米だね。',{mood:'smile'}); await w(2000); if(!preview){ hNagomi(1,{x:(E.x+H.x)/2,y:E.y-40}); await w(700); } }
+  hhush();
+  if(!preview) log(first?'今夜から、新米のごはんです。':'今年も、新米のごはんです。');
+}
+/* 見るだけの画面（版番号5回タップ →「季節の行事を見る」）から */
+async function shinmaiPreview(pat){
+  homeSkip=false; setupRoom();
+  const E=HA.eri, D=HA.shada, H=HA.homare;
+  place(E,HSPOT.tableEri.x,HSPOT.tableEri.y,0); place(H,HSPOT.tableHomare.x,HSPOT.tableHomare.y,0); place(D,HSPOT.tableShada.x,HSPOT.tableShada.y,0);
+  const rec=RECIPES.find(r=>r.name==='トマトとたまごの炒めもの')||RECIPES[0];
+  const de=$('#hDish'); de.className='hDish'; de.innerHTML=DISH.table(rec); de.classList.add('on');
+  $('#g-setting').style.display=''; setPortions(rec); riceShow(true);
+  home.classList.add('on'); void home.offsetWidth; home.classList.add('show');
+  await sleep(900);
+  try{
+    riceFill(true,true); await sleep(900);
+    await shinmaiTalk(E,D,H,true,pat);
+    hsay(E,'いただきます。',{mood:'smile'}); hsay(H,'いただきます。'); hsay(D,'いただきますばう。');
+    await sleep(1600); hhush(); await sleep(400);
+  }finally{ await sleep(400); home.classList.remove('show'); await sleep(600); home.classList.remove('on','dark'); setupRoom(); }
+}
+async function tanboPreview(kind,pat){
+  if(kind==='shinmai') return shinmaiPreview(pat);
+  if(kind==='hakobi') return hakobiScene(true);
+  return tanboScene(kind,true,pat);
 }
 
 /* ================= 近所のおじさん（おすそわけ） =================
@@ -4996,7 +5365,8 @@ async function afterAction(resting){
   S.sinceEvent+=1;
   await weatherScenes(resting);
   await checkUnlocks();
-  if(visitDue()){ await bgWait(); await visitScene(); } else if(gyojiDue()){ await bgWait(); await gyojiScene(gyojiDue()); } else await maybeEvent(resting);   /* v1.27.0：季節の行事。v1.37.2：おじさん・行事の前は、うしろの場面を待つ */
+  if(tanboDue()){ await bgWait(); await tanboScene(tanboDue(),false); }   /* v1.52.0：田植え・稲刈り（ふつうは朝いちばんに すんでいる） */
+  else if(visitDue()){ await bgWait(); await visitScene(); } else if(gyojiDue()){ await bgWait(); await gyojiScene(gyojiDue()); } else await maybeEvent(resting);   /* v1.27.0：季節の行事。v1.37.2：おじさん・行事の前は、うしろの場面を待つ */
   await checkUnlocks();
   if(S.clock>=DAY_END || (resting && S.clock>=DUSK)){ await bgWait(); await endDay(); }   /* v1.37.2：夜の場面と重ならないように待つ */   /* v1.35.5：ひとやすみで夕暮れ（17:00）をすぎたら、その場で1日を終える（依頼者の希望） */
 }
@@ -5825,7 +6195,7 @@ function setupRoom(){
   ['g-clock','g-fishbowl','g-mirror','g-chair'].forEach(id=>{ const g=document.getElementById(id); if(g) g.classList.remove('call','eat','reflect','hop','rock'); });   /* v1.32.0・v1.33.0 */
   { const u=document.getElementById('g-ukulele'); if(u) u.style.visibility=''; }
   updatePhoto(false);
-  $('#g-setting').style.display='none'; setPortions(null);
+  $('#g-setting').style.display='none'; setPortions(null); riceShow(false);
   const d2=$('#hDish2'); if(d2){ d2.className='hDish hDish2'; d2.innerHTML=''; }   /* ほまれくんの一品（v1.24.0） */
   const d3=$('#hDish3'); if(d3){ d3.className='hDish hDish3'; d3.innerHTML=''; }   /* えりちゃんのもう一品（v1.49.0） */
   home.classList.remove('dark','morning'); $('#hBeam').style.display=S.raining?'none':'';
@@ -6631,7 +7001,7 @@ async function homeEvening(cands){
         await hp(900);
       }
       if(sideDish){   /* ほまれくんの一品（v1.24.0）。v1.26.0（依頼者の希望）：お皿をならべてから、ほまれくんも台所まで行って作る。えりちゃんは なべのうしろへ少しずれて、となりをあける */
-        await hmove(H,HSPOT.tableHomare); $('#g-setting').style.display='';
+        await hmove(H,HSPOT.tableHomare); $('#g-setting').style.display=''; riceShow(true);
         await hp(350);
         await hmove(E,HSPOT.cookPot,{ms:460});
         await hmove(H,HSPOT.cookH);
@@ -6641,7 +7011,7 @@ async function homeEvening(cands){
         await hp(250);
       }
       await hmove(H,HSPOT.tableHomare);
-      $('#g-setting').style.display='';
+      $('#g-setting').style.display=''; riceShow(true);   /* v1.52.0：お皿と いっしょに お茶碗も */
       if(sideDish) await hmove(E,HSPOT.cook,{ms:460});
     })();
     $('#hSteam').classList.add('on');
@@ -6669,7 +7039,7 @@ async function homeEvening(cands){
     }
     await hwalkAll([[E,HSPOT.tableEri],[D,HSPOT.tableShada],[H,HSPOT.tableHomare]]);
     if(decorShown('clock') && !cuckooTonight) cuckoo();   /* v1.32.0：食卓につくと、はと時計が「ぽっぽー」（その夜「はと時計を待つ」が出ていれば、もう鳴らさない） */
-    $('#g-setting').style.display='';
+    $('#g-setting').style.display=''; riceShow(true);
     $('#hDish').classList.add('on');
     hsay(E,askPlates?pickV(['できたよ。'+dish.name+'。',dish.name+'、できたよ。']):'はい、'+dish.name+'。',{mood:'happy'});
     await hp(1300);
@@ -6711,7 +7081,8 @@ async function homeEvening(cands){
       await hp(900);
     }
     /* v1.47.0（依頼者の希望）：「いただきます」の前に、3人の取り皿に よそっておく（前は 食べたあとに よそっていた） */
-    setPortions(dish); await hp(900);
+    setPortions(dish); riceFill(true,true); await hp(900);   /* v1.52.0：お茶碗にも ごはん */
+    if(shinmaiDue()) await shinmaiTalk(E,D,H,false);   /* v1.52.0：稲刈りの日の夜から 新米 */
     /* 「いただきます。」は、3人そろって */
     hsay(E,'いただきます。',{mood:'smile'}); hsay(H,'いただきます。'); hsay(D,'いただきますばう。');
     await hp(1500);
@@ -6776,7 +7147,7 @@ async function homeEvening(cands){
     }
     /* お皿が からになって、3人そろって「ごちそうさまでした。」（v1.18.0。依頼者の希望。吹き出しは ひとつにまとめて、しっぽを3人ぶん）。そのあと、なごみ度がふえる */
     hhush();
-    $('#hDish').classList.remove('eating'); $('#hDish').classList.add('eaten'); setPortions(null);
+    $('#hDish').classList.remove('eating'); $('#hDish').classList.add('eaten'); setPortions(null); riceFill(false);
     if(sideDish || hoshiDish) $('#hDish2').classList.add('eaten');
     if(dish2 || fridgeDish) $('#hDish3').classList.add('eaten');   /* v1.49.0 */
     await hp(450);
@@ -6914,7 +7285,7 @@ async function homeEvening(cands){
     const ds=(cushionOut()?HSPOT.cushion:HSPOT.tableShada); place(D,ds.x,ds.y,0);
     [H,D,E].forEach(a=>{ a.el.classList.remove('sleeping'); hmood(a,'normal'); });
     hhold(E,null); hhold(H,null); openFridge(false); if(passed){ passed.remove(); passed=null; }
-    if(dish){ $('#hDish').classList.add('on','eaten'); $('#g-setting').style.display=''; }
+    if(dish){ $('#hDish').classList.add('on','eaten'); $('#g-setting').style.display=''; riceShow(true); riceFill(false); }
     if(newDecor) document.getElementById(newDecor.g).style.display='';
     if(newReward){ if(newReward.key==='photo') $('#g-photo').style.display=''; if(newReward.key==='cake'||newReward.key==='omiyage'){ const de=$('#hDish'); de.className='hDish on eaten'; if(!de.innerHTML) de.innerHTML=cakePlate(); $('#g-setting').style.display=''; } }
     seasonalShow();
@@ -7852,6 +8223,7 @@ async function endDay(){
   say('shada',pickV(['また明日ばう。','かえるばう！','おなかすいたばう。']),2400);
   await pause(1500);
   hush();   /* 歩きだす前にしまう（歩きながら・画面が動きながらだと、読みにくく、画面のはしで切れる） */
+  if(hakobiDue()) await hakobiScene(false);   /* v1.52.0：稲刈りの日の夕方、ほまれくんが はざかけの お米を おうちに運ぶ（依頼者の希望） */
   await returnCan();   /* v1.22.0：じょうろを小屋へ */
   await returnBigCan();   /* v1.41.0：日照りの日は、3代目を小屋へ */
   await giftDetour();   /* v1.24.0：たくさんとれた日は、おじさんへ おすそわけ */
@@ -7913,6 +8285,7 @@ async function nextMorning(){
   if(season()!==3 && S.snowman){ S.snowman=false; melted=true; }
   S.bigDay=null;   /* v1.24.0 */
   const fr=fruitMorning();   /* v1.21.0：梨の木・ぶどうの育ちと、実 */
+  if(S.tanbo && S.tanbo.kari && S.tanbo.hakobi!==S.tanbo.kari) S.tanbo.hakobi=S.tanbo.kari;   /* v1.52.0：夕方に運べなかったとき（とちゅうで とじた など）は、夜のうちに運んだことに */
   const hg=hangMorning();   /* v1.28.0：小屋の軒先 */
   await morning({droopy,sprouted,changed,melted,frogs:S.plots.some(p=>p.frog),grown:fr.grown,vineGrown:fr.vineGrown,fruit:fr.fruit,basil:fr.basil,hoshi:hg.hoshi,zabuton:hg.zabuton});
 }
@@ -8081,6 +8454,11 @@ async function morning(info){
       await pause(1500); setMood('shada','happy',1600); say('shada','えりちゃん、バジル、そだったばう！');
       await pause(1500); say('eri','ほんとだ。あとで、つんでおこうね。',0,'happy',true); log('温室のバジルが育っています。タップして、つみましょう。');
     }
+    if(S.unlocked.tanbo && seasonDay()===1 && (season()===0 || season()===2)){   /* v1.52.0：田んぼ。あしたの朝が 田植え・稲刈り */
+      const T=tanboT(), y=yearNo();
+      if(season()===0 && T.taue!==y){ await pause(1500); setMood('shada','happy',1600); say('shada','たんぼに、みず、ばう！'); await pause(1700); say('eri','あしたは、田植えだね。',0,'smile',true); log('春になって、田んぼに水をはりました。あしたの朝は、田植えです。'); }
+      if(season()===2 && T.taue===y && T.kari!==y){ await pause(1500); setMood('shada','happy',1600); say('shada','たんぼ、きんいろばう！'); await pause(1700); say('eri','あしたは、稲刈りだね。',0,'smile',true); log('田んぼの稲が、きんいろに実りました。あしたの朝は、稲刈りです。'); }
+    }
     if(info.hoshi){   /* v1.28.0：大根が干しあがった朝 */
       await pause(1500); setMood('shada','happy',1600); say('shada','えりちゃん、だいこん、ほせたばう！');
       await pause(1700); say('eri','ほんとだ。いい干しぐあい。',0,'happy',true);
@@ -8115,6 +8493,8 @@ async function morning(info){
     await notices();
   };
   if(!info.first && unlockPending()){ await pause(500); await checkUnlocks(); }   /* v1.48.0：季節で来るもの（ベンチ・花壇・小屋・苗木…）は、その朝 畑に着いたら すぐ（前は その日のさいしょの行動のあと） */
+  const tk=info.first?null:tanboDue();   /* v1.52.0：田植え・稲刈りの朝は、畑に着いたら まず それ（依頼者の希望「その日の朝 最初に」）。ふだんの あいさつは なし、知らせは そのあと うしろで */
+  if(tk){ await pause(400); await tanboScene(tk,false); await pause(300); if(info.zabuton) await notices(); busy=false; renderButtons(); saveSoon(); runQueued(); if(!info.zabuton) bgStart('morning',null,notices); return; }
   if(info.first || info.zabuton){ await talk(); await pause(400); busy=false; renderButtons(); saveSoon(); runQueued(); }
   else { busy=false; renderButtons(); saveSoon(); runQueued(); bgStart('morning',null,talk); }
 }
@@ -8144,6 +8524,7 @@ async function welcomeBack(){
   say('shada','おかえりばう！');
   busy=false; renderButtons();
   if(S.clock<DAY_END && !S.raining && unlockPending()){ busy=true; renderButtons(); await pause(900); await checkUnlocks(); busy=false; renderButtons(); saveSoon(); }   /* v1.21.0：前の版のセーブにも、梨の苗木を */
+  if(tanboDue()){ busy=true; renderButtons(); await pause(900); await tanboScene(tanboDue(),false); busy=false; renderButtons(); saveSoon(); }   /* v1.52.0：田植え・稲刈りの日に、朝をすぎて開いたとき */
   if(S.clock>=DAY_END){ busy=true; renderButtons(); await endDay(); busy=false; renderButtons(); }
 }
 
@@ -8271,6 +8652,7 @@ function openDiary(){
   html+='<p style="margin:2px 0">出会ったカエル '+S.frogs+'ひき　'+row('i-frog',S.frogs,10)+'</p>';   /* v1.37.1：カエルと かたつむりを別々に */
   html+='<p style="margin:2px 0">出会ったかたつむり '+(S.snails||0)+'ひき　'+row('i-snail',S.snails||0,10)+'</p>';
   if(reduceMotion) html+='<p class="sub" style="margin:2px 0">＊ この端末は「動きを減らす（アニメーションなし）」の設定です。人や ものは、歩かずに ぱっと動きます。</p>';   /* v1.27.2 */
+  if(S.unlocked.tanbo){ const T=tanboT(); html+='<p style="margin:2px 0">田んぼ：田植え '+(T.tn||0)+'回・稲刈り '+(T.kn||0)+'回'+(T.sn?'（新米の夜 '+T.sn+'回）':'')+'</p>'; }   /* v1.52.1：にっきに 田んぼの記録 */
   html+='<p style="margin:2px 0">季節の行事：'+Object.keys(GYOJI).map(k=>esc(GYOJI[k].name)+' '+((S.gyojiN&&S.gyojiN[k])||0)+'回').join('・')+'</p>';   /* v1.27.0 */
   if(hangStatus()) html+='<p style="margin:2px 0">小屋の軒先：'+esc(hangStatus())+'</p>';   /* v1.28.0 */
   html+='<p style="margin:2px 0">おじさんのおすそわけ '+(S.gifts||0)+'回'+((S.giftToday||[]).length?'（きょう：'+S.giftToday.map(vegName).map(esc).join('、')+'）':'')+'</p>';
@@ -8367,6 +8749,7 @@ $('#compostBtn').addEventListener('click',e=>{ e.stopPropagation(); compostTap()
 $('#askBtn').addEventListener('click',e=>{ e.stopPropagation(); askScene(); });   /* v1.40.0 */
 $('#ngauge').addEventListener('click',e=>{ e.stopPropagation(); Snd.play('pick'); openNagomi(); });
 $('#stones').addEventListener('click',e=>{ e.stopPropagation(); fxText('きれいな石 '+S.stones+'こ'+((S.acorns||0)?'・どんぐり '+S.acorns+'こ':''),{x:90,y:234}); });
+$('#paddyBtn').addEventListener('click',e=>{ e.stopPropagation(); paddyTap(); });   /* v1.52.0：田んぼ（いつ田植え・稲刈りか） */
 $('#tbox').addEventListener('click',e=>{ e.stopPropagation(); fxText('たからばこ：石 '+boxed('stone')+'こ'+(boxed('acorn')?'・どんぐり '+boxed('acorn')+'こ':''),{x:90,y:292}); });
 $('#sndBtn').addEventListener('click',e=>{ e.stopPropagation(); Snd.toggle(); });
 /* 音をためす：アドレスの最後に #sound をつけて開くと、右上に「音をためす」が出て、効果音を1つずつ聴ける（音の調整用。ふだんは出ない） */
@@ -8435,6 +8818,7 @@ function openGyojiMenu(){
   let html=sheetHead('季節の行事を見る')+'<p class="sub">押すと、その行事が すぐに始まります（見るだけ。なごみ度や回数は ふえません）。どの行事も 3年でくり返します（誕生日のプレゼントは、1回め マフラー・2回め 絵・3回め以降 石）。</p><div class="seeds">';
   let i=0;
   Object.keys(GYOJI).forEach(k=>{ for(let p=1;p<=3;p++){ i++; const t=k==='bday'?(p===1?'1年目・マフラー':p===2?'2年目・絵':'3年目・石'):(p+'年目');   /* v1.51.0：誕生日も 3年でくり返す */ html+='<button class="seed" type="button" data-gyoji="'+k+'" data-pat="'+p+'"><span><b>'+i+'. '+esc(GYOJI[k].name)+'（'+t+'）</b></span></button>'; } });   /* v1.37.0：パターンごと */
+  [['taue',1,'田植え（1回め）'],['taue',2,'田植え（2回めから）'],['kari',1,'稲刈り（1回め）'],['kari',2,'稲刈り（2回めから）'],['hakobi',1,'稲刈りの日の夕方（お米を運ぶ）'],['shinmai',1,'新米の夜（1回め）'],['shinmai',2,'新米の夜（2回めから）']].forEach(([k,p,t])=>{ i++; html+='<button class="seed" type="button" data-tanbo="'+k+'" data-pat="'+p+'"><span><b>'+i+'. '+esc(t)+'</b></span></button>'; });   /* v1.52.0：田んぼ（3年目から） */
   openSheet(html+'</div>'+tuneSection(),{kind:'gyoji'});   /* v1.36.0：下に「曲をきく」（依頼者が アプリのプレビューでも 新しい曲を聴けるように） */
   bindTuneButtons();
   sheetCard.querySelectorAll('[data-gyoji]').forEach(b=>b.addEventListener('click',async()=>{
@@ -8442,31 +8826,48 @@ function openGyojiMenu(){
     busy=true; renderButtons();
     try{ await gyojiScene(b.dataset.gyoji,true,+b.dataset.pat||0); } finally { busy=false; renderButtons(); runQueued(); }
   }));
+  sheetCard.querySelectorAll('[data-tanbo]').forEach(b=>b.addEventListener('click',async()=>{   /* v1.52.0 */
+    closeSheet(); if(busy) return;
+    busy=true; renderButtons();
+    try{ await tanboPreview(b.dataset.tanbo,+b.dataset.pat||1); } finally { busy=false; renderButtons(); runQueued(); }
+  }));
 }
 if(location.hash.indexOf('gyoji')>=0){
   const gb=document.createElement('button'); gb.type='button'; gb.className='btn small'; gb.id='gyojiTest'; gb.textContent='行事を見る';
   $('.headR').insertBefore(gb,$('#sndBtn'));
   gb.addEventListener('click',e=>{ e.stopPropagation(); openGyojiMenu(); });
 }
-/* v1.51.1：英文サブタイトルの字間を、日本語の題名の幅に合わせる（右はしの「—」が題名の右はしにそろう）。読みこみ時と、向きや幅が変わったとき */
+/* v1.51.1：英文サブタイトルの字間を、日本語の題名の幅に合わせる（右はしの「—」が題名の右はしにそろう）。読みこみ時と、向きや幅が変わったとき
+   v1.51.3：題名も英文も かならず1行に（依頼者「英文サブタイトルが1行におさまっていません」）。
+   ① 題名が 音のボタン・版番号の左に入りきらないときは、題名の字を少し小さくして1行に（13px まで。それより せまい画面だけ 前の2行）
+   ② 英文は 題名と同じ幅に：短ければ 字間で広げる（6px まで）／長ければ 字を小さくする。端末の字体や 文字の大きさの設定が ちがっても 合う */
 function fitTitleEn(){
-  const h1=document.querySelector('.head h1'), en=document.getElementById('titleEn'); if(!h1 || !en) return;
-  en.style.letterSpacing='0px'; en.style.marginRight='0px';
-  const n=en.textContent.length; if(n<2) return;
-  const rg=document.createRange(); rg.selectNodeContents(h1.firstChild); const W=rg.getBoundingClientRect().width;   /* 日本語の1行めの幅 */
-  rg.selectNodeContents(en); const w=rg.getBoundingClientRect().width;
-  if(!(W>0) || !(w>0) || W<=w){ return; }
+  const head=document.querySelector('.head'), h1=head&&head.querySelector('h1'), en=document.getElementById('titleEn'), hr=head&&head.querySelector('.headR'); if(!h1 || !en) return;
+  h1.style.fontSize=''; h1.style.whiteSpace='nowrap'; en.style.fontSize=''; en.style.letterSpacing='0px'; en.style.marginRight='0px';
+  const rg=document.createRange();
+  const jpW=()=>{ rg.selectNodeContents(h1.firstChild); return rg.getBoundingClientRect().width; };   /* 日本語の題名の幅（1行のとき） */
+  const avail=head.getBoundingClientRect().width-(hr?hr.getBoundingClientRect().width:0)-(parseFloat(getComputedStyle(head).columnGap)||8)-1;
+  let W=jpW();
+  const shrink=min=>{ let f=parseFloat(getComputedStyle(h1).fontSize);   /* 字の幅が 大きさに ぴったり比例しない端末もあるので、はかりなおして 少しずつ つめる */
+    for(let i=0;i<8 && W>avail;i++){ const g=Math.min(f-0.2,Math.floor(f*avail/W*10)/10); if(g<min) break; f=g; h1.style.fontSize=f+'px'; W=jpW(); } };
+  if(W>avail && avail>0){
+    shrink(13);
+    if(W>avail){ h1.style.fontSize=''; h1.style.whiteSpace=''; W=jpW(); if(W>avail) shrink(10); }   /* とてもせまい画面：「えりとしゃだはるの／ちいさな畑」の2行（W は長いほうの行） */
+  }
+  const n=en.textContent.length; if(n<2 || !(W>0)) return;
+  rg.selectNodeContents(en); const w=rg.getBoundingClientRect().width; if(!(w>0)) return;
+  if(w>W){ const ef=parseFloat(getComputedStyle(en).fontSize); en.style.fontSize=(Math.floor(ef*W/w*10)/10)+'px'; return; }   /* 英文のほうが長い：字を小さくして 題名の幅に */
   const ls=Math.min(6,(W-w)/(n-1));
   en.style.letterSpacing=ls.toFixed(2)+'px'; en.style.marginRight=(-ls).toFixed(2)+'px';   /* さいごの字のうしろの字間ぶんを打ち消す */
 }
-fitTitleEn();
-window.addEventListener('resize',fitTitleEn); window.addEventListener('orientationchange',()=>setTimeout(fitTitleEn,300));
+fitTitleEn(); let fitTitleW=innerWidth;
+window.addEventListener('resize',()=>{ if(innerWidth!==fitTitleW){ fitTitleW=innerWidth; fitTitleEn(); } }); window.addEventListener('orientationchange',()=>setTimeout(fitTitleEn,300));
 if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitTitleEn);
 /* v1.27.3：かくし入口。右上の版番号を、3秒のうちに5回タップ → 「季節の行事を見る」。Claude アプリのプレビューのように URL を変えられない場所で、依頼者が確認するためのもの */
 { const v=document.querySelector('.ver'); let taps=[];
   if(v) v.addEventListener('click',e=>{ e.stopPropagation(); const t=Date.now(); taps=taps.filter(x=>t-x<3000); taps.push(t); if(taps.length>=5){ taps=[]; openGyojiMenu(); } }); }
 if(location.hash.indexOf('debug')>=0){
-  window.__hatake={ seedOK, recipeOK, hsay, bubbleHTML, TSUKIMI, hotDry, returnBigCan, spOf, spKeys, spEmpty, HOT_AT, get bigCanCarry(){return bigCanCarry;}, get wxQueue(){return wxQueue;}, weatherScenes, askScene, askLeft, renderAsk, compostTap, ASK_MAX, COMPOST_MAX, place, moveTo, moveShada, shadaCanDown, shadaCarry, shadaMode, afterAction, returnCan, shadaSelfWater, get canDownScene(){return canDownScene;}, rollBig, spawnBug, startRain, yearReview, yearReviewScene, yearSnap, yearLines, openZukan, openDiary, dayStr, get sheetKind(){return sheetKind;}, get bg(){return bg;}, bgWait, set forceWait(v){forceWait=v;}, gyojiPat, GYOJI_LEAD, birthdayNight, get gyojiStep(){return gyojiStep;}, rollWeather, pickPre, gyojiNightDue, nightOn, nightOff, nightOuting, fwLaunch, senkoOn, HANABI, hangCan, hangScene, hangMorning, renderShed, shedTap, nextHoshiDish, hoshiReady, morningPlan, morning, GYOJI, GYOJI_SCENE, gyojiDue, gyojiScene, hRoute, hCross, hInB, HTABLE, HSPOT, hmove, get S(){return S;}, get busy(){return busy;}, get hiddenNow(){return hiddenNow;}, get pausedMs(){return pausedMs;}, gnow, A, homeEvening, pickPre, dishCandidates, makeRequest, get HA(){return HA;}, advance, maybeEvent, renderAll, addHarvest, checkUnlocks, nextMorning, Store, CROPS, RECIPES, UNLOCKS, EVENTS, FRIDGE, rollFridge, rollWeather, placeFrost, weatherScenes, importSave, exportSave, normalize, Snd, GIFTS, planVisit, visitDue, fitVisit, DISH, setPortions, shelterAtShed, restAtHome, placeTreasure, rest, FRUITS, plantTree, plantVine, pickFruit, TREES, treeTap, dessertNight, fruitMorning, renderTree, moveShada, shadaSelfWater, selfWaterTarget, returnCan, playerAction, endDay, plantBasil, pickBasil, pickV, judgeBigDay, giftDetour, basilInFridge, SLOT_MAX, makeRoomFor, seasonSwap, fixup, workLeft, decorShown, closetTalk, openFridge, cuckoo, feedFish, mirrorReflect, strum, playUke, sitRock, seasonalDue, seasonalShow, SEASONAL, SEASONAL_SCENE, setupRoom, REWARD_NIGHT, DECOR, REWARDS, rewardSetup, get SW(){return {n:S.swN,day:S.swDay,can:S.canOut};},
+  window.__hatake={ TANBO, tanboDue, hakobiDue, shinmaiDue, tanboScene, hakobiScene, shinmaiTalk, shinmaiPreview, tanboPreview, tanboState, renderPaddy, paddyArt, paddyHint, paddyTap, riceShow, riceFill, get tanboView(){return tanboView;}, sayTest:say, focusRange, seedOK, recipeOK, hsay, bubbleHTML, TSUKIMI, hotDry, returnBigCan, spOf, spKeys, spEmpty, HOT_AT, get bigCanCarry(){return bigCanCarry;}, get wxQueue(){return wxQueue;}, weatherScenes, askScene, askLeft, renderAsk, compostTap, ASK_MAX, COMPOST_MAX, place, moveTo, moveShada, shadaCanDown, shadaCarry, shadaMode, afterAction, returnCan, shadaSelfWater, get canDownScene(){return canDownScene;}, rollBig, spawnBug, startRain, yearReview, yearReviewScene, yearSnap, yearLines, openZukan, openDiary, dayStr, get sheetKind(){return sheetKind;}, get bg(){return bg;}, bgWait, set forceWait(v){forceWait=v;}, gyojiPat, GYOJI_LEAD, birthdayNight, get gyojiStep(){return gyojiStep;}, rollWeather, pickPre, gyojiNightDue, nightOn, nightOff, nightOuting, fwLaunch, senkoOn, HANABI, hangCan, hangScene, hangMorning, renderShed, shedTap, nextHoshiDish, hoshiReady, morningPlan, morning, GYOJI, GYOJI_SCENE, gyojiDue, gyojiScene, hRoute, hCross, hInB, HTABLE, HSPOT, hmove, get S(){return S;}, get busy(){return busy;}, get hiddenNow(){return hiddenNow;}, get pausedMs(){return pausedMs;}, gnow, A, homeEvening, pickPre, dishCandidates, makeRequest, get HA(){return HA;}, advance, maybeEvent, renderAll, addHarvest, checkUnlocks, nextMorning, Store, CROPS, RECIPES, UNLOCKS, EVENTS, FRIDGE, rollFridge, rollWeather, placeFrost, weatherScenes, importSave, exportSave, normalize, Snd, GIFTS, planVisit, visitDue, fitVisit, DISH, setPortions, shelterAtShed, restAtHome, placeTreasure, rest, FRUITS, plantTree, plantVine, pickFruit, TREES, treeTap, dessertNight, fruitMorning, renderTree, moveShada, shadaSelfWater, selfWaterTarget, returnCan, playerAction, endDay, plantBasil, pickBasil, pickV, judgeBigDay, giftDetour, basilInFridge, SLOT_MAX, makeRoomFor, seasonSwap, fixup, workLeft, decorShown, closetTalk, openFridge, cuckoo, feedFish, mirrorReflect, strum, playUke, sitRock, seasonalDue, seasonalShow, SEASONAL, SEASONAL_SCENE, setupRoom, REWARD_NIGHT, DECOR, REWARDS, rewardSetup, get SW(){return {n:S.swN,day:S.swDay,can:S.canOut};},
     visit:async()=>{ if(busy) return false; busy=true; renderButtons(); S.oji={sy:Math.floor((S.day-1)/SEASON_DAYS),day:S.day,at:S.clock,done:false}; await visitScene(); busy=false; renderButtons(); return true; },
     force:async id=>{ if(busy) return false; busy=true; renderButtons(); S.sinceEvent=9; const r=await maybeEvent(false,id); await checkUnlocks(); busy=false; renderButtons(); return r; } };
 }
