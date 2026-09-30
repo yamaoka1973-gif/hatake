@@ -34,11 +34,13 @@ button,.plot,.actor,.scroller{touch-action:manipulation}
 .game{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .xfer textarea{-webkit-user-select:text;user-select:text}
 button{font:inherit;color:inherit}
-.game{position:relative;width:min(980px,100%);margin:0 auto;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(28px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
-.head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
-h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
+.game{position:relative;width:min(980px,100%);margin:0 auto;padding:max(6px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(28px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+.head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:nowrap}   /* v1.51.2：折り返さない。入りきらないときは 題名のほうを2行に */
+h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.2;min-width:0;word-break:keep-all}   /* v1.51.2：せまいときは「えりとしゃだはるの／ちいさな畑」の空白で折る（単語の途中では折れない） */
+/* 英文サブタイトル（v1.51.1。依頼者が決めた「Days on a Tiny Garden」）：斜体・緑。字間は fitTitleEn() が 日本語の題名と同じ幅になるように合わせる */
+h1 .en{display:block;font-size:.7em;font-weight:400;font-style:italic;color:#8a9a68;line-height:1.25;margin-top:1px;white-space:nowrap}
 .ver{font-size:12px;color:var(--muted)}
-.headR{display:inline-flex;align-items:center;gap:8px}
+.headR{display:inline-flex;align-items:center;gap:8px;flex:none}
 /* 音のボタン（右上）。off＝音なし */
 .sndBtn{width:34px;height:34px;padding:0;border-radius:50%;border:1px solid var(--border);background:#fff;color:#7d8f5b;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .sndBtn svg{width:20px;height:20px;display:block}
@@ -308,7 +310,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 .actor.holding .hold{display:block}
 .actor.offer .hold{transform:translate(calc(-50% - 23px),-42px)}
 .actor.show .hold{transform:translate(calc(-50% - 37px),-51px)}
-.actor.jasta.offer.offerR .hold{transform:translate(calc(-50% + 23px),-42px)}   /* v1.37.0：じゃすたくんは台の左はしにすわるので、「これ。」は右へ */
+.actor.jasta.offer.offerR .hold{transform:translate(calc(-50% + 16px),-52px)}   /* v1.51.0：となりの しゃだはる君の顔にかくれないよう、頭の上（少し右）にかかげる（armsUp と組で使う） */
 .actor .holdIn{display:flex;flex-wrap:wrap-reverse;align-items:center;justify-content:center;width:max-content;max-width:40px}
 .actor.holding .holdIn{animation:popIn .4s ease-out}
 .actor .hold svg{width:19px;height:19px;display:block;flex:none;margin:0 -2px}
@@ -509,9 +511,9 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 .actor.scarf .face .scarf{display:inline}
 #homeActors .actor.jasta{display:none}
 #homeActors .actor.jasta.on{display:block;animation:fadeIn .4s ease-out}
-.actor.jasta .egg{position:absolute;left:50%;top:12.7px;width:52px;margin-left:-26px}
+.actor.jasta .egg{position:absolute;left:50%;top:19.2px;width:46px;margin-left:-23px}   /* v1.51.0：ひと回り小さく（52→46px。足の下は前と同じ コマの上から69px） */
 .actor.jasta .egg svg{display:block;width:100%;height:auto;overflow:visible}
-.home .actor.jasta .shadow{bottom:-56%;left:6%;right:6%}
+.home .actor.jasta .shadow{bottom:-56%;left:10%;right:10%}
 .home .actor.jasta .bob{transform-origin:50% 150%;transition:transform .35s ease-in-out}
 .actor.jasta.bow .bob{transform:rotate(-22deg)}
 .egg .m-smile,.egg .m-happy,.egg .m-bow,.egg .m-wow,.egg .arms-up,.egg .snowcap{display:none}
@@ -527,6 +529,13 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 @keyframes flick{from{transform:scale(1)}to{transform:scale(.86,1.12)}}
 .hGlow2{position:absolute;left:152px;top:254px;width:220px;height:160px;z-index:600;pointer-events:none;background:radial-gradient(circle at 50% 50%,rgba(255,210,122,.55) 0,rgba(255,179,71,.18) 55%,rgba(255,179,71,0) 100%);opacity:0;transition:opacity .8s}
 .hGlow2.on{opacity:1}
+/* 玄関のチャイムの絵（v1.51.0）：左上のかべに ベルと音の線を1.7秒。文字は出さない */
+.hBell{position:absolute;left:10px;top:60px;width:32px;height:32px;z-index:300;pointer-events:none;animation:hBell 1.7s ease-out forwards}
+.hBell svg{display:block;width:100%;height:100%;overflow:visible}
+.hBell .w1,.hBell .w2{transform-box:fill-box;transform-origin:0% 50%;animation:hBellWave .55s ease-out infinite}
+.hBell .w2{animation-delay:.18s}
+@keyframes hBell{0%{opacity:0;transform:scale(.7)}12%{opacity:1;transform:scale(1.08)}22%{transform:scale(1)}78%{opacity:1}100%{opacity:0}}
+@keyframes hBellWave{0%{opacity:.25;transform:scale(.85)}50%{opacity:1}100%{opacity:.25;transform:scale(1.12)}}
 .bdNote{position:absolute;width:16px;height:20px;z-index:610;pointer-events:none;animation:bdNote 2.2s ease-out forwards}
 .bdNote svg{display:block;width:100%;height:100%;overflow:visible}
 @keyframes bdNote{0%{opacity:0;transform:translateY(6px)}20%{opacity:1}100%{opacity:0;transform:translateY(-40px)}}
@@ -966,7 +975,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
   <symbol id="i-cup" viewBox="0 0 40 40"><path d="M9 17 H29 V25 C29 31 25 34 19 34 C13 34 9 31 9 25Z" fill="#fffdf8" stroke="#cfc6b9" stroke-width="2"/><path d="M29 19 C35 19 35 28 28.5 28" fill="none" stroke="#cfc6b9" stroke-width="2.4"/><path d="M11 19 H27" stroke="#9cc36b" stroke-width="3" stroke-linecap="round"/><g fill="none" stroke="#cfc6b9" stroke-width="2" stroke-linecap="round"><path d="M15 12 q-3 -4 0 -8"/><path d="M22 12 q-3 -4 0 -8"/></g></symbol>
   <!-- 季節のしるし -->
   <symbol id="i-bcake" viewBox="0 0 40 40"><path d="M5 22 V31 C5 36 35 36 35 31 V22Z" fill="#f6dfb6"/><path d="M5 27 C5 31.5 35 31.5 35 27" fill="none" stroke="#ef9a9a" stroke-width="2.4"/><ellipse cx="20" cy="22" rx="15" ry="5.4" fill="#fffdf8" stroke="#eadfce" stroke-width="1"/><g fill="#e0524f"><path d="M8.8 21 c0 -4.4 5.6 -4.4 5.6 0 c0 2.6 -5.6 2.6 -5.6 0Z"/><path d="M25.6 21 c0 -4.4 5.6 -4.4 5.6 0 c0 2.6 -5.6 2.6 -5.6 0Z"/></g><rect x="12.8" y="8" width="2.8" height="11" rx="1" fill="#f7c9d4"/><rect x="18.6" y="7" width="2.8" height="12" rx="1" fill="#cfe3f5"/><rect x="24.4" y="8" width="2.8" height="11" rx="1" fill="#f9e5a8"/><path d="M14.2 2.5 C16.3 4.7 16.1 7 14.2 7.4 C12.3 7 12.1 4.7 14.2 2.5Z M20 1.5 C22.1 3.7 21.9 6 20 6.4 C18.1 6 17.9 3.7 20 1.5Z M25.8 2.5 C27.9 4.7 27.7 7 25.8 7.4 C23.9 7 23.7 4.7 25.8 2.5Z" fill="#ffb347"/></symbol>
-<symbol id="i-jdraw" viewBox="0 0 40 40"><rect x="5" y="7" width="30" height="26" rx="2" fill="#fff9ec" stroke="#d9c9a8" stroke-width="1.4"/><path d="M29.5 12.2 m-2.6 0 a2.6 2.6 0 1 0 5.2 0 a2.6 2.6 0 1 0 -5.2 0 M29.5 8.2 v1.6 M29.5 14.6 v1.6 M25.5 12.2 h1.6 M31.9 12.2 h1.6" fill="none" stroke="#f2c14e" stroke-width="1.3" stroke-linecap="round"/><path d="M9.4 18.6 L8.4 13.2 L12.6 15.6Z M17.8 18.6 L18.8 13.2 L14.6 15.6Z" fill="#fffefb" stroke="#bfb3a4" stroke-width="1.1" stroke-linejoin="round"/><circle cx="13.6" cy="21.4" r="5.4" fill="#fffefb" stroke="#bfb3a4" stroke-width="1.2"/><circle cx="11.6" cy="20.6" r=".9" fill="#4a4340"/><circle cx="15.6" cy="20.6" r=".9" fill="#4a4340"/><path d="M12.5 23.3 q1.1 1 2.2 0" fill="none" stroke="#8a6f66" stroke-width=".9" stroke-linecap="round"/><path d="M9.2 26.2 q4.4 2.2 8.8 0" fill="none" stroke="#d94b45" stroke-width="1.6" stroke-linecap="round"/><path d="M26.4 14.8 c3.8 0 6.2 3.6 6.2 7.6 c0 3.9 -2.7 6.1 -6.2 6.1 c-3.5 0 -6.2 -2.2 -6.2 -6.1 c0 -4 2.4 -7.6 6.2 -7.6Z" fill="#fde3cf" stroke="#d8ad95" stroke-width="1.1"/><path d="M20.3 22.6 q6.1 1.6 12.2 0 c0 3.8 -2.7 5.9 -6.1 5.9 c-3.4 0 -6.1 -2.1 -6.1 -5.9Z" fill="#f4a08a"/><path d="M23.4 19.6 h2.2 M27.2 19.6 h2.2" stroke="#2f2622" stroke-width="1.2" stroke-linecap="round"/><path d="M25.5 21.9 h1.8" stroke="#5d4740" stroke-width=".9" stroke-linecap="round"/><path d="M26.4 25.2 l-2.2 -1.3 v2.6Z M26.4 25.2 l2.2 -1.3 v2.6Z" fill="#56719c"/><path d="M20 11.2 c-1 -1.6 -3.2 -.4 -2.2 1.2 l2.2 2.2 l2.2 -2.2 c1 -1.6 -1.2 -2.8 -2.2 -1.2Z" fill="#e8786d"/></symbol><symbol id="i-scarf" viewBox="0 0 40 40"><path d="M6 13 Q20 5 34 13 L34 23 Q20 31 6 23Z" fill="#8fbb8a" stroke="#6f9a6b" stroke-width="1.2" stroke-linejoin="round"/><path d="M9 17.5 Q20 24 31 17.5" stroke="#fff8ec" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M24 25 L29 35 H19 L15 27Z" fill="#8fbb8a" stroke="#6f9a6b" stroke-width="1.2" stroke-linejoin="round"/><path d="M20.5 35 v2.5 M24 35 v2.5 M27.5 35 v2.5" stroke="#e1d5c0" stroke-width="1.2" stroke-linecap="round"/></symbol>
+<symbol id="i-jdraw" viewBox="0 0 40 40"><rect x="5" y="7" width="30" height="26" rx="2" fill="#fff9ec" stroke="#d9c9a8" stroke-width="1.4"/><path d="M29.5 12.2 m-2.6 0 a2.6 2.6 0 1 0 5.2 0 a2.6 2.6 0 1 0 -5.2 0 M29.5 8.2 v1.6 M29.5 14.6 v1.6 M25.5 12.2 h1.6 M31.9 12.2 h1.6" fill="none" stroke="#f2c14e" stroke-width="1.3" stroke-linecap="round"/><path d="M9.4 18.6 L8.4 13.2 L12.6 15.6Z M17.8 18.6 L18.8 13.2 L14.6 15.6Z" fill="#fffefb" stroke="#bfb3a4" stroke-width="1.1" stroke-linejoin="round"/><circle cx="13.6" cy="21.4" r="5.4" fill="#fffefb" stroke="#bfb3a4" stroke-width="1.2"/><circle cx="11.6" cy="20.6" r=".9" fill="#4a4340"/><circle cx="15.6" cy="20.6" r=".9" fill="#4a4340"/><path d="M12.5 23.3 q1.1 1 2.2 0" fill="none" stroke="#8a6f66" stroke-width=".9" stroke-linecap="round"/><path d="M9.2 26.2 q4.4 2.2 8.8 0" fill="none" stroke="#d94b45" stroke-width="1.6" stroke-linecap="round"/><path d="M26.4 14.8 c3.8 0 6.2 3.6 6.2 7.6 c0 3.9 -2.7 6.1 -6.2 6.1 c-3.5 0 -6.2 -2.2 -6.2 -6.1 c0 -4 2.4 -7.6 6.2 -7.6Z" fill="#fde3cf" stroke="#d8ad95" stroke-width="1.1"/><path d="M20.3 22.6 q6.1 1.6 12.2 0 c0 3.8 -2.7 5.9 -6.1 5.9 c-3.4 0 -6.1 -2.1 -6.1 -5.9Z" fill="#f4a08a"/><path d="M23.4 19.6 h2.2 M27.2 19.6 h2.2" stroke="#2f2622" stroke-width="1.2" stroke-linecap="round"/><path d="M25.5 21.9 h1.8" stroke="#5d4740" stroke-width=".9" stroke-linecap="round"/><path d="M20 11.2 c-1 -1.6 -3.2 -.4 -2.2 1.2 l2.2 2.2 l2.2 -2.2 c1 -1.6 -1.2 -2.8 -2.2 -1.2Z" fill="#e8786d"/></symbol><symbol id="i-scarf" viewBox="0 0 40 40"><path d="M6 13 Q20 5 34 13 L34 23 Q20 31 6 23Z" fill="#8fbb8a" stroke="#6f9a6b" stroke-width="1.2" stroke-linejoin="round"/><path d="M9 17.5 Q20 24 31 17.5" stroke="#fff8ec" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M24 25 L29 35 H19 L15 27Z" fill="#8fbb8a" stroke="#6f9a6b" stroke-width="1.2" stroke-linejoin="round"/><path d="M20.5 35 v2.5 M24 35 v2.5 M27.5 35 v2.5" stroke="#e1d5c0" stroke-width="1.2" stroke-linecap="round"/></symbol>
 <symbol id="i-sakura" viewBox="0 0 40 40"><g fill="#f6a9bd"><path d="M20 19.5 C12.5 15 13 6 20 2.5 C27 6 27.5 15 20 19.5Z" transform="rotate(0 20 20)"/><path d="M20 19.5 C12.5 15 13 6 20 2.5 C27 6 27.5 15 20 19.5Z" transform="rotate(72 20 20)"/><path d="M20 19.5 C12.5 15 13 6 20 2.5 C27 6 27.5 15 20 19.5Z" transform="rotate(144 20 20)"/><path d="M20 19.5 C12.5 15 13 6 20 2.5 C27 6 27.5 15 20 19.5Z" transform="rotate(216 20 20)"/><path d="M20 19.5 C12.5 15 13 6 20 2.5 C27 6 27.5 15 20 19.5Z" transform="rotate(288 20 20)"/></g><circle cx="20" cy="20" r="3.4" fill="#e8798f"/><g fill="#f6d365"><circle cx="20" cy="17.6" r="1"/><circle cx="22.2" cy="20.8" r="1"/><circle cx="17.8" cy="20.8" r="1"/></g></symbol>
   <symbol id="i-himawari" viewBox="0 0 40 40"><g fill="#f4b942"><ellipse cx="20" cy="7" rx="3.3" ry="6.6" transform="rotate(0 20 20)"/><ellipse cx="20" cy="7" rx="3.3" ry="6.6" transform="rotate(30 20 20)"/><ellipse cx="20" cy="7" rx="3.3" ry="6.6" transform="rotate(60 20 20)"/><ellipse cx="20" cy="7" rx="3.3" ry="6.6" transform="rotate(90 20 20)"/><ellipse cx="20" cy="7" rx="3.3" ry="6.6" transform="rotate(120 20 20)"/><ellipse cx="20" cy="7" rx="3.3" ry="6.6" transform="rotate(150 20 20)"/><ellipse cx="20" cy="7" rx="3.3" ry="6.6" transform="rotate(180 20 20)"/><ellipse cx="20" cy="7" rx="3.3" ry="6.6" transform="rotate(210 20 20)"/><ellipse cx="20" cy="7" rx="3.3" ry="6.6" transform="rotate(240 20 20)"/><ellipse cx="20" cy="7" rx="3.3" ry="6.6" transform="rotate(270 20 20)"/><ellipse cx="20" cy="7" rx="3.3" ry="6.6" transform="rotate(300 20 20)"/><ellipse cx="20" cy="7" rx="3.3" ry="6.6" transform="rotate(330 20 20)"/></g><circle cx="20" cy="20" r="8.2" fill="#8a5a2b"/><circle cx="20" cy="20" r="5" fill="#6e4520"/></symbol>
   <symbol id="i-momiji" viewBox="0 0 40 40"><path d="M20 2 L23 12 L31 7 L28 17 L38 19 L29 24.5 L33 34 L22.5 29 L20 38 L17.5 29 L7 34 L11 24.5 L2 19 L12 17 L9 7 L17 12Z" fill="#d9573a"/><path d="M20 12 V34 M20 22 L12 17 M20 22 L28 17 M20 27 L12.5 30 M20 27 L27.5 30" stroke="#b8402a" stroke-width="1.4" fill="none" stroke-linecap="round"/></symbol>
@@ -1096,7 +1105,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
   <g class="m-happy"><g transform="translate(36 46) rotate(-7)"><path d="M-9.5 3 Q0 -7.5 9.5 3" fill="none" stroke="#2f2622" stroke-width="3.1" stroke-linecap="round"/></g><g transform="translate(84 46) rotate(7)"><path d="M-9.5 3 Q0 -7.5 9.5 3" fill="none" stroke="#2f2622" stroke-width="3.1" stroke-linecap="round"/></g><path d="M53 56.5 Q60 63.9 67 56.5" fill="none" stroke="#5d4740" stroke-width="2.4" stroke-linecap="round"/></g>
   <g class="m-bow"><g transform="translate(36 46) rotate(-7)"><path d="M-9.5 -1 Q0 6 9.5 -1" fill="none" stroke="#2f2622" stroke-width="3.1" stroke-linecap="round"/></g><g transform="translate(84 46) rotate(7)"><path d="M-9.5 -1 Q0 6 9.5 -1" fill="none" stroke="#2f2622" stroke-width="3.1" stroke-linecap="round"/></g><path d="M55.5 58.9 H64.5" fill="none" stroke="#5d4740" stroke-width="2.4" stroke-linecap="round"/></g>
   <g class="m-wow"><g transform="translate(36 45.5)"><circle r="8" fill="#ffffff" stroke="#2f2622" stroke-width="2"/><circle cx="0" cy=".4" r="4.3" fill="#2f2622"/><circle cx="1.7" cy="-1.2" r="1.5" fill="#ffffff"/></g><g transform="translate(84 45.5)"><circle r="8" fill="#ffffff" stroke="#2f2622" stroke-width="2"/><circle cx="0" cy=".4" r="4.3" fill="#2f2622"/><circle cx="1.7" cy="-1.2" r="1.5" fill="#ffffff"/></g><ellipse cx="60" cy="57" rx="2.5" ry="3" fill="#5d4740"/></g>
-  <path d="M60 84 L46 76.6 Q43.4 84 46 91.4Z" fill="#56719c"/><path d="M60 84 L74 76.6 Q76.6 84 74 91.4Z" fill="#56719c"/><rect x="56" y="79.4" width="8" height="9.2" rx="2.7" fill="#7490bd"/><path d="M48.4 80.2 Q47.4 84 48.4 87.8" fill="none" stroke="#a9bfdf" stroke-width="1.4" stroke-linecap="round"/>
+  <!-- v1.51.0：ちょうネクタイは やめた（依頼者の指定） -->
 </svg></div>
 </template>
 
@@ -1160,8 +1169,8 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
 </template>
 <div class="game" id="game">
   <div class="head">
-    <h1>えりとしゃだはるの ちいさな畑</h1>
-    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.50.0</span></span>
+    <h1>えりとしゃだはるの ちいさな畑<span class="en" id="titleEn">— Days on a Tiny Garden —</span></h1>
+    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.51.2</span></span>
   </div>
 
   <div class="hud">
@@ -1384,7 +1393,7 @@ h1{font-size:clamp(17px,4.4vw,24px);margin:0;line-height:1.3}
           <!-- しゃだはる君のかいた絵（v1.16.0：畑の絵のとなり → v1.47.0：台所の上の棚、写真立てと同じ場所。棚は1つずつなので、季節ごとに写真立てと入れかわる） -->
           <g id="g-pawart" style="display:none" transform="translate(11 41)"><rect x="95" y="43.5" width="32" height="27.5" rx="2.5" fill="#fffdf8" stroke="#c48f52" stroke-width="3"/><svg x="92" y="38" width="38" height="38" viewBox="0 0 40 40"><rect x="5" y="7" width="30" height="26" rx="2" fill="#fff9ec" stroke="#d9c9a8" stroke-width="1.4"/><circle cx="13" cy="19" r="4.4" fill="#4a4340"/><circle cx="21" cy="18" r="4.6" fill="#5b5048"/><circle cx="29.5" cy="21" r="3.6" fill="#fffefb" stroke="#d3cabd" stroke-width="1"/><g fill="#e8786d"><circle cx="11" cy="28.5" r="1.5"/><circle cx="8.4" cy="26" r=".8"/><circle cx="11" cy="25.2" r=".8"/><circle cx="13.6" cy="26" r=".8"/></g><g fill="#7fb069"><circle cx="27" cy="28.5" r="1.5"/><circle cx="24.4" cy="26" r=".8"/><circle cx="27" cy="25.2" r=".8"/><circle cx="29.6" cy="26" r=".8"/></g><path d="M8 11 q4 -3 8 0 q4 3 8 0 q4 -3 8 0" fill="none" stroke="#f2c14e" stroke-width="1.6" stroke-linecap="round"/></svg></g>
           <!-- じゃすたくんのかいた絵（v1.31.1。2回めの誕生日のプレゼント。窓の下のかべ） -->
-          <g id="g-jdraw" style="display:none" transform="translate(54 0)"><rect x="242" y="170" width="32" height="27.5" rx="2.5" fill="#fffdf8" stroke="#c48f52" stroke-width="3"/><svg x="239" y="164.5" width="38" height="38" viewBox="0 0 40 40"><rect x="5" y="7" width="30" height="26" rx="2" fill="#fff9ec" stroke="#d9c9a8" stroke-width="1.4"/><path d="M29.5 12.2 m-2.6 0 a2.6 2.6 0 1 0 5.2 0 a2.6 2.6 0 1 0 -5.2 0 M29.5 8.2 v1.6 M29.5 14.6 v1.6 M25.5 12.2 h1.6 M31.9 12.2 h1.6" fill="none" stroke="#f2c14e" stroke-width="1.3" stroke-linecap="round"/><path d="M9.4 18.6 L8.4 13.2 L12.6 15.6Z M17.8 18.6 L18.8 13.2 L14.6 15.6Z" fill="#fffefb" stroke="#bfb3a4" stroke-width="1.1" stroke-linejoin="round"/><circle cx="13.6" cy="21.4" r="5.4" fill="#fffefb" stroke="#bfb3a4" stroke-width="1.2"/><circle cx="11.6" cy="20.6" r=".9" fill="#4a4340"/><circle cx="15.6" cy="20.6" r=".9" fill="#4a4340"/><path d="M12.5 23.3 q1.1 1 2.2 0" fill="none" stroke="#8a6f66" stroke-width=".9" stroke-linecap="round"/><path d="M9.2 26.2 q4.4 2.2 8.8 0" fill="none" stroke="#d94b45" stroke-width="1.6" stroke-linecap="round"/><path d="M26.4 14.8 c3.8 0 6.2 3.6 6.2 7.6 c0 3.9 -2.7 6.1 -6.2 6.1 c-3.5 0 -6.2 -2.2 -6.2 -6.1 c0 -4 2.4 -7.6 6.2 -7.6Z" fill="#fde3cf" stroke="#d8ad95" stroke-width="1.1"/><path d="M20.3 22.6 q6.1 1.6 12.2 0 c0 3.8 -2.7 5.9 -6.1 5.9 c-3.4 0 -6.1 -2.1 -6.1 -5.9Z" fill="#f4a08a"/><path d="M23.4 19.6 h2.2 M27.2 19.6 h2.2" stroke="#2f2622" stroke-width="1.2" stroke-linecap="round"/><path d="M25.5 21.9 h1.8" stroke="#5d4740" stroke-width=".9" stroke-linecap="round"/><path d="M26.4 25.2 l-2.2 -1.3 v2.6Z M26.4 25.2 l2.2 -1.3 v2.6Z" fill="#56719c"/><path d="M20 11.2 c-1 -1.6 -3.2 -.4 -2.2 1.2 l2.2 2.2 l2.2 -2.2 c1 -1.6 -1.2 -2.8 -2.2 -1.2Z" fill="#e8786d"/></svg></g>
+          <g id="g-jdraw" style="display:none" transform="translate(54 0)"><rect x="242" y="170" width="32" height="27.5" rx="2.5" fill="#fffdf8" stroke="#c48f52" stroke-width="3"/><svg x="239" y="164.5" width="38" height="38" viewBox="0 0 40 40"><rect x="5" y="7" width="30" height="26" rx="2" fill="#fff9ec" stroke="#d9c9a8" stroke-width="1.4"/><path d="M29.5 12.2 m-2.6 0 a2.6 2.6 0 1 0 5.2 0 a2.6 2.6 0 1 0 -5.2 0 M29.5 8.2 v1.6 M29.5 14.6 v1.6 M25.5 12.2 h1.6 M31.9 12.2 h1.6" fill="none" stroke="#f2c14e" stroke-width="1.3" stroke-linecap="round"/><path d="M9.4 18.6 L8.4 13.2 L12.6 15.6Z M17.8 18.6 L18.8 13.2 L14.6 15.6Z" fill="#fffefb" stroke="#bfb3a4" stroke-width="1.1" stroke-linejoin="round"/><circle cx="13.6" cy="21.4" r="5.4" fill="#fffefb" stroke="#bfb3a4" stroke-width="1.2"/><circle cx="11.6" cy="20.6" r=".9" fill="#4a4340"/><circle cx="15.6" cy="20.6" r=".9" fill="#4a4340"/><path d="M12.5 23.3 q1.1 1 2.2 0" fill="none" stroke="#8a6f66" stroke-width=".9" stroke-linecap="round"/><path d="M9.2 26.2 q4.4 2.2 8.8 0" fill="none" stroke="#d94b45" stroke-width="1.6" stroke-linecap="round"/><path d="M26.4 14.8 c3.8 0 6.2 3.6 6.2 7.6 c0 3.9 -2.7 6.1 -6.2 6.1 c-3.5 0 -6.2 -2.2 -6.2 -6.1 c0 -4 2.4 -7.6 6.2 -7.6Z" fill="#fde3cf" stroke="#d8ad95" stroke-width="1.1"/><path d="M20.3 22.6 q6.1 1.6 12.2 0 c0 3.8 -2.7 5.9 -6.1 5.9 c-3.4 0 -6.1 -2.1 -6.1 -5.9Z" fill="#f4a08a"/><path d="M23.4 19.6 h2.2 M27.2 19.6 h2.2" stroke="#2f2622" stroke-width="1.2" stroke-linecap="round"/><path d="M25.5 21.9 h1.8" stroke="#5d4740" stroke-width=".9" stroke-linecap="round"/><path d="M20 11.2 c-1 -1.6 -3.2 -.4 -2.2 1.2 l2.2 2.2 l2.2 -2.2 c1 -1.6 -1.2 -2.8 -2.2 -1.2Z" fill="#e8786d"/></svg></g>
           <g id="g-picture" style="display:none">
             <rect x="24" y="36" width="64" height="48" rx="3" fill="#fffdf8" stroke="#8f6a44" stroke-width="3"/>
             <rect x="29" y="41" width="54" height="16" fill="#cfe8f5"/><path d="M29 57 L44 46 L58 55 L70 44 L83 57Z" fill="#97b8a5"/>
@@ -3582,9 +3591,12 @@ const GYOJI_SCENE={
     homeSkip=false; setupRoom();
     const E=HA.eri, D=HA.shada, H=HA.homare;
     place(E,HSPOT.tableEri.x,HSPOT.tableEri.y,0); place(H,HSPOT.tableHomare.x,HSPOT.tableHomare.y,0); place(D,HSPOT.tableShada.x,HSPOT.tableShada.y,0);
+    /* v1.51.0：見るだけの画面では、2年目は柱のマフラー、3年目はかべの絵を出しておく（じゃすたくんが気づくセリフのため）。終わったら もとどおり */
+    const pt=(((pat||1)-1)%3)+1, gs=document.getElementById('g-scarf'), gj=document.getElementById('g-jdraw');
+    if(preview){ if(gs && pt>=2) gs.style.display=''; if(gj && pt>=3){ gj.style.display=''; gj.classList.remove('popIn'); } }
     home.classList.add('on'); void home.offsetWidth; home.classList.add('show');
     await sleep(700);
-    try{ await birthdayNight(E,D,H,preview,pat); } finally { await sleep(600); home.classList.remove('show'); await sleep(600); home.classList.remove('on','dark'); bdayCleanup(); }
+    try{ await birthdayNight(E,D,H,preview,pat); } finally { await sleep(600); home.classList.remove('show'); await sleep(600); home.classList.remove('on','dark'); bdayCleanup(); if(gs) gs.style.display=S.scarf?'':'none'; if(gj){ gj.style.display=S.jdraw?'':'none'; gj.classList.remove('popIn'); } }
   },
   /* 春：お花見。ほまれくんが お弁当を持って出てくる → ござで3人 → ほまれくんは おうちへ。時間は進めない（おじさんと同じ）
      v1.37.0：3年で3つのパターン（pat＝1・2・3。gyojiPat）。場所・小道具・流れは同じで、セリフと小さな動き（2年目＝花びらを追いかける、3年目＝花びらが3枚ふってきて3人で見上げる）が変わる。セリフは依頼者が了解ずみ */
@@ -4207,64 +4219,139 @@ function bdNote(x,y,flip){
   n.innerHTML='<svg viewBox="0 0 12 16"><g'+(flip?' transform="translate(12 0) scale(-1 1)"':'')+'><ellipse cx="3.2" cy="13" rx="3.2" ry="2.3" transform="rotate(-22 3.2 13)" fill="#7a6858"/><path d="M6 12.6 V1.2" stroke="#7a6858" stroke-width="1.5" stroke-linecap="round"/><path d="M6 1.2 Q10.2 2.6 10 7" fill="none" stroke="#7a6858" stroke-width="1.5" stroke-linecap="round"/></g></svg>';
   homeStage.appendChild(n); setTimeout(()=>n.remove(),2300);
 }
+/* 玄関のチャイムの絵（v1.51.0）：左上のかべに ベルと音の線（1.7秒）。文字は出さない（依頼者の希望：音を切っている端末でも 来たと分かるように） */
+function ringBell(){
+  if(homeSkip) return;
+  const d=document.createElement('div'); d.className='hBell';
+  d.innerHTML='<svg viewBox="0 0 40 40" aria-hidden="true">'
+    +'<path class="w1" d="M27.5 12.5 Q33.5 20 27.5 27.5" fill="none" stroke="#c9a35a" stroke-width="2.2" stroke-linecap="round"/>'
+    +'<path class="w2" d="M32.5 8.5 Q41.5 20 32.5 31.5" fill="none" stroke="#c9a35a" stroke-width="2.2" stroke-linecap="round"/>'
+    +'<path d="M16 8.5 C10.4 8.5 7.6 13.2 7.6 18.6 V25.2 Q7.6 27.4 5.2 29 H26.8 Q24.4 27.4 24.4 25.2 V18.6 C24.4 13.2 21.6 8.5 16 8.5Z" fill="#f2c96b" stroke="#b98a3a" stroke-width="1.6" stroke-linejoin="round"/>'
+    +'<path d="M12.2 13.5 C11 15 10.6 16.6 10.6 18.6" fill="none" stroke="#fff3c4" stroke-width="1.6" stroke-linecap="round"/>'
+    +'<circle cx="16" cy="7" r="2.1" fill="#b98a3a"/><circle cx="16" cy="31.6" r="2.7" fill="#b98a3a"/>'
+    +'</svg>';
+  homeStage.appendChild(d); setTimeout(()=>d.remove(),1700);
+}
 function bdayCleanup(){
   try{
-    homeStage.querySelectorAll('.hCandle,.hGlow2,.bdNote').forEach(e=>e.remove());
+    homeStage.querySelectorAll('.hCandle,.hGlow2,.bdNote,.hBell').forEach(e=>e.remove());
     if(JA){ JA.el.classList.remove('on','snowy','bow','armsUp','holding','offer','offerR','wobble','walking'); JA.el.dataset.mood='normal'; clearTimeout(JA.bubT); JA.bub.classList.remove('on'); }
-    [HA.eri,HA.shada,HA.homare].forEach(a=>a.el.classList.remove('lookupR','lookupL','jumping','wag'));
+    [HA.eri,HA.shada,HA.homare].forEach(a=>a.el.classList.remove('lookupR','lookupL','jumping','wag','spin2'));
   }catch(e){}
 }
+/* v1.51.0：作りなおし（依頼者の希望）。流れは3年とも同じ：
+   ① 席をつめる（左から じゃすた・しゃだはる・えり・ほまれ）→ ② チャイム（音＋ベルの絵）→ えりちゃんとしゃだはる君が玄関（左はし）へ出迎え
+   → ③ じゃすたくんが左の外から ゆっくり歩いて入る（3秒。おじさんと同じ速さ）→ あいさつ → ④ みんなで台へ（雪の夜は ほまれくんが雪をはらう）
+   → ⑤ ケーキ → ⑥ 歌 → ⑦ ふーっ → おめでとう → しゃだはる「みんな、ありがとばう！」→ ⑧ ケーキを切る → 通訳のオチ → 食べる
+   → ⑨ プレゼント（となりで手から手へ。マフラーは受けとってから くるっと回って巻く。絵はかべへ、石はたなへ）→ ⑩ 帰り（ふたりで玄関まで見送り → ゆっくり歩いて帰る）→ ⑪ 記録
+   セリフは pt（1年目・2年目・3年目の形。4年目からは順にくり返す）で変わる。プレゼントは nth（1回め マフラー・2回め 絵・3回め以降 石）。セリフは依頼者が了解ずみ */
 async function birthdayNight(E,D,H,preview,pat){
   const G=GYOJI.bday, JA=getJasta();
   const nth=pat||((S.gyojiN&&S.gyojiN.bday)||0)+1, gift=nth===1?'scarf':nth===2?'jdraw':'stone';   /* 何回めの誕生日か（v1.31.1）。pat＝見るだけの画面から 番号で（v1.37.0） */
+  const pt=((nth-1)%3)+1;   /* セリフの形（v1.51.0） */
+  const hasScarf=!!S.scarf || (preview && pt>=2), hasJdraw=!!S.jdraw || (preview && pt>=3);   /* 2年目：柱のマフラー、3年目：かべの絵に気づく（あるときだけ） */
   const w=ms=>homeSkip?Promise.resolve():sleep(ms);   /* セリフを読む時間は「動きを減らす」でも ちぢめない。「とばす」は早送り */
   /* じゃすたくんは HA に入っていないので、ほかの人が話すとき 先に吹き出しをしまう（重ならないように） */
   const say=(a,t,o)=>{ if(!(o&&o.keep)) hhush(); if(a!==JA) hbubOff(JA); hsay(a,t,o); };   /* 吹き出しは 1つずつ（お花見と同じ）。ふふふ／ははは だけ 重ねる */
   const bow=async a=>{ a.el.classList.add('bow'); hmood(a,'bow',1000); await w(750); a.el.classList.remove('bow'); await w(350); };
-  const seat={E:{x:220,y:282},H:{x:267,y:277},D:{x:314,y:288},J:{x:172,y:291},Jout:{x:-40,y:300}};   /* v1.37.0：じゃすたくんは 左の外（Jout）から入って、台の左はし（J）へ。3人は少し右へつめる（前は 右はし x336・右の外 x404） */
+  const wag=async ms=>{ D.el.classList.add('wag'); await w(ms); D.el.classList.remove('wag'); };
+  /* 席（v1.51.0）：じゃすたくんは台の左はし、しゃだはる君はそのとなり。door＝左の外、inDoor＝玄関（部屋の左はし）、greetE/greetD＝出迎え・見送りの場所 */
+  const seat={J:{x:172,y:291},D:{x:216,y:290},E:{x:262,y:281},H:{x:308,y:277},door:{x:-46,y:302},inDoor:{x:52,y:304},greetE:{x:148,y:296},greetD:{x:100,y:318}};
   const snowy=!!(S.raining && season()===3);
-  let cand=null, glow=null, tick=null;
+  let cand=null, glow=null, tick=null, held=null;
   try{
-    /* ① 席をつめて、カード → チャイム */
+    /* ① 席をつめる */
     hhush();
-    await hmove(D,seat.D); await hmove(H,seat.H); await hmove(E,seat.E);
-    if(!homeSkip) await w(600);   /* v1.35.3：カードは出さない（さりげなく始める） */
-    Snd.play('chime');
-    [E,D,H].forEach(a=>a.el.classList.add('lookupL'));   /* 左を見る（v1.37.0） */
-    await w(1000);
-    say(D,'だれか、きたばう！',{mood:'happy'});
-    await w(1900);
+    await hmove(H,seat.H); await hmove(E,seat.E); await hmove(D,seat.D);
+    if(!homeSkip) await w(500);
+    /* チャイムの前（2年目：くるかな／3年目：しゃだはる君は玄関で待っている） */
+    if(pt===2){
+      say(D,'じゃすたくん、くるかなばう。'); await w(2300);
+      say(E,'きっと来るよ。',{mood:'smile'}); await w(1900);
+    } else if(pt===3){
+      hhush(); await hmove(D,seat.greetD); await w(400);
+      say(E,'しゃだはる、そこにいると さむいよ。',{mood:'smile'}); await w(2500);
+      say(D,'じゃすたくん、まつばう。',{mood:'happy'}); await w(2100);
+    }
+    /* ② チャイム → 3人が左を見る → 出迎え（えりちゃんとしゃだはる君が玄関へ。ほまれくんは台のそば） */
+    hhush(); Snd.play('chime'); ringBell();
+    [E,D,H].forEach(a=>a.el.classList.add('lookupL'));
+    await w(1100);
     [E,D,H].forEach(a=>a.el.classList.remove('lookupL'));
-    /* ② じゃすたくんが 入ってくる（雪の夜は 頭に雪） */
+    if(pt===1){
+      say(E,'はーい。',{mood:'smile'}); await w(1000);
+      hhush();
+      const eGo=hmove(E,seat.greetE); await w(300); await Promise.all([eGo,hmove(D,seat.greetD)]);
+    } else if(pt===2){
+      say(D,'きたばう！',{mood:'happy'}); await w(700);
+      const dGo=hmove(D,seat.greetD,{ms:900}); await w(500);
+      say(E,'ふふ、まってたもんね。',{mood:'smile'}); await w(1600); hhush();
+      await Promise.all([dGo,hmove(E,seat.greetE)]);
+    } else {
+      say(D,'きたばう！きたばう！',{mood:'happy'}); D.el.classList.add('jumping'); await w(1300); D.el.classList.remove('jumping'); hhush();
+      await hmove(E,seat.greetE);
+    }
+    await w(300);
+    /* ③ じゃすたくんが 左の外から ゆっくり歩いて入ってくる（雪の夜は 頭に雪） */
     JA.el.classList.toggle('snowy',snowy); JA.el.dataset.mood='normal';
-    place(JA,seat.Jout.x,seat.Jout.y,0); JA.el.classList.add('on');
-    await hmove(JA,seat.J); await w(300);
+    place(JA,seat.door.x,seat.door.y,0); JA.el.classList.add('on');
+    await hmove(JA,seat.inDoor,{ms:3000}); await w(350);
     await bow(JA);
-    say(JA,'……こんばんは。おじゃまします。');
-    await w(2700);
-    say(E,'じゃすたくん、いらっしゃい。',{mood:'smile'});
-    await w(2100);
-    say(H,'さあ、あがって。さむかったでしょ。');
-    await w(2300);
+    if(pt===1){
+      say(JA,'……こんばんは。おじゃまします。',{fit:true}); await w(2700);
+      say(E,'じゃすたくん、いらっしゃい。',{mood:'smile'}); await w(2100);
+      say(D,'じゃすたくん！きてくれたばう！',{mood:'happy'}); await w(2300);
+      say(JA,'……。',{fit:true}); await bow(JA); await w(1000);
+      say(D,'『おめでとう』って、いってるばう！',{mood:'happy'}); await w(2500);
+      say(E,'ふふ。しゃだはるには、わかるんだね。',{mood:'smile'}); await w(2500);
+      say(H,'さあ、あがって。さむかったでしょ。'); await w(2300);
+    } else if(pt===2){
+      say(JA,'……こんばんは。ことしも、きました。',{fit:true}); await w(2800);
+      say(D,'じゃすたくん、まってたばう！',{mood:'happy'}); await w(2200);
+      say(E,'いらっしゃい、じゃすたくん。',{mood:'smile'}); await w(2100);
+      say(JA,'……おたんじょうび、おめでとうございます。',{fit:true}); hmood(JA,'smile',2600); await w(3000);
+      say(D,'じゃすたくんが、いったばう！',{mood:'happy'}); await w(2200);
+      say(E,'ふふ、聞こえたよ。',{mood:'smile'}); await w(1900);
+      say(H,'さあ、あがって。今日は冷えるね。'); await w(2300);
+    } else {
+      say(JA,'……こんばんは。',{fit:true}); await w(1900);
+      say(D,'じゃすたくん、まってたばう！',{mood:'happy'}); await w(2200);
+      say(JA,'……おまたせしました。',{fit:true}); await w(2200);
+      say(E,'いらっしゃい。さあ、あがって。',{mood:'smile'}); await w(2300);
+      say(H,'じゃすたくんが来ると、しゃだはるは、朝からそわそわだよ。'); await w(3200);
+      say(JA,'……。',{fit:true}); await bow(JA); await w(1000);
+      say(D,'『ぼくもです』って、いってるばう！',{mood:'happy'}); await w(2500);
+      say(E,'ふふ。',{mood:'smile'}); await w(1300);
+    }
+    /* ④ みんなで台へ（しゃだはる君が先に、じゃすたくんはゆっくり、えりちゃんはあとから） */
+    hhush();
+    const dGo2=hmove(D,seat.D); await w(300);
+    const jGo=hmove(JA,seat.J,{ms:1800}); await w(350);
+    await Promise.all([dGo2,jGo,hmove(E,seat.E)]);
+    await w(300);
     if(snowy){
-      await hmove(H,{x:198,y:262});   /* じゃすたくんの右うしろ（v1.37.0。前は左うしろ x312） */
+      await hmove(H,{x:146,y:260});   /* じゃすたくんの左うしろ（v1.51.0：右うしろだと しゃだはる君のかげになる） */
       H.el.classList.add('working'); await w(500); JA.el.classList.remove('snowy'); hfx('i-snow',{x:JA.x+6,y:JA.y-4});
       await w(700); H.el.classList.remove('working');
       say(JA,'……ありがとうございます。'); await w(2200);
       await hmove(H,seat.H);
     }
-    /* ③ しゃだはる君の通訳 */
-    say(D,'じゃすたくん、きてくれたばう！',{mood:'happy'});
-    await w(2100);
-    say(JA,'……。'); await bow(JA); await w(1200);
-    say(D,'『おめでとう』って、いってるばう！',{mood:'happy'});
-    await w(2500);
-    say(E,'ふふ。しゃだはるには、わかるんだね。',{mood:'smile'});
-    await w(2500);
-    /* ④ ケーキ → 電気を消す */
+    /* 2年目：柱のマフラーに気づく／3年目：かべの絵に気づく */
+    if(pt===2 && hasScarf){
+      say(JA,'……マフラー。'); await w(1900);
+      say(D,'じゃすたくんのマフラー、たいせつにしてるばう！',{mood:'happy'}); await w(2900);
+      say(JA,'……うれしいです。'); hmood(JA,'smile',2200); await w(2300);
+    } else if(pt===3 && hasJdraw){
+      say(JA,'……絵。'); await w(1700);
+      say(D,'じゃすたくんの絵、まいにち見てるばう！',{mood:'happy'}); await w(2700);
+      say(H,'ちゃんと、かざってあるよ。',{mood:'happy'}); await w(2200);
+      say(JA,'……はずかしいです。'); hmood(JA,'smile',2200); await w(2300);
+      say(E,'ふふ、じょうずだもん。',{mood:'smile'}); await w(2100);
+    }
+    /* ⑤ ケーキ → 電気を消す */
     say(E,'じゃあ、ケーキを出すね。',{mood:'smile'});
     await w(1300);
-    await hmove(E,HSPOT.handH); await w(300);   /* v1.37.0：ケーキは 台所と冷蔵庫のあいだ（handH）から。counterEnd だと じゃすたくんの上を通る */
+    await hmove(E,HSPOT.handH); await w(300);   /* v1.37.0：ケーキは 台所と冷蔵庫のあいだ（handH）から */
     const dishEl=$('#hDish'); dishEl.className='hDish'; dishEl.innerHTML=bcakeSVG(3); void dishEl.offsetWidth; dishEl.classList.add('on');
     cand=document.createElement('div'); cand.className='hCandle'; cand.innerHTML=candleFlamesSVG(); homeStage.appendChild(cand);
     glow=document.createElement('div'); glow.className='hGlow2'; homeStage.appendChild(glow);
@@ -4274,7 +4361,7 @@ async function birthdayNight(E,D,H,preview,pat){
     await w(1600);
     hhush(); Snd.play('lamp'); home.classList.add('dark'); glow.classList.add('on');
     await w(1300);
-    /* ⑤ 歌（3人）。吹き出しは出さず、曲と音符。じゃすたくんは ゆらゆら */
+    /* ⑥ 歌（3人）。吹き出しは出さず、曲と音符。じゃすたくんは ゆらゆら */
     if(!homeSkip){
       Snd.hush(11500); Snd.play('bday');
       [E,H,D].forEach(a=>hmood(a,'happy'));
@@ -4284,7 +4371,7 @@ async function birthdayNight(E,D,H,preview,pat){
       clearInterval(tick); tick=null; JA.el.classList.remove('wobble');
       [E,H,D].forEach(a=>hmood(a,'normal'));
     }
-    /* ⑥ ふーっ → 電気がつく → おめでとう */
+    /* ⑦ ふーっ → 電気がつく → おめでとう → ありがとう */
     say(H,'しゃだはる、ふーってして。');
     await w(2100);
     say(D,'ふーばう！',{mood:'happy'}); D.el.classList.add('jumping'); Snd.play('blow');
@@ -4300,77 +4387,97 @@ async function birthdayNight(E,D,H,preview,pat){
     await w(1700);
     say(JA,'……おめでとう、ございます。'); hmood(JA,'smile',2600);
     await w(2600);
-    /* ⑦ ケーキを切る → 通訳のオチ → 食べる */
+    say(D,'みんな、ありがとばう！',{mood:'happy'}); await wag(2400);   /* v1.51.0（依頼者の希望） */
+    /* ⑧ ケーキを切る → 通訳のオチ（年ごと）→ 食べる */
     dishEl.innerHTML=bcakeSVG(0);
     say(E,'はい、しゃだはるのぶん。',{mood:'smile'});
     await w(2100);
-    say(D,'『大きいほうは しゃだはるに』って、いってるばう。',{mood:'happy'});
-    await w(3000);
-    say(JA,'……いってません。');
-    await w(2100);
-    say(E,'ふふふ。',{mood:'smile',keep:true}); say(H,'ははは。',{mood:'happy',keep:true});
-    await w(2100);
+    if(pt===1){
+      say(D,'『大きいほうは、しゃだはるに』って、いってるばう。',{mood:'happy'}); await w(3000);   /* v1.51.0：空白 → 読点（吹き出しの中で「しゃだはる」が折れていた） */
+      say(JA,'……いってません。'); await w(2100);
+      say(E,'ふふふ。',{mood:'smile',keep:true}); say(H,'ははは。',{mood:'happy',keep:true}); await w(2100);
+    } else if(pt===2){
+      say(D,'『ことしも、大きいほうは、しゃだはるに』って、いってるばう。',{mood:'happy'}); await w(3300);
+      say(JA,'……いってません。'); await w(2100);
+      say(H,'ははは。ことしも言われたね。',{mood:'happy',keep:true}); say(E,'ふふふ。',{mood:'smile',keep:true}); await w(2500);
+    } else {
+      say(D,'『大きいほうは、しゃだはるに』って、いってるばう。',{mood:'happy'}); await w(3000);
+      say(JA,'……ことしは、いいです。'); await w(2200);
+      say(D,'えっ、いいのばう？'); await w(1900);
+      say(JA,'……たんじょうびですから。'); hmood(JA,'smile',2200); await w(2500);
+      say(E,'ふふふ。',{mood:'smile',keep:true}); say(H,'ははは。',{mood:'happy',keep:true}); await w(2100);
+    }
     hmood(D,'happy',2000); say(D,'おいしいばう！',{mood:'happy'});
     await w(1900);
     say(JA,'……おいしいです。'); hmood(JA,'smile',2200);
     await w(2300);
-    /* ⑧ プレゼント（v1.31.1）：何回めの誕生日かで変わる。同じものは2度もらわない。1回め＝手あみのマフラー／2回め＝じゃすたくんのかいた絵／3回め以降＝きれいな石 */
-    hhold(JA,[gift==='scarf'?'i-scarf':gift==='jdraw'?'i-jdraw':'i-stone']); await w(700);
-    say(JA,'……これ。'); JA.el.classList.add('offer','offerR');   /* 右（しゃだはる君のほう）へ さし出す（v1.37.0） */
-    await w(1900);
+    /* ⑨ プレゼント：じゃすたくんが さし出す → となりの しゃだはる君が受けとる（手から手へ）。1回め＝手あみのマフラー／2回め＝じゃすたくんのかいた絵／3回め以降＝きれいな石 */
+    const gid=gift==='scarf'?'i-scarf':gift==='jdraw'?'i-jdraw':'i-stone';
+    const paw={x:D.x-2,y:D.y+14};   /* しゃだはる君の手もと */
+    hhold(JA,[gid]); await w(700);
+    say(JA,'……これ。'); JA.el.classList.add('offer','offerR','armsUp');   /* 両手で 頭の上にかかげる（となりの しゃだはる君の顔にかくれないように） */
+    await w(1500);
+    hhold(JA,null); JA.el.classList.remove('offerR','armsUp'); held=await hpass(gid,{x:JA.x+16,y:JA.y-18},paw);   /* 受けとる（v1.51.0）：かかげた手もとから しゃだはる君の手もとへ */
+    hmood(D,'happy',2000); await w(500);
     if(gift==='scarf'){
-      say(D,'マフラーばう！',{mood:'happy'}); hhold(JA,null); D.el.classList.add('scarf'); hfx('i-heart',{x:D.x,y:D.y-30});
-      await w(2100);
-      say(E,'もしかして、じゃすたくんがあんだの？',{mood:'smile'});
-      await w(2600);
-      say(JA,'……はい。'); hmood(JA,'smile',2000);
-      await w(1900);
-      say(H,'すごいなあ。',{mood:'happy'});
-      await w(1900);
-      say(D,'あったかいばう！ありがとばう！',{mood:'happy'}); D.el.classList.add('wag');
-      await w(2700); D.el.classList.remove('wag');
+      say(D,'マフラーばう！',{mood:'happy'}); await w(1900);
+      /* 受けとってから、くるっと回って 首に巻く（依頼者の指定：ア） */
+      hhush(); if(held){ held.remove(); held=null; }
+      if(!reduceMotion && !homeSkip){ D.el.classList.add('spin2'); await w(520); }
+      D.el.classList.add('scarf'); hfx('i-heart',{x:D.x,y:D.y-30});
+      await w(620); D.el.classList.remove('spin2');
+      say(D,'あったかいばう！',{mood:'happy'}); await w(2000);
+      say(E,'もしかして、じゃすたくんがあんだの？',{mood:'smile'}); await w(2600);
+      say(JA,'……はい。'); hmood(JA,'smile',2000); await w(1900);
+      say(H,'すごいなあ。',{mood:'happy'}); await w(1900);
+      say(D,'じゃすたくん、ありがとばう！',{mood:'happy'}); await wag(2500);
     } else if(gift==='jdraw'){
-      say(E,'わあ、絵だ。',{mood:'happy'}); hhold(JA,null);
-      await w(2000);
-      say(JA,'……かきました。'); hmood(JA,'smile',2200);
-      await w(2300);
-      say(D,'しゃだはると、じゃすたくんばう！',{mood:'happy'}); hfx('i-heart',{x:D.x,y:D.y-30});
-      await w(2700);
-      say(H,'いい絵だなあ。かべに、かざろう。',{mood:'happy'});
-      await w(1600);
+      say(D,'絵ばう！',{mood:'happy'}); await w(1700);
+      say(E,'わあ、絵だ。',{mood:'happy'}); await w(2000);
+      say(JA,'……かきました。'); hmood(JA,'smile',2200); await w(2300);
+      say(D,'しゃだはると、じゃすたくんばう！',{mood:'happy'}); hfx('i-heart',{x:D.x,y:D.y-30}); await w(2700);
+      say(H,'いい絵だなあ。かべに、かざろう。',{mood:'happy'}); await w(1600);
+      if(held){ held.remove(); held=null; }
+      await hfly('i-jdraw',paw,{x:312,y:184});   /* かべ（窓の下）へ */
       { const g=document.getElementById('g-jdraw'); if(g){ g.style.display=''; g.classList.remove('popIn'); void g.getBoundingClientRect(); if(!reduceMotion&&!homeSkip) g.classList.add('popIn'); } if(!homeSkip) Snd.play('spark'); }
       await w(1500);
-      say(D,'ありがとばう！',{mood:'happy'}); D.el.classList.add('wag');
-      await w(2300); D.el.classList.remove('wag');
+      say(D,'じゃすたくん、ありがとばう！',{mood:'happy'}); await wag(2500);
     } else {
-      say(E,'わあ、きれいな石。',{mood:'happy'}); hhold(JA,null);
-      await w(2000);
-      say(JA,'……ひろいました。'); hmood(JA,'smile',2200);
-      await w(2300);
-      say(D,'しゃだはるの、たからものばう！',{mood:'happy'}); hfx('i-heart',{x:D.x,y:D.y-30});
-      await w(2700);
-      say(H,'たなに、かざろう。',{mood:'happy'});
-      await w(1600);
+      say(D,'きらきらばう！',{mood:'happy'}); await w(1700);
+      say(E,'わあ、きれいな石。',{mood:'happy'}); await w(2000);
+      say(JA,'……ひろいました。'); hmood(JA,'smile',2200); await w(2300);
+      say(D,'しゃだはるの、たからものばう！',{mood:'happy'}); hfx('i-heart',{x:D.x,y:D.y-30}); await w(2700);
+      say(H,'たなに、かざろう。',{mood:'happy'}); await w(1600);
+      if(held){ held.remove(); held=null; }
+      await hfly('i-stone',paw,{x:62,y:103});   /* 台所の棚（たからもの）へ */
       if(!preview){ S.stones=(S.stones||0)+1; renderTreasures(); } if(!homeSkip) Snd.play('spark');
       await w(1500);
-      say(D,'ありがとばう！',{mood:'happy'}); D.el.classList.add('wag');
-      await w(2300); D.el.classList.remove('wag');
+      say(D,'じゃすたくん、ありがとばう！',{mood:'happy'}); await wag(2500);
     }
-    /* ⑨ 帰り */
-    await w(400);
-    say(JA,'……おじゃましました。'); await bow(JA);
-    await w(2300);
-    say(D,'またきてばう！',{mood:'happy'});
-    await w(1900);
-    say(JA,'……また、きます。'); hmood(JA,'smile',2200);
-    await w(2300);
-    say(E,'気をつけてね。',{mood:'smile'});
-    await w(1700);
-    say(H,'また来てね。');
-    await w(1700);
+    /* ⑩ 帰り：ふたりで玄関まで見送り → じゃすたくんは ゆっくり歩いて帰る */
+    await w(300);
+    say(JA,'……おじゃましました。'); await bow(JA); await w(1900);
+    say(H,'また来てね。'); await w(1700);
     hhush();
-    await hmove(JA,seat.Jout); JA.el.classList.remove('on');
-    /* ⑩ 記録：なごみ度+3、マフラー、行事の回数、できごと欄 */
+    const jOut=hmove(JA,seat.inDoor,{ms:1800}); await w(500);
+    const dOut=hmove(D,seat.greetD); await w(300);
+    await Promise.all([jOut,dOut,hmove(E,seat.greetE)]);
+    await w(300);
+    say(E,'気をつけてね。',{mood:'smile'}); await w(1800);
+    if(pt===3){
+      say(D,'またきてばう！こんどは、しゃだはるが行くばう！',{mood:'happy'}); await w(3000);
+      say(JA,'……まってます。',{fit:true}); hmood(JA,'smile',2200); await w(2200);
+    } else {
+      say(D,'またきてばう！',{mood:'happy'}); await w(1900);
+      say(JA,'……また、きます。',{fit:true}); hmood(JA,'smile',2200); await w(2200);
+    }
+    hhush(); await bow(JA);
+    const leave=hmove(JA,seat.door,{ms:3200}).then(()=>{ JA.el.classList.remove('on'); });
+    hmood(D,'happy',2000); await wag(1800);
+    await leave;
+    await w(400);
+    const eBack=hmove(E,seat.E); await w(250); await Promise.all([eBack,hmove(D,seat.D)]);
+    /* ⑪ 記録：なごみ度+3、マフラー、行事の回数、できごと欄 */
     if(!preview){
       hNagomi(3,{x:D.x,y:D.y-34});
       if(gift==='scarf') S.scarf=S.day; else if(gift==='jdraw') S.jdraw=S.day;   /* 石は、場面の中で たからものに足してある */
@@ -4386,6 +4493,7 @@ async function birthdayNight(E,D,H,preview,pat){
   }
   if(tick) clearInterval(tick);
   if(cand) cand.remove(); if(glow) glow.remove();
+  if(held){ try{ held.remove(); }catch(e){} }
 }
 async function nightOuting(key){
   homeSkipBtn.style.display='none';
@@ -8324,9 +8432,9 @@ if(reduceMotion){ const v=document.querySelector('.ver'); if(v) v.textContent+='
 /* 季節の行事を、季節を待たずに見る（v1.27.0。URLの最後に #gyoji。#sound と同じ考え。見るだけで、なごみ度・回数・記録は変えない） */
 function openGyojiMenu(){
   if(modal || busy || !S || home.classList.contains('on')) return;
-  let html=sheetHead('季節の行事を見る')+'<p class="sub">押すと、その行事が すぐに始まります（見るだけ。なごみ度や回数は ふえません）。春・夏・秋は 3年でくり返します。</p><div class="seeds">';
+  let html=sheetHead('季節の行事を見る')+'<p class="sub">押すと、その行事が すぐに始まります（見るだけ。なごみ度や回数は ふえません）。どの行事も 3年でくり返します（誕生日のプレゼントは、1回め マフラー・2回め 絵・3回め以降 石）。</p><div class="seeds">';
   let i=0;
-  Object.keys(GYOJI).forEach(k=>{ for(let p=1;p<=3;p++){ i++; const t=k==='bday'?(p===1?'1回め・マフラー':p===2?'2回め・絵':'3回め以降・石'):(p+'年目'); html+='<button class="seed" type="button" data-gyoji="'+k+'" data-pat="'+p+'"><span><b>'+i+'. '+esc(GYOJI[k].name)+'（'+t+'）</b></span></button>'; } });   /* v1.37.0：パターンごと */
+  Object.keys(GYOJI).forEach(k=>{ for(let p=1;p<=3;p++){ i++; const t=k==='bday'?(p===1?'1年目・マフラー':p===2?'2年目・絵':'3年目・石'):(p+'年目');   /* v1.51.0：誕生日も 3年でくり返す */ html+='<button class="seed" type="button" data-gyoji="'+k+'" data-pat="'+p+'"><span><b>'+i+'. '+esc(GYOJI[k].name)+'（'+t+'）</b></span></button>'; } });   /* v1.37.0：パターンごと */
   openSheet(html+'</div>'+tuneSection(),{kind:'gyoji'});   /* v1.36.0：下に「曲をきく」（依頼者が アプリのプレビューでも 新しい曲を聴けるように） */
   bindTuneButtons();
   sheetCard.querySelectorAll('[data-gyoji]').forEach(b=>b.addEventListener('click',async()=>{
@@ -8340,6 +8448,20 @@ if(location.hash.indexOf('gyoji')>=0){
   $('.headR').insertBefore(gb,$('#sndBtn'));
   gb.addEventListener('click',e=>{ e.stopPropagation(); openGyojiMenu(); });
 }
+/* v1.51.1：英文サブタイトルの字間を、日本語の題名の幅に合わせる（右はしの「—」が題名の右はしにそろう）。読みこみ時と、向きや幅が変わったとき */
+function fitTitleEn(){
+  const h1=document.querySelector('.head h1'), en=document.getElementById('titleEn'); if(!h1 || !en) return;
+  en.style.letterSpacing='0px'; en.style.marginRight='0px';
+  const n=en.textContent.length; if(n<2) return;
+  const rg=document.createRange(); rg.selectNodeContents(h1.firstChild); const W=rg.getBoundingClientRect().width;   /* 日本語の1行めの幅 */
+  rg.selectNodeContents(en); const w=rg.getBoundingClientRect().width;
+  if(!(W>0) || !(w>0) || W<=w){ return; }
+  const ls=Math.min(6,(W-w)/(n-1));
+  en.style.letterSpacing=ls.toFixed(2)+'px'; en.style.marginRight=(-ls).toFixed(2)+'px';   /* さいごの字のうしろの字間ぶんを打ち消す */
+}
+fitTitleEn();
+window.addEventListener('resize',fitTitleEn); window.addEventListener('orientationchange',()=>setTimeout(fitTitleEn,300));
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitTitleEn);
 /* v1.27.3：かくし入口。右上の版番号を、3秒のうちに5回タップ → 「季節の行事を見る」。Claude アプリのプレビューのように URL を変えられない場所で、依頼者が確認するためのもの */
 { const v=document.querySelector('.ver'); let taps=[];
   if(v) v.addEventListener('click',e=>{ e.stopPropagation(); const t=Date.now(); taps=taps.filter(x=>t-x<3000); taps.push(t); if(taps.length>=5){ taps=[]; openGyojiMenu(); } }); }
