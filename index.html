@@ -147,6 +147,29 @@ h1 .en{display:block;font-size:.7em;font-weight:400;font-style:italic;color:#8a9
 .paddyBtn{position:absolute;border:0;background:transparent;padding:0;cursor:pointer;border-radius:12px;z-index:9}
 .paddyBtn.locked{display:none}
 .paddyBtn:focus-visible{outline:3px solid rgba(138,154,104,.5);outline-offset:2px}
+/* v1.57.0：田んぼの いきもの。入れものは 田んぼのボタン（z9）より上・人のコマ（#actors z30）より下 */
+.paddyLife{position:absolute;left:0;top:0;width:0;height:0;z-index:20}
+.paddyLife .pfrog{position:absolute;border:0;background:transparent;padding:0;margin:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.paddyLife .pfrog svg{display:block;width:100%;height:100%;overflow:visible;transform-origin:50% 100%}
+.paddyLife .pfrog:focus-visible{outline:2px solid rgba(138,154,104,.6);outline-offset:2px;border-radius:6px}
+.paddyLife .pfrog.hop svg{animation:pfHop .5s ease-out}
+.paddyLife .pfrog.dive svg{animation:pfDive .62s ease-in forwards}
+.paddyLife .pfrog.pfPeek.dive svg{animation:pfSink .5s ease-in forwards}   /* .peek は 前からある べつの部品の名前なので つかわない */
+.paddyLife .pfrog.back svg{animation:fadeIn .5s ease-out}
+.paddyLife .tonbo{position:absolute;left:-13px;top:-13px;width:26px;height:26px;pointer-events:none;transition:transform 1s ease-in-out,opacity .6s;will-change:transform}
+.paddyLife .tonbo.aka{left:-12px;top:-12px;width:24px;height:24px}
+.paddyLife .tonbo svg{display:block;width:100%;height:100%;overflow:visible;animation:tbBob 1.2s ease-in-out infinite alternate}
+.vp.raining .paddyLife .tonbo{opacity:0}
+.vp.night .paddyLife .tonbo{display:none}
+@keyframes pfHop{0%,100%{transform:translateY(0)}40%{transform:translateY(-6px) scaleY(1.06)}}
+@keyframes pfDive{0%{transform:none;opacity:1}45%{transform:translate(var(--dx,8px),calc(var(--dy,-8px) - 6px))}100%{transform:translate(calc(var(--dx,8px)*1.6),var(--dy,-8px)) scale(.55);opacity:0}}
+@keyframes pfSink{to{transform:translateY(7px);opacity:0}}
+@keyframes tbBob{from{transform:translateY(0)}to{transform:translateY(-1.8px)}}
+.actor.shada .tonboNose{position:absolute;left:46%;top:38%;width:46%;height:46%;pointer-events:none;z-index:3}
+.actor.shada .tonboNose svg{display:block;width:100%;height:100%;overflow:visible}
+.tonboFly{position:absolute;left:-10px;top:-10px;width:20px;height:20px;z-index:700;pointer-events:none;transition:transform 1.1s ease-in-out,opacity .5s}
+.tonboFly svg{display:block;width:100%;height:100%;overflow:visible}
+@media (prefers-reduced-motion:reduce){.paddyLife *,.tonboFly{animation:none!important;transition:none!important}.paddyLife .pfrog.dive svg{opacity:0}}
 .shedBtn{position:absolute;border:0;background:transparent;padding:0;cursor:pointer;border-radius:14px;z-index:9}
 .shedBtn.locked{display:none}
 .shedBtn .pill{position:absolute;left:50%;top:-6px;transform:translateX(-50%);display:none;white-space:nowrap}
@@ -964,6 +987,7 @@ h1 .en{display:block;font-size:.7em;font-weight:400;font-style:italic;color:#8a9
   <symbol id="i-grass" viewBox="0 0 40 40"><path d="M20 36 C18 24 12 18 8 12 M20 36 C20 22 20 14 20 6 M20 36 C22 24 28 18 33 13 M20 36 C17 30 12 27 7 26 M20 36 C23 30 28 27 33 26" fill="none" stroke="#7fb35a" stroke-width="3.2" stroke-linecap="round"/></symbol>   <!-- 草（v1.40.0：たいひ運び） -->
   <symbol id="i-compost" viewBox="0 0 40 40"><ellipse cx="20" cy="33" rx="16" ry="3" fill="rgba(60,44,24,.14)"/><path d="M5 31 C7 20 13 14 20 14 C27 14 33 20 35 31 Z" fill="#6f5334"/><path d="M10 27 q4 -6 9 -5 M21 24 q5 -3 9 2" fill="none" stroke="#8a6a44" stroke-width="1.6" stroke-linecap="round"/><path d="M22 12 q3 -6 8 -3 q-3 1 -8 3z" fill="#8fbf9a"/></symbol>   <!-- たいひ（v1.40.0） -->
   <symbol id="i-frog" viewBox="0 0 40 40"><ellipse cx="20" cy="26.5" rx="13" ry="9.5" fill="#a9d36f" stroke="#6f9c46" stroke-width="1.2"/><ellipse cx="20" cy="30" rx="8" ry="4.2" fill="#dcecb0"/><circle cx="13.5" cy="18.5" r="5" fill="#a9d36f" stroke="#6f9c46" stroke-width="1.2"/><circle cx="26.5" cy="18.5" r="5" fill="#a9d36f" stroke="#6f9c46" stroke-width="1.2"/><circle cx="13.5" cy="18.5" r="3" fill="#fff"/><circle cx="26.5" cy="18.5" r="3" fill="#fff"/><circle cx="14" cy="18.9" r="1.5" fill="#3a3a32"/><circle cx="27" cy="18.9" r="1.5" fill="#3a3a32"/><path d="M15.5 26.5 q4.5 3.2 9 0" fill="none" stroke="#6f9c46" stroke-width="1.2" stroke-linecap="round"/><circle cx="11" cy="25" r="1.6" fill="#f2a29a" opacity=".7"/><circle cx="29" cy="25" r="1.6" fill="#f2a29a" opacity=".7"/><path d="M9.5 34.5 q2 -3.2 5.5 -1.2 M25 33.3 q3.5 -2 5.5 1.2" fill="none" stroke="#6f9c46" stroke-width="1.4" stroke-linecap="round"/></symbol>   <!-- v1.37.1：カエル復活（かたつむりと両方。依頼者の希望） -->
+  <symbol id="i-tonbo" viewBox="0 0 40 40"><g class="wings" fill="#ffffff" fill-opacity=".74" stroke="#a7c3d4" stroke-width=".8"><ellipse cx="11.2" cy="13.4" rx="9.4" ry="3.1" transform="rotate(-10 11.2 13.4)"/><ellipse cx="28.8" cy="13.4" rx="9.4" ry="3.1" transform="rotate(10 28.8 13.4)"/><ellipse cx="11.9" cy="19.2" rx="8.6" ry="2.9" transform="rotate(13 11.9 19.2)"/><ellipse cx="28.1" cy="19.2" rx="8.6" ry="2.9" transform="rotate(-13 28.1 19.2)"/></g><path d="M6 13.2 Q11 11.9 16.6 13.6 M34 13.2 Q29 11.9 23.4 13.6" stroke="#b9d0de" stroke-width=".6" fill="none"/><rect x="18.7" y="15.6" width="2.6" height="21" rx="1.3" fill="#86b8df"/><path d="M18.9 21.2 h2.2 M18.9 25.2 h2.2 M18.9 29.2 h2.2" stroke="#5d90bd" stroke-width=".8"/><rect x="18.7" y="31.8" width="2.6" height="4.8" rx="1.3" fill="#3a4c5e"/><ellipse cx="20" cy="14.4" rx="3.1" ry="3.9" fill="#5f8db5"/><circle cx="17.7" cy="9.1" r="2.8" fill="#3d6b94"/><circle cx="22.3" cy="9.1" r="2.8" fill="#3d6b94"/><circle cx="16.9" cy="8.2" r=".85" fill="#fff" opacity=".85"/><circle cx="21.5" cy="8.2" r=".85" fill="#fff" opacity=".85"/></symbol><symbol id="i-akatonbo" viewBox="0 0 40 40"><g class="wings" fill="#ffffff" fill-opacity=".74" stroke="#a7c3d4" stroke-width=".8"><ellipse cx="11.2" cy="13.4" rx="9.4" ry="3.1" transform="rotate(-10 11.2 13.4)"/><ellipse cx="28.8" cy="13.4" rx="9.4" ry="3.1" transform="rotate(10 28.8 13.4)"/><ellipse cx="11.9" cy="19.2" rx="8.6" ry="2.9" transform="rotate(13 11.9 19.2)"/><ellipse cx="28.1" cy="19.2" rx="8.6" ry="2.9" transform="rotate(-13 28.1 19.2)"/></g><path d="M6 13.2 Q11 11.9 16.6 13.6 M34 13.2 Q29 11.9 23.4 13.6" stroke="#b9d0de" stroke-width=".6" fill="none"/><rect x="18.7" y="15.6" width="2.6" height="21" rx="1.3" fill="#e0654f"/><path d="M18.9 21.2 h2.2 M18.9 25.2 h2.2 M18.9 29.2 h2.2" stroke="#b5473a" stroke-width=".8"/><rect x="18.7" y="31.8" width="2.6" height="4.8" rx="1.3" fill="#b5473a"/><ellipse cx="20" cy="14.4" rx="3.1" ry="3.9" fill="#c95a43"/><circle cx="17.7" cy="9.1" r="2.8" fill="#9d3f33"/><circle cx="22.3" cy="9.1" r="2.8" fill="#9d3f33"/><circle cx="16.9" cy="8.2" r=".85" fill="#fff" opacity=".85"/><circle cx="21.5" cy="8.2" r=".85" fill="#fff" opacity=".85"/></symbol><symbol id="i-tonboside" viewBox="0 0 40 40"><g fill="#ffffff" fill-opacity=".78" stroke="#a7c3d4" stroke-width=".8"><ellipse cx="21" cy="15.5" rx="11" ry="3.4" transform="rotate(-24 21 15.5)"/><ellipse cx="22.5" cy="18" rx="10.5" ry="3.1" transform="rotate(-12 22.5 18)"/></g><rect x="12" y="21" width="24" height="2.8" rx="1.4" fill="#86b8df"/><path d="M19 21.2 v2.4 M24 21.2 v2.4 M29 21.2 v2.4" stroke="#5d90bd" stroke-width=".8"/><ellipse cx="11" cy="22" rx="3.6" ry="3" fill="#86b8df"/><circle cx="6.6" cy="20.8" r="3.2" fill="#3d6b94"/><circle cx="5.8" cy="19.9" r=".9" fill="#fff" opacity=".85"/><path d="M9.5 24.6 l-1.4 3 M12 24.8 l-.4 3.2" stroke="#5b4a40" stroke-width=".8" stroke-linecap="round"/></symbol><symbol id="i-frogpeek" viewBox="0 0 40 24"><ellipse cx="20" cy="17.5" rx="15" ry="3.2" fill="#e4f2f3" opacity=".75"/><path d="M8 17.6 Q20 6.5 32 17.6Z" fill="#a9d36f" stroke="#6f9c46" stroke-width="1.1"/><circle cx="14.2" cy="10.6" r="4.2" fill="#a9d36f" stroke="#6f9c46" stroke-width="1.1"/><circle cx="25.8" cy="10.6" r="4.2" fill="#a9d36f" stroke="#6f9c46" stroke-width="1.1"/><circle cx="14.2" cy="10.6" r="2.5" fill="#fff"/><circle cx="25.8" cy="10.6" r="2.5" fill="#fff"/><circle cx="14.7" cy="10.9" r="1.3" fill="#3a3a32"/><circle cx="26.3" cy="10.9" r="1.3" fill="#3a3a32"/><path d="M6 19.6 q3 -1.4 6 0 M28 19.6 q3 -1.4 6 0" stroke="#ffffff" stroke-width="1" fill="none" stroke-linecap="round" opacity=".9"/></symbol>   <!-- v1.57.0：田んぼの いきもの（トンボ＝上から見た形・頭が上。赤とんぼ。とまったトンボ＝横から・頭が左。水から目だけのカエル） -->
   <symbol id="i-nae" viewBox="0 0 40 40"><rect x="5" y="25" width="30" height="9" rx="2" fill="#a47a4c" stroke="#7f5c38" stroke-width="1"/><path d="M8 28.5 h24" stroke="#c49a66" stroke-width="1" stroke-linecap="round"/><g stroke="#5aa246" stroke-width="2.2" stroke-linecap="round" fill="none"><path d="M10 26 q-1 -8 -4 -12"/><path d="M14 26 q0 -9 1 -15"/><path d="M19 26 q1 -10 3 -16"/><path d="M24 26 q1 -9 4 -14"/><path d="M29 26 q2 -7 6 -11"/></g><g stroke="#7fc464" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M12 26 q-2 -6 -5 -8"/><path d="M27 26 q1 -6 4 -9"/></g></symbol>   <!-- 苗箱（v1.52.0） -->
   <symbol id="i-inaba" viewBox="0 0 40 40"><path d="M13 37 L18 23 L10 9 Q15 5.5 20 7.5 Q25 5.5 30 9 L22 23 L27 37 Z" fill="#dcb44c" stroke="#b48b2c" stroke-width="1" stroke-linejoin="round"/><path d="M16 36 L19 24.5 M20 37 V24.5 M24 36 L21 24.5 M15 11 L19 21 M20 9 V21 M25 11 L21 21" stroke="#b48b2c" stroke-width=".8" fill="none"/><rect x="16" y="20.5" width="8" height="3.6" rx="1" fill="#8a6a44"/><g fill="#eec757"><ellipse cx="11" cy="10" rx="2.3" ry="1.6"/><ellipse cx="15.5" cy="7.4" rx="2.3" ry="1.6"/><ellipse cx="20.5" cy="7.8" rx="2.3" ry="1.6"/><ellipse cx="25.5" cy="7.2" rx="2.3" ry="1.6"/><ellipse cx="29.5" cy="10" rx="2.3" ry="1.6"/></g></symbol>   <!-- 稲のたば（v1.52.0） -->
   <symbol id="i-stone" viewBox="0 0 40 40"><path d="M8 26 L13 12 L26 8 L34 18 L30 31 L15 34Z" fill="#9cc7d8"/><path d="M13 12 L20 19 L26 8 M20 19 L34 18 M20 19 L15 34 M20 19 L30 31" stroke="#d9eef5" stroke-width="1.4" fill="none"/><path d="M8 26 L20 19" stroke="#d9eef5" stroke-width="1.4"/></symbol>
@@ -1202,7 +1226,7 @@ h1 .en{display:block;font-size:.7em;font-weight:400;font-style:italic;color:#8a9
 <div class="game" id="game">
   <div class="head">
     <h1>えりとしゃだはるの ちいさな畑<span class="en" id="titleEn">— Days on a Tiny Garden —</span></h1>
-    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.56.1</span></span>
+    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.57.1</span></span>
   </div>
 
   <div class="hud">
@@ -1305,6 +1329,7 @@ h1 .en{display:block;font-size:.7em;font-weight:400;font-style:italic;color:#8a9
         <!-- 田んぼ（v1.52.0。2年目の冬2日目から。絵は renderPaddy が季節とようすで かく） -->
         <svg class="deco locked" id="d-paddy" style="left:912px;top:320px" width="200" height="80" viewBox="0 0 200 80" aria-hidden="true"></svg>
         <button class="paddyBtn locked" id="paddyBtn" type="button" style="left:912px;top:316px;width:200px;height:84px" aria-label="田んぼ"></button>
+        <div class="paddyLife" id="paddyLife"></div>   <!-- v1.57.0：夏のカエル・トンボ、秋の赤とんぼ（renderPaddyLife） -->
         <svg class="deco locked" id="d-shed" style="left:636px;top:96px" width="116" height="150" viewBox="0 0 116 150" aria-hidden="true">
           <ellipse cx="58" cy="146" rx="54" ry="5" fill="rgba(60,44,24,.16)"/>
           <rect x="10" y="54" width="96" height="92" rx="4" fill="#c99a68" stroke="#a87c4e" stroke-width="2"/>
@@ -1461,6 +1486,9 @@ h1 .en{display:block;font-size:.7em;font-weight:400;font-style:italic;color:#8a9
             <g transform="translate(-32.5 0)"><rect x="103" y="155" width="23" height="21" rx="5" fill="#f1eee7" stroke="#c8c2b8" stroke-width="1.2"/><path d="M104.5 165 Q114.5 167.5 124.5 165" fill="none" stroke="#a49e94" stroke-width="1.1" stroke-linecap="round"/>
             <rect x="108" y="156.6" width="13" height="4.2" rx="1.2" fill="#dedbd3"/><circle cx="111" cy="158.7" r=".9" fill="#8d8780"/><circle cx="114.5" cy="158.7" r=".9" fill="#8d8780"/><rect x="117" y="157.8" width="2.6" height="1.8" rx=".5" fill="#8fb3c9"/>
             <path d="M122.5 168 h2 M122.5 170 h2 M122.5 172 h2" stroke="#c3bdb4" stroke-width=".8" stroke-linecap="round"/></g>
+            <!-- v1.57.0：米袋（依頼者「炊飯器のとなりではなく、キッチンカウンターの右端に」）。はじめての稲刈りの夜から。中身は renderRiceBag。
+                 v1.57.1（依頼者「右端いっぱいではなく、もうちょっとだけ左に」）：x 132.6 → 124.6（左へ 8。袋は x124.6〜143.8、カウンターの右はし 155 まで 11 あく） -->
+            <g id="g-ricebag" style="display:none" transform="translate(124.6 176.6) scale(.74)"></g>
           </g>
           <!-- 冷蔵庫（台所のとなり） -->
           <g id="g-fridge">
@@ -2438,7 +2466,7 @@ function newGame(){
     v:1, sd:SEASON_DAYS, day:1, clock:DAY_START, weather:'sun', rainAt:0, raining:false, mood:'helpful',
     wx:null, windy:false, snowCover:false, rainbow:false, frostJoy:false, slipDay:0, fridge:rollFridge(null),
     plots, shadaPlot:{phase:'none',crop:null,growth:0,appearDay:0}, shadaPlot2:{phase:'none',crop:null,growth:0,appearDay:0},   /* shadaPlot2 は v1.41.0（200こ） */
-    tanbo:{taue:0,kari:0,hakobi:0,shinmai:0,tn:0,kn:0,sn:0},   /* v1.52.0：田んぼ（した年と回数） */
+    tanbo:{taue:0,kari:0,hakobi:0,shinmai:0,tn:0,kn:0,sn:0,oni:0,firstY:0},   /* v1.57.0：oni＝「うちのお米」の おにぎりの お花見の回数、firstY＝はじめて お米が とれた年 */   /* v1.52.0：田んぼ（した年と回数） */
     hotDay:0, bigCanDay:0,   /* v1.41.0：日照りの日、3代目のじょうろが かごのそばに出ている日 */
     totals:{}, total:0, today:{}, pantry:{}, recipes:{}, nagomi:0, stones:0, acorns:0, frogs:0, snails:0, snowman:false,   /* snails は v1.37.1（それまでの数は frogs に入ったまま） */
     unlocked:{}, decor:{}, request:null, photo:null, newToday:[], basketToday:[], held:null, lastSeed:null,
@@ -3545,6 +3573,7 @@ function tanboState(){
 }
 function renderPaddy(){
   const el=$('#d-paddy'); if(!el||!S) return;
+  renderPaddyLife();   /* v1.57.0 */
   const v=tanboView||tanboState(), sn=season(), sig=v.st+'|'+(v.mask==null?'':v.mask)+'|'+(v.rack==null?'':v.rack)+'|'+sn;
   if(el.dataset.sig!==sig){ el.innerHTML=paddyArt(v.st,v.mask,v.rack,sn); el.dataset.sig=sig; }
   const b=$('#paddyBtn'); if(b) b.setAttribute('aria-label','田んぼ：'+paddyHint());
@@ -3561,6 +3590,127 @@ function paddyTap(){
   const t='田んぼ：'+paddyHint();
   if(reduceMotion){ if(!busy) say('eri',t.replace(/^田んぼ：/,'')+'。',0,'smile'); return; }   /* 動きを減らす端末では 吹き出しで（文字の演出が出ないので） */
   fxText(t,{x:TANBO.x+100,y:TANBO.y-14},'info');
+}
+/* ===== v1.57.0：田んぼの いきもの（依頼者「夏の田んぼにカエルとトンボ」・決めること3ア「秋は赤とんぼ」）=====
+   夏（その年に田植えをした 青田）＝カエル3びき（あぜに2ひき・水から目だけ1ぴき）とトンボ2ひき。秋（田んぼがあれば）＝赤とんぼ3びき。
+   トンボは しばらく とまって（ういて）、となりの場所へ すいーっと。雨のあいだと 夜は 出ない（CSS の .vp.raining・.vp.night）。カエルは ときどき ぴょこっと はねる。
+   カエルをタップ →「ケロッ」＋ぽちゃんと もぐって、7秒で もどる。その日 はじめてなら なごみ度 +1（できごと欄にも。「出会った生きもの」には 数えない）。
+   見るだけの もの：場面の じゃまは しない（busy のときは「ケロッ」だけ）。くじは ゲームの Math.random を つかわない（plRnd。テストの くじの ならびを かえない） */
+const PADDY_FROGS=[{x:917,y:352,s:22,dx:9,dy:-6},{x:1060,y:388,s:22,dx:-3,dy:-13},{x:1006,y:360,s:20,peek:true}];
+const TONBO_ZONE={x0:930,x1:1102,y0:276,y1:352};   /* トンボが とぶ ところ（田んぼの上） */
+let plTonbo=[], plTimer=0, plHopAt=0, plSeed=(Date.now()>>>0)||7;
+const plRnd=()=>{ plSeed=(plSeed*1664525+1013904223)>>>0; return plSeed/4294967296; };
+function paddyLifeKind(){
+  if(plForce) return plForce;   /* 見るだけの画面 */
+  if(!S || !S.unlocked || !S.unlocked.tanbo) return '';
+  const sn=season();
+  if(sn===1 && (tanboView||tanboState()).st==='green') return 'natsu';
+  if(sn===2) return 'aka';
+  return '';
+}
+function renderPaddyLife(){
+  const box=$('#paddyLife'); if(!box) return;
+  const kind=paddyLifeKind();
+  if(box.dataset.sig===kind) return;
+  box.dataset.sig=kind;
+  let h='';
+  if(kind==='natsu') PADDY_FROGS.forEach((f,i)=>{ const hh=f.peek?Math.round(f.s*.6):f.s;
+    h+='<button class="pfrog'+(f.peek?' pfPeek':'')+'" type="button" data-i="'+i+'" style="left:'+(f.x-f.s/2)+'px;top:'+(f.y-hh/2)+'px;width:'+f.s+'px;height:'+hh+'px'+(f.dx!=null?';--dx:'+f.dx+'px;--dy:'+f.dy+'px':'')+'" aria-label="田んぼのカエル"><svg viewBox="0 0 40 '+(f.peek?24:40)+'" aria-hidden="true"><use href="#'+(f.peek?'i-frogpeek':'i-frog')+'"/></svg></button>'; });
+  const n=kind==='natsu'?2:kind==='aka'?3:0;
+  for(let i=0;i<n;i++) h+='<div class="tonbo'+(kind==='aka'?' aka':'')+'" aria-hidden="true"><svg viewBox="0 0 40 40"><use href="#'+(kind==='aka'?'i-akatonbo':'i-tonbo')+'"/></svg></div>';
+  box.innerHTML=h;
+  plTonbo=[...box.querySelectorAll('.tonbo')].map((el,i)=>{ const t={el,x:0,y:0,a:0,next:0}; tonboSpot(t,i,n,true); return t; });
+  box.querySelectorAll('.pfrog').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); paddyFrogTap(b); }));
+  clearTimeout(plTimer); plTimer=0;
+  if((n || kind==='natsu') && !reduceMotion) plTimer=setTimeout(paddyLifeTick,900);
+}
+/* トンボを 次の場所へ（first＝はじめの ならび） */
+function tonboSpot(t,i,n,first){
+  const Z=TONBO_ZONE, w=(Z.x1-Z.x0)/Math.max(1,n);
+  const x=first?Z.x0+w*(i+.5)+(plRnd()-.5)*w*.5:clamp(t.x+(plRnd()-.5)*120,Z.x0,Z.x1);
+  const y=Z.y0+plRnd()*(Z.y1-Z.y0);
+  const dx=x-t.x, dy=y-t.y;
+  let a=first?(plRnd()<.5?-76:68):Math.atan2(dy,dx)*180/Math.PI+90;   /* 頭を すすむ むきへ */
+  while(a-t.a>180) a-=360; while(a-t.a<-180) a+=360;   /* 近い まわりかたで */
+  const ms=first?0:Math.round(clamp(Math.hypot(dx,dy)*9,450,1300));
+  t.el.style.transitionDuration=ms+'ms, .6s';
+  t.el.style.transform='translate('+x.toFixed(1)+'px,'+y.toFixed(1)+'px) rotate('+Math.round(a)+'deg)';
+  t.x=x; t.y=y; t.a=a; t.next=Date.now()+ms+1300+plRnd()*2700;
+}
+function paddyLifeTick(){
+  plTimer=0;
+  const box=$('#paddyLife'); if(!box || !box.firstChild) return;
+  if(!hiddenNow && !document.hidden){
+    const now=Date.now();
+    plTonbo.forEach((t,i)=>{ if(t.el.isConnected && now>=t.next) tonboSpot(t,i,plTonbo.length,false); });
+    const fs=[...box.querySelectorAll('.pfrog:not(.dive)')];
+    if(fs.length && now>=plHopAt){ plHopAt=now+5000+plRnd()*6000; const f=fs[Math.floor(plRnd()*fs.length)]; if(plHopAt && f){ f.classList.remove('hop'); void f.offsetWidth; f.classList.add('hop'); setTimeout(()=>f.classList.remove('hop'),560); } }
+  }
+  plTimer=setTimeout(paddyLifeTick,700);
+}
+function paddyFrogTap(b){
+  if(modal || !S || b.classList.contains('dive')) return;
+  const f=PADDY_FROGS[+b.dataset.i]; if(!f) return;
+  fxText('ケロッ',{x:f.x,y:f.y-18}); Snd.play('frog');
+  b.classList.remove('hop','back'); b.classList.add('dive');   /* ぽちゃん（水へ もぐる） */
+  setTimeout(()=>{ if(!b.isConnected) return; b.classList.remove('dive'); b.classList.add('back'); setTimeout(()=>b.classList.remove('back'),560); },7000);
+  if(!busy && S.paddyFrogDay!==S.day){ S.paddyFrogDay=S.day; addNagomi(1,{x:f.x,y:f.y}); log('田んぼのカエルが、ケロッとないて、ぽちゃんと 水に もぐりました。'); saveSoon(); }
+}
+/* しゃだはる君の はなに とまる トンボ（出来事 tonbo）：from から to へ 飛ぶ。動きを減らす端末では 何もしない */
+function tonboFlyTo(from,to,ms,fade){
+  if(reduceMotion) return Promise.resolve();
+  const el=document.createElement('div'); el.className='tonboFly';
+  el.innerHTML='<svg viewBox="0 0 40 40" aria-hidden="true"><use href="#i-tonbo"/></svg>';
+  const a=Math.round(Math.atan2(to.y-from.y,to.x-from.x)*180/Math.PI+90);
+  el.style.transition='none'; el.style.transform='translate('+from.x+'px,'+from.y+'px) rotate('+a+'deg)';
+  layer.appendChild(el); void el.offsetWidth;
+  el.style.transition='transform '+ms+'ms ease-in-out, opacity '+Math.round(ms*.6)+'ms';
+  el.style.transform='translate('+to.x+'px,'+to.y+'px) rotate('+a+'deg)'; if(fade) el.style.opacity='0';
+  return new Promise(res=>setTimeout(()=>{ el.remove(); res(); },ms+40));
+}
+/* 出来事 tonbo の中身（preview＝見るだけ：なごみ度・できごと欄は かえない）。待ちは「動きを減らす」でも ちぢめない（hurry のときだけ はやく） */
+async function tonboNose(preview){
+  const D=A.shada, bob=D.el.querySelector('.bob'), tw=ms=>sleep(hurry?Math.min(ms,40):ms);
+  bob.querySelectorAll('.tonboNose').forEach(x=>x.remove());
+  const nose={x:D.x+8,y:D.y+5}, away={x:D.x+150,y:D.y-120};
+  let perch=null;
+  try{
+    await tonboFlyTo({x:D.x+120,y:D.y-96},nose,1100);
+    perch=document.createElement('div'); perch.className='tonboNose'; perch.innerHTML='<svg viewBox="0 0 40 40" aria-hidden="true"><use href="#i-tonboside"/></svg>'; bob.appendChild(perch);
+    setMood('shada','normal');
+    await tw(500);
+    say('shada','……はなに、トンボ、とまったばう。');
+    await tw(1800);
+    say('eri','しーっ。そのまま、そのまま。',0,'smile',true);
+    await tw(2100);
+    perch.remove(); perch=null;
+    tonboFlyTo(nose,away,900,true);
+    await tw(700);
+    say('shada','……とんでったばう。');
+    await tw(1500);
+    say('eri','ふふ。田んぼに、かえったのかな。',0,'smile',true);
+    setMood('shada','happy',1600);
+    if(!preview) addNagomi(1,A.shada); else { fx('i-heart',{x:D.x,y:D.y-30}); Snd.play('heart'); }
+    if(!preview) log('しゃだはる君の はなに、トンボが とまりました。じっと がまんしていました。');
+    if(preview) await tw(1800);
+  } finally { if(perch) perch.remove(); }
+}
+/* v1.57.0：見るだけの画面「夏の田んぼ（カエルとトンボ）」「秋の田んぼ（赤とんぼ）」。S は かえない（田んぼが まだの年でも 見せて、おわったら もどす） */
+let plForce='';
+async function paddyLifePreview(...a){ return inScene(paddyLifePreview_,a); }
+async function paddyLifePreview_(kind){
+  const pd=$('#d-paddy'), lockedBefore=pd.classList.contains('locked'), box=$('#paddyLife');
+  const {E0,D0}=tanboKit();
+  tanboPrep();
+  try{
+    pd.classList.remove('locked'); tanboView={st:kind==='natsu'?'green':'gold'}; plForce=kind; box.dataset.sig='-'; renderPaddy();
+    focusRange(TANBO.look[0],TANBO.look[1]);
+    await Promise.all([moveTo(A.eri,E0,{ms:reduceMotion?0:1600}), moveShada(D0,{ms:reduceMotion?0:1700})]);
+    await gwait(kind==='natsu'?2500:4500);
+    if(kind==='natsu') await tonboNose(true);
+  } finally {
+    plForce=''; tanboView=null; box.dataset.sig='-'; renderPaddy(); if(lockedBefore) renderWorld();
+  }
 }
 /* 田植え（春の2日目）・稲刈り（秋の2日目。その年に田植えをしたときだけ）。その日の朝いちばんに（まにあわなかったら その日のうちに） */
 function tanboDue(){
@@ -3752,7 +3902,7 @@ async function tanboScene_(kind,preview,pat){
     log('（'+(taue?'田植え':'稲刈り')+'の場面で問題がおきました。この文を教えてください：'+gyojiStep+'／'+String((err&&err.message)||err).slice(0,140)+'）');
     try{ console.error(err); }catch(e){}
   }
-  if(!preview){ if(taue){ T.taue=y; T.tn=(T.tn||0)+1; } else { T.kari=y; T.kn=(T.kn||0)+1; } }   /* 記録は 場面のあと（v1.52.1。とちゅうで アプリが とじられて 開きなおしたら、場面を はじめから）。問題がおきたときも 記録して くり返さない */
+  if(!preview){ if(taue){ T.taue=y; T.tn=(T.tn||0)+1; } else { T.kari=y; T.kn=(T.kn||0)+1; if(!T.firstY) T.firstY=y-T.kn+1; } }   /* v1.57.0：firstY＝はじめて お米が とれた年（図鑑）。前の版のセーブ（もう とれていた）は 回数から さかのぼる */   /* 記録は 場面のあと（v1.52.1。とちゅうで アプリが とじられて 開きなおしたら、場面を はじめから）。問題がおきたときも 記録して くり返さない */
   tanboEnd(lockedBefore);
   if(!preview){
     if(ok) log(taue?(pat===1?'ほまれくんも手伝いに来て、3人で田植えをしました。苗は、おじさんに わけてもらいました。秋の2日目の朝は、稲刈りです。':'ほまれくんも手伝いに来て、今年も 3人で田植えをしました。秋の2日目の朝は、稲刈りです。')
@@ -3877,7 +4027,7 @@ async function shinmaiTalk(E,D,H,preview,pat){
 }
 /* 見るだけの画面（版番号5回タップ →「季節の行事を見る」）から */
 async function shinmaiPreview(pat){
-  homeSkip=false; setupRoom();
+  homeSkip=false; setupRoom(); renderRiceBag(3);   /* v1.57.0：米袋（いっぱい）も 見せる。おわりの setupRoom で もどる */
   const E=HA.eri, D=HA.shada, H=HA.homare;
   place(E,HSPOT.tableEri.x,HSPOT.tableEri.y,0); place(H,HSPOT.tableHomare.x,HSPOT.tableHomare.y,0); place(D,HSPOT.tableShada.x,HSPOT.tableShada.y,0);
   const rec=RECIPES.find(r=>r.name==='トマトとたまごの炒めもの')||RECIPES[0];
@@ -4224,9 +4374,17 @@ async function gyojiScene_(key,preview,pat){
   }
   if(nightHere){ A.homare.el.classList.remove('on'); nightOff(); focus(A.eri.x); }
   shadaCanDown(false);   /* v1.39.1 */
-  if(!preview){ if(ok) log(G['log'+pat]||G.log); S.sinceEvent=0; saveSoon(); }
+  if(!preview){ if(ok) log(gyojiLog(key,pat)); S.sinceEvent=0; saveSoon(); }
+  hanamiRice=false;
 }
 let gyojiStep='';
+/* v1.57.0：お花見で うちのお米の おにぎりが出た年は、にっきの文にも */
+let hanamiRice=false;
+function gyojiLog(key,pat){
+  const G=GYOJI[key]; let t=G['log'+pat]||G.log;
+  if(key==='hanami' && hanamiRice) t=pat===4?t.replace('おにぎりも ありました。','うちの お米の おにぎりも ありました。'):t+'おにぎりは、うちの お米でした。';
+  return t;
+}
 function gyojiCleanup(){
   try{
     hush();
@@ -4258,6 +4416,10 @@ const GYOJI_SCENE={
     const H=A.homare, goza=$('#d-goza'), walkMs=(a,p)=>Math.round(clamp(Math.hypot(p.x-a.x,p.y-a.y)*2.3,300,2600));
     const line=async(who,text,mood,ms)=>{ hush(); say(who,text,0,mood); await gwait(ms||(1500+text.length*60)); };
     const food=[];
+    /* v1.57.0（依頼者「お花見のおにぎりが『うちのお米』に」）：お米が とれた次の春から、2・3・4つめの お花見に うちのお米の おにぎり。
+       見るだけの画面は いつも お米あり。oni＝その年の おにぎり（場面のはじめに 1回だけ 数える＝T.oni） */
+    const T=tanboT(), rice=preview || (T.kn||0)>0, again=!preview && (T.oni||0)>0;
+    const oni=()=>{ put('i-onigiri',{x:GOZA.bento.x-30,y:GOZA.bento.y+4},22); Snd.play('basket'); if(!preview && rice){ T.oni=(T.oni||0)+1; hanamiRice=true; } };
     const put=(id,pos,px)=>{ let f=fx(id,pos,'snack',0);
       if(!f){ f=document.createElement('div'); f.className='fx snack'; f.innerHTML='<span>'+icon(id)+'</span>'; f.style.transform='translate('+pos.x+'px,'+pos.y+'px)'; layer.appendChild(f); }   /* 「動きを減らす」の端末では fx が出ないので、じかに置く（v1.27.2） */
       f.style.zIndex=500; if(px) f.firstChild.style.width=f.firstChild.style.height=px+'px'; food.push(f); return f; };
@@ -4328,8 +4490,10 @@ const GYOJI_SCENE={
       await line('homare','今年は、たまごやきを多めにしたよ。');
       setMood('shada','happy',1800);
       await line('shada','たまごやき、ばう！',null,1800);
+      if(rice){ hush(); oni(); await gwait(400); await line('homare','おにぎりは、うちの お米だよ。'); }   /* v1.57.0 */
       hush(); mogu();
       await gwait(900);
+      if(rice){ await line('eri','うちの お米、おにぎりも おいしいね。','happy'); hush(); }   /* v1.57.0 */
       /* 花びらが 舞ってきて、しゃだはる君が 追いかける（2年目） */
       gyojiStep='花びら';
       const to={x:GOZA.shada.x+58,y:GOZA.shada.y-26}, chase={x:GOZA.shada.x+52,y:GOZA.shada.y+4};
@@ -4350,10 +4514,9 @@ const GYOJI_SCENE={
       await line('homare','うん。こんどは、もっと大きなお弁当にしよう。');
     } else if(pat===4){
       /* v1.56.0：4つめ（依頼者が了解ずみ）。うちの お米で おにぎり（田んぼが まだの年は ただの おにぎり）→ はなびらが ふたりの頭に */
-      const rice=preview || ((S.tanbo && S.tanbo.kn)||0)>0;
-      put('i-onigiri',{x:GOZA.bento.x-30,y:GOZA.bento.y+4},22); Snd.play('basket');
+      oni();
       await gwait(400);
-      await line('homare',rice?'今年は、うちの お米で、おにぎりも 作ったよ。':'今年は、おにぎりも 作ったよ。');
+      await line('homare',rice?(again?'今年も、うちの お米で、おにぎり 作ったよ。':'今年は、うちの お米で、おにぎりも 作ったよ。'):'今年は、おにぎりも 作ったよ。');   /* v1.57.0：毎年 おにぎりが出るので、2回めからは「今年も」 */
       await line('eri',rice?'わあ、3人で作った お米だね。':'わあ、おいしそう。','happy');
       setMood('shada','happy',1800);
       await line('shada','おにぎり、ばう！',null,1700);
@@ -4378,9 +4541,10 @@ const GYOJI_SCENE={
       setMood('homare','happy',1600);
       await line('homare','ははは。',null,1300);
       await line('eri','ふふふ。','happy',1300);
+      if(rice){ hush(); oni(); await gwait(400); setMood('shada','happy',1800); await line('shada','おにぎり、うちの おこめばう？',null,2300); await line('homare','うん。田んぼの お米だよ。'); }   /* v1.57.0 */
       hush(); mogu();
       await gwait(700);
-      await line('eri','たまごやき、今年もおいしい。','happy');
+      await line('eri',rice?'おにぎりも、たまごやきも、おいしい。':'たまごやき、今年もおいしい。','happy');   /* v1.57.0：うちのお米の年は おにぎりも */
       hush();
       /* 花びらが3枚 ふってきて、3人で見上げる（3年目） */
       gyojiStep='花びら';
@@ -7680,7 +7844,33 @@ function setupRoom(){
   $('#hBlanket').classList.remove('on');
   { const g=document.getElementById('g-jdraw'); if(g){ g.style.display=S.jdraw?'':'none'; g.classList.remove('popIn'); } }   /* じゃすたくんのかいた絵（v1.31.1） */
   renderTreasures();
+  renderRiceBag();   /* v1.57.0 */
   setupRoomRest();
+}
+/* v1.57.0：台所の米袋（依頼者「2イ。ただし キッチンカウンターの右端に」）。はじめての稲刈りの夜（ほまれくんが お米を運んだ夜）から ずっと。
+   中身＝稲刈りの日に いっぱい（3）→ 冬 2 → 春 1 → 夏 0（少し）→ つぎの稲刈りで また 3。稲刈りが ない年も 0 のまま（なくならない）。
+   うしろの白いカウンター（炊飯器と同じ台）の右はし（#g-ricebag。えりちゃんが 料理をするときは、えりちゃんの うしろ） */
+function riceBagLevel(){ const T=S&&S.tanbo; if(!T || !T.hakobi) return -1; const k=(yearNo()-T.hakobi)*4+(season()-2); return Math.max(0,Math.min(3,3-k)); }
+function riceBagArt(level){
+  const H=[15,21,28,35][level], y0=-H, bul=level>=2?1.6:level===1?1.1:.7;
+  let s='<ellipse cx="13" cy="0.4" rx="14" ry="2" fill="rgba(60,44,24,.16)"/>';
+  s+='<path d="M3.2 '+(y0+4)+' L22.8 '+(y0+4)+' Q'+(25+bul)+' '+(y0+H*.45)+' 25.2 -3.2 Q25.2 0 21.6 0 L4.4 0 Q.8 0 .8 -3.2 Q'+(1-bul)+' '+(y0+H*.45)+' 3.2 '+(y0+4)+'Z" fill="#efe0c2" stroke="#c7ae84" stroke-width="1"/>';
+  s+='<path d="M4.6 -4 Q13 -2.6 21.4 -4" stroke="#d9c39b" stroke-width=".9" fill="none"/>';
+  const folds=level>=3?1:level===2?2:3;   /* へるほど 上を 何回も 折る */
+  for(let i=0;i<folds;i++){ const fy=y0+4-i*2.2; s+='<rect x="3" y="'+(fy-3.4).toFixed(1)+'" width="20" height="4.2" rx="1.4" fill="'+(i%2?'#dcc69c':'#e6d3ad')+'" stroke="#c7ae84" stroke-width=".8"/>'; }
+  const lh=level>=2?11:level===1?8.6:6.4, ly=y0+5.6+(level>=2?2.4:1), lw=level>=1?15:13, lx=13-lw/2;   /* ラベル（白・緑の帯・稲穂） */
+  s+='<rect x="'+lx+'" y="'+ly.toFixed(1)+'" width="'+lw+'" height="'+lh+'" rx="2.2" fill="#fffdf8" stroke="#d8ccb4" stroke-width=".7"/>';
+  s+='<rect x="'+lx+'" y="'+(ly+lh-2.2).toFixed(1)+'" width="'+lw+'" height="2.2" rx="1" fill="#7fae5a"/>';
+  const cx=13, cy=ly+lh*.42, k=lh/11;
+  s+='<path d="M'+(cx-3.6*k).toFixed(1)+' '+(cy+3.2*k).toFixed(1)+' Q'+(cx-1*k).toFixed(1)+' '+(cy-2.6*k).toFixed(1)+' '+(cx+3.4*k).toFixed(1)+' '+(cy-3*k).toFixed(1)+'" stroke="#b58a34" stroke-width="'+(0.8*k+.2).toFixed(2)+'" fill="none" stroke-linecap="round"/>';
+  for(let i=0;i<4;i++){ const t=i/3, x=cx-2.4*k+t*5.4*k, y=cy+1.6*k-t*4.2*k+Math.sin(t*3)*0.4*k; s+='<ellipse cx="'+x.toFixed(1)+'" cy="'+(y+0.9*k).toFixed(1)+'" rx="'+(1.15*k).toFixed(2)+'" ry="'+(0.85*k).toFixed(2)+'" fill="'+(i%2?'#f0c85a':'#e3b440')+'"/>'; }
+  return s;
+}
+function renderRiceBag(force){
+  const g=document.getElementById('g-ricebag'); if(!g || !S) return;
+  const lv=force!=null?force:riceBagLevel(); if(lv<0){ g.style.display='none'; return; }   /* force＝見るだけの 新米の夜（いっぱい） */
+  if(g.dataset.lv!==String(lv)){ g.innerHTML=riceBagArt(lv); g.dataset.lv=String(lv); }
+  g.style.display='';
 }
 /* たなの上：しゃだはる君のたからもの（v1.31.1 で関数に。誕生日の石も ここで出す） */
 const TREASURE_MAX=3;   /* v1.45.1：台所の棚にならべる宝ものは 3つまで（前は5つ。石が先、のこりに どんぐり） */
@@ -9507,6 +9697,9 @@ EVENTS.push(
       addNagomi(1,A.shada);
       log('暑い日。しゃだはる君は木かげでひとやすみして、お水をもらいました。');
     }},
+  /* v1.57.0（依頼者「1ア」）：田んぼの トンボが、しゃだはる君の はなに とまる（夏・その年に田植えをした青田・雨でない）。しゃだはる君は じっと がまん */
+  { id:'tonbo', w:{helpful:1.2,goofy:2,sleepy:1.4}, can:()=>season()===1 && !S.raining && paddyLifeKind()==='natsu',
+    async run(){ await tonboNose(false); }},
   { id:'compost', w:{helpful:3,goofy:2.4,sleepy:1.6}, can:()=>!!S.unlocked.compost && S.compostDay!==S.day && (S.compost||0)<COMPOST_MAX && season()!==3 && !S.raining && S.clock<=DAY_END-90,   /* v1.40.0：たいひ運び（春夏＝草、秋＝落ち葉。冬はなし）。出やすさは高め（1日1つまでなので、その日の最初の出来事になりやすい） */
     async run(){
       const leaf=season()===2, item=leaf?'i-momiji':'i-grass';
@@ -9597,7 +9790,7 @@ function watchable(){
 /* 季節の出来事（v1.14.0。依頼者の希望「もう少し頻度を高く」）：どの季節も1回はかならず＋出やすさ2倍。
    S.seasonEv＝{sy:季節の通し番号, seen:この季節に もう出たか, day:さいごに出た日}。出やすさは2倍。同じ日に2回は出さない（1季節に1〜2回になる）。
    季節のさいごの日に まだなら、しゃだはる君が動ける さいしょの機会に かならず出す（1日の上限も、あいだの3行動も またぐ）。おうちの pickPre と同じ考えかた */
-const SEASONAL_EV={butterfly:1,shade:1,acorn:1,snowman:1,slip:1};
+const SEASONAL_EV={butterfly:1,shade:1,acorn:1,snowman:1,slip:1,tonbo:1};   /* v1.57.0：tonbo（夏。田植えをした年） */
 function seasonEv(){ const sy=Math.floor((S.day-1)/SEASON_DAYS); if(!S.seasonEv || S.seasonEv.sy!==sy) S.seasonEv={sy,seen:false,day:0}; return S.seasonEv; }
 async function maybeEvent(resting,forceId){
   if(A.shada.mode!=='follow') return false;
@@ -9627,7 +9820,7 @@ async function maybeEvent(resting,forceId){
   return true;
 }
 /* v1.37.2：しゃだはる君ひとりで進む出来事（うしろで流せる）。pull（いっしょに引っぱる）と shade（えりちゃんが小屋へ）は えりちゃんが動くので いままでどおり止める */
-const EVENT_SOLO={water:1,bug:1,stone:1,soggy:1,nap:1,watch:1,butterfly:1,acorn:1,snowman:1,slip:1,compost:1};   /* compost は v1.40.0 */
+const EVENT_SOLO={water:1,bug:1,stone:1,soggy:1,nap:1,watch:1,butterfly:1,acorn:1,snowman:1,slip:1,compost:1,tonbo:1};   /* compost は v1.40.0 */
 let forceWait=false;   /* しらべる用：true のあいだは うしろで流さず待つ */
 
 /* ================= 1日の流れ ================= */
@@ -10131,10 +10324,11 @@ async function morning_(info){
       await pause(1500); setMood('shada','happy',1600); say('shada','えりちゃん、バジル、そだったばう！');
       await pause(1500); say('eri','ほんとだ。あとで、つんでおこうね。',0,'happy',true); log('温室のバジルが育っています。タップして、つみましょう。');
     }
-    if(S.unlocked.tanbo && seasonDay()===1 && (season()===0 || season()===2)){   /* v1.52.0：田んぼ。あしたの朝が 田植え・稲刈り */
+    if(S.unlocked.tanbo && seasonDay()===1 && season()!==3){   /* v1.52.0：田んぼ。あしたの朝が 田植え・稲刈り。v1.57.0：夏も（カエルとトンボ） */
       const T=tanboT(), y=yearNo();
       if(season()===0 && T.taue!==y){ await pause(1500); setMood('shada','happy',1600); say('shada',((T.tn||0)%2)?'たんぼ、きらきらばう！':'たんぼに、みず、ばう！');   /* v1.56.0：年ごとに */ await pause(1700); say('eri','あしたは、田植えだね。',0,'smile',true); log('春になって、田んぼに水をはりました。あしたの朝は、田植えです。'); }
-      if(season()===2 && T.taue===y && T.kari!==y){ await pause(1500); setMood('shada','happy',1600); say('shada',((T.kn||0)%2)?'たんぼ、いいにおいばう！':'たんぼ、きんいろばう！');   /* v1.56.0：年ごとに */ await pause(1700); say('eri','あしたは、稲刈りだね。',0,'smile',true); log('田んぼの稲が、きんいろに実りました。あしたの朝は、稲刈りです。'); }
+      if(season()===2 && T.taue===y && T.kari!==y){ await pause(1500); setMood('shada','happy',1600); say('shada',((T.kn||0)%2)?'たんぼ、いいにおいばう！':'たんぼ、きんいろばう！');   /* v1.56.0：年ごとに */ await pause(1700); say('eri','あしたは、稲刈りだね。',0,'smile',true); log('田んぼの稲が、きんいろに実りました。赤とんぼも とんでいます。あしたの朝は、稲刈りです。'); }
+      if(season()===1 && T.taue===y){ await pause(1500); setMood('shada','happy',1600); const k=((T.tn||0)+1)%2; say('shada',k?'たんぼに、トンボ いっぱいばう！':'たんぼで、ケロケロ いってるばう！');   /* v1.57.0：年ごとに */ await pause(1700); say('eri',k?'ふふ。すっかり、夏の田んぼだね。':'ふふ。カエルさん、げんきだね。',0,'smile',true); log('田んぼの稲が、青々と育っています。カエルが鳴いて、トンボも とんでいます。'); }
     }
     if(info.hoshi){   /* v1.28.0：大根が干しあがった朝 */
       await pause(1500); setMood('shada','happy',1600); say('shada','えりちゃん、だいこん、ほせたばう！');
@@ -10250,19 +10444,23 @@ function openSeeds(i){
    前からのセーブで もう2年目以降なら、最初の1回だけ「これまでの畑（1〜N年め）」として出る（依頼者が了解ずみ） ---------- */
 function dayStr(d){ const y=Math.floor((d-1)/(SEASON_DAYS*4))+1, sn=Math.floor((d-1)/SEASON_DAYS)%4, dd=((d-1)%SEASON_DAYS)+1; return (y>1?y+'年目 ':'')+SEASONS[sn]+dd+'日目'; }
 function fruitSum(){ const f=S.fruitN||{}; return Object.keys(f).reduce((a,k)=>a+(f[k]||0),0); }
-function yearSnap(){ return {day:S.day, total:S.total, totals:Object.assign({},S.totals), frogs:S.frogs||0, snails:S.snails||0, gyojiN:Object.assign({},S.gyojiN||{}), gifts:S.gifts||0, fruit:fruitSum(), nagomi:S.nagomi}; }
+function yearSnap(){ return {day:S.day, total:S.total, totals:Object.assign({},S.totals), frogs:S.frogs||0, snails:S.snails||0, gyojiN:Object.assign({},S.gyojiN||{}), gifts:S.gifts||0, fruit:fruitSum(), nagomi:S.nagomi, tn:(S.tanbo&&S.tanbo.tn)||0, kn:(S.tanbo&&S.tanbo.kn)||0}; }   /* v1.57.0：tn・kn（田んぼ） */
 function yearReview(){
   const b=S.yearBase||{}, bt=b.totals||{}, bg=b.gyojiN||{}, tot={};
   Object.keys(CROPS).forEach(k=>{ const v=(S.totals[k]||0)-(bt[k]||0); if(v>0) tot[k]=v; });
   let top=null; Object.keys(tot).forEach(k=>{ if(!top || tot[k]>tot[top]) top=k; });
   const gyoji=Object.keys(GYOJI).filter(k=>((S.gyojiN||{})[k]||0)-(bg[k]||0)>0).map(k=>GYOJI[k].name);
   const y1=(S.yearsAt||0)+1, y2=yearNo()-1;
-  return {y1, y2, title:(y1===y2?y2+'年めの畑':'これまでの畑（'+y1+'〜'+y2+'年め）'), total:S.total-(b.total||0), top, topN:top?tot[top]:0,
+  /* v1.57.0：田んぼ（1年ぶんは その年に したか。何年ぶんかの まとめは 回数） */
+  const T=S.tanbo||{}, paddy=y1===y2?{t:T.taue===y2?1:0, k:T.kari===y2?1:0, n:T.kn||0}:{t:clamp((T.tn||0)-(b.tn||0),0,y2-y1+1), k:clamp((T.kn||0)-(b.kn||0),0,y2-y1+1), lump:true};
+  return {y1, y2, paddy, title:(y1===y2?y2+'年めの畑':'これまでの畑（'+y1+'〜'+y2+'年め）'), total:S.total-(b.total||0), top, topN:top?tot[top]:0,
     frogs:(S.frogs||0)-(b.frogs||0), snails:(S.snails||0)-(b.snails||0), gyoji, gifts:(S.gifts||0)-(b.gifts||0), fruit:fruitSum()-(b.fruit||0), nagomi:S.nagomi-(b.nagomi||0)};
 }
 function yearLines(rv){
   const Z='​';   /* 見えない区切り（カードで、「・」「：」のあとで折れるように） */
   const L=['収穫 '+rv.total+'こ'+(rv.top?'（いちばん多かったのは '+Z+CROPS[rv.top].name+' '+rv.topN+'こ）':'')];
+  const P=rv.paddy;   /* v1.57.0：田んぼ（前の版の ふりかえりには ない） */
+  if(P && (P.t||P.k)) L.push(P.lump?'田んぼ：'+Z+'田植え '+P.t+'回・'+Z+'稲刈り '+P.k+'回':'田んぼ：'+Z+[P.t?'田植え':'',P.k?'稲刈り':''].filter(Boolean).join('・'+Z)+(P.k?(P.n===1?'（はじめての お米！）':'（'+P.n+'回め）'):''));
   if(rv.frogs||rv.snails) L.push('出会った生きもの：'+Z+'カエル '+rv.frogs+'ひき・'+Z+'かたつむり '+rv.snails+'ひき');
   if(rv.gyoji.length) L.push('行事：'+Z+rv.gyoji.join('・'+Z));
   if(rv.gifts||rv.fruit) L.push((rv.gifts?'おじさんのおすそわけ '+rv.gifts+'回':'')+(rv.gifts&&rv.fruit?'・'+Z:'')+(rv.fruit?'くだもののデザート '+rv.fruit+'回':''));
@@ -10303,6 +10501,12 @@ function openZukan(){
         +'<span class="d">料理 '+made.length+'／'+rs.length+(made.length?'（'+made.map(r=>esc(r.name)).join('、')+'）':'')+'</span></div></div>';
     });
     html+='</div>';
+  }
+  if(S.unlocked && S.unlocked.tanbo){   /* v1.57.0（依頼者「図鑑に田植え・稲刈り」）：田んぼの お米。まだ とれていないあいだは うすく */
+    const T=tanboT(), fy=T.firstY||(T.kn?T.kari-T.kn+1:0);
+    html+='<p class="zkSeason">'+icon('i-inaba')+'田んぼ</p><div class="zukan"><div class="zk'+(T.kn?'':' none')+'">'+icon('i-inaba')+'<div><b>お米</b><span class="d">田んぼ・春に田植え、秋に稲刈り</span>'
+      +'<span class="n">田植え '+(T.tn||0)+'回・稲刈り '+(T.kn||0)+'回</span>'
+      +(T.kn?'<span class="d">はじめての お米：'+fy+'年目の秋</span><span class="d" style="word-break:keep-all">新米の夜 '+(T.sn||0)+'回・<wbr>お花見の おにぎり '+(T.oni||0)+'回</span>':'')+'</div></div></div>';
   }
   html+='<div class="rowEnd"><button class="btn small" type="button" id="zkBack">にっきにもどる</button><button class="btn primary" type="button" data-close>とじる</button></div>';
   openSheet(html,{center:true,kind:'zukan'});
@@ -10517,6 +10721,7 @@ function openGyojiMenu(){
   [['taue',1,'田植え（1回め）'],['taue',2,'田植え（2回め）'],['taue',3,'田植え（3回め）'],['taue',4,'田植え（4回め）'],['kari',1,'稲刈り（1回め）'],['kari',2,'稲刈り（2回め）'],['kari',3,'稲刈り（3回め）'],['kari',4,'稲刈り（4回め）'],['hakobi',1,'稲刈りの日の夕方（お米を運ぶ・1）'],['hakobi',2,'稲刈りの日の夕方（お米を運ぶ・2）'],['hakobi',3,'稲刈りの日の夕方（お米を運ぶ・3）'],['shinmai',1,'新米の夜（1回め）'],['shinmai',2,'新米の夜（2回め）'],['shinmai',3,'新米の夜（3回め）'],['shinmai',4,'新米の夜（4回め）']].forEach(([k,p,t])=>{ i++; html+='<button class="seed" type="button" data-tanbo="'+k+'" data-pat="'+p+'"><span><b>'+i+'. '+esc(t)+'</b></span></button>'; });   /* v1.52.0：田んぼ（3年目から） */
   [['cushion','クッションのカバー'],['vase','新しい花びん'],['photo','また3人で記念写真'],['toybox','新しいおもちゃ（ロープ）'],['rug','新しいラグ'],['picture','新しい畑の絵'],['star','また3人で流れ星'],['bookshelf','新しい絵本']].forEach(([k,t])=>{ i++; html+='<button class="seed" type="button" data-lap="'+k+'"><span><b>'+i+'. ごほうび2周め：'+esc(t)+'</b></span></button>'; });   /* v1.53.0：なごみ度のごほうび 2周め（見るだけ） */
   [['height','また せいくらべ',1],['plant','観葉植物の お手入れ',1],['pawart','しゃだはる君の新しい絵',1],['clock','はと時計の しゅうり',1],['fishbowl','金魚が ふえる',1],['mirror','かがみの前で おめかし',1],['ukulele','ほまれくんの新しい曲（しゃだはるの うた）',1],['ukulele','ほまれくんの新しい曲（はたけの うた）',2],['ukulele','ほまれくんの新しい曲（3にんの うた）',3],['chair','ゆりいすの ひざかけ',1]].forEach(([k,t,nn])=>{ i++; html+='<button class="seed" type="button" data-lap="'+k+'" data-n="'+nn+'"><span><b>'+i+'. ごほうび2周め：'+esc(t)+'</b></span></button>'; });   /* v1.54.0：10〜17（新しい曲は 3つとも） */
+  [['natsu','夏の田んぼ（カエルとトンボ・はなに トンボ）'],['aka','秋の田んぼ（赤とんぼ）']].forEach(([k,t])=>{ i++; html+='<button class="seed" type="button" data-paddylife="'+k+'"><span><b>'+i+'. '+esc(t)+'</b></span></button>'; });   /* v1.57.0 */
   openSheet(html+'</div>'+tuneSection(),{kind:'gyoji'});   /* v1.36.0：下に「曲をきく」（依頼者が アプリのプレビューでも 新しい曲を聴けるように） */
   bindTuneButtons();
   sheetCard.querySelectorAll('[data-gyoji]').forEach(b=>b.addEventListener('click',async()=>{
@@ -10528,6 +10733,11 @@ function openGyojiMenu(){
     closeSheet(); if(busy) return;
     busy=true; renderButtons();
     try{ await tanboPreview(b.dataset.tanbo,+b.dataset.pat||1); } finally { busy=false; renderButtons(); runQueued(); }
+  }));
+  sheetCard.querySelectorAll('[data-paddylife]').forEach(b=>b.addEventListener('click',async()=>{   /* v1.57.0 */
+    closeSheet(); if(busy) return;
+    busy=true; renderButtons();
+    try{ await paddyLifePreview(b.dataset.paddylife); } finally { busy=false; renderButtons(); runQueued(); }
   }));
   sheetCard.querySelectorAll('[data-lap]').forEach(b=>b.addEventListener('click',async()=>{   /* v1.53.0 */
     closeSheet(); if(busy) return;
@@ -10570,7 +10780,7 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitTitleEn)
 { const v=document.querySelector('.ver'); let taps=[];
   if(v) v.addEventListener('click',e=>{ e.stopPropagation(); const t=Date.now(); taps=taps.filter(x=>t-x<3000); taps.push(t); if(taps.length>=5){ taps=[]; openGyojiMenu(); } }); }
 if(location.hash.indexOf('debug')>=0){
-  window.__hatake={ tipOK, GIFT_TALK, VISIT_SETS, VISIT_CALL, visitScene, vary, saidOK, get SAID(){return SAID;}, ERI_TALK, OKAWARI, eriTalk, etSlot, MORN_X, mornExtra, reportLine, svgPop, liftOffFaces, walkHomeTogether, camGlide, bplates, bslice, bcakeSVG, get cameWithH(){return cameWithH;}, TANBO, tanboDue, hakobiDue, shinmaiDue, tanboScene, hakobiScene, shinmaiTalk, shinmaiPreview, tanboPreview, tanboState, renderPaddy, paddyArt, paddyHint, paddyTap, riceShow, riceFill, get tanboView(){return tanboView;}, sayTest:say, focusRange, seedOK, recipeOK, hsay, bubbleHTML, TSUKIMI, hotDry, returnBigCan, spOf, spKeys, spEmpty, HOT_AT, get bigCanCarry(){return bigCanCarry;}, get wxQueue(){return wxQueue;}, weatherScenes, askScene, askLeft, renderAsk, compostTap, ASK_MAX, COMPOST_MAX, place, moveTo, moveShada, shadaCanDown, shadaCarry, shadaMode, afterAction, returnCan, shadaSelfWater, get canDownScene(){return canDownScene;}, rollBig, spawnBug, startRain, yearReview, yearReviewScene, yearSnap, yearLines, openZukan, openDiary, dayStr, get sheetKind(){return sheetKind;}, get bg(){return bg;}, bgWait, set forceWait(v){forceWait=v;}, gyojiPat, GYOJI_LEAD, birthdayNight, get gyojiStep(){return gyojiStep;}, rollWeather, pickPre, gyojiNightDue, nightOn, nightOff, nightOuting, fwLaunch, senkoOn, HANABI, hangCan, hangScene, hangMorning, renderShed, shedTap, nextHoshiDish, hoshiReady, morningPlan, morning, GYOJI, GYOJI_SCENE, gyojiDue, gyojiScene, hRoute, hCross, hInB, HTABLE, HSPOT, hmove, get S(){return S;}, get busy(){return busy;}, get hiddenNow(){return hiddenNow;}, get pausedMs(){return pausedMs;}, gnow, shadaAcc, lapBlanket, heightArt, plantArt, pawArt, fishbowlArt, BLANKET, ACC, SONGS, playSong, homeMorning, get sceneDepth(){return sceneDepth;}, pumpTimers, mikanFit, basketPlace, get lastErr(){return lastErr;}, get stall(){return {n:stallN,max:stallMax};}, saveDiag, saveNow, get saveOK(){return saveOK;}, A, homeEvening, pickPre, dishCandidates, makeRequest, get HA(){return HA;}, advance, maybeEvent, renderAll, addHarvest, checkUnlocks, nextMorning, Store, CROPS, RECIPES, UNLOCKS, EVENTS, FRIDGE, rollFridge, rollWeather, placeFrost, weatherScenes, importSave, exportSave, normalize, Snd, GIFTS, planVisit, visitDue, fitVisit, DISH, setPortions, shelterAtShed, restAtHome, placeTreasure, rest, FRUITS, plantTree, plantVine, pickFruit, TREES, treeTap, dessertNight, fruitMorning, renderTree, moveShada, shadaSelfWater, selfWaterTarget, returnCan, playerAction, endDay, plantBasil, pickBasil, pickV, judgeBigDay, giftDetour, basilInFridge, SLOT_MAX, makeRoomFor, seasonSwap, fixup, workLeft, decorShown, closetTalk, openFridge, cuckoo, feedFish, mirrorReflect, strum, playUke, sitRock, seasonalDue, seasonalShow, SEASONAL, SEASONAL_SCENE, setupRoom, REWARD_NIGHT, DECOR, REWARDS, rewardSetup, LOOP, LOOP_SCENE, lapNext, lapReward, lapReady, lapPreview, renderLooks, showLook, bringOut, tugGame, tugRope, paintArt, LOOK_ART, lookN, lookV, nextReward, dueReward, renderNagomi, openNagomi, rewardCard, sweetsNight, updatePhoto, get SW(){return {n:S.swN,day:S.swDay,can:S.canOut};},
+  window.__hatake={ renderPaddyLife, paddyLifeKind, paddyFrogTap, tonboFlyTo, tonboNose, paddyLifePreview, PADDY_FROGS, TONBO_ZONE, get plTonbo(){return plTonbo;}, riceBagLevel, renderRiceBag, gyojiLog, get hanamiRice(){return hanamiRice;}, tipOK, GIFT_TALK, VISIT_SETS, VISIT_CALL, visitScene, vary, saidOK, get SAID(){return SAID;}, ERI_TALK, OKAWARI, eriTalk, etSlot, MORN_X, mornExtra, reportLine, svgPop, liftOffFaces, walkHomeTogether, camGlide, bplates, bslice, bcakeSVG, get cameWithH(){return cameWithH;}, TANBO, tanboDue, hakobiDue, shinmaiDue, tanboScene, hakobiScene, shinmaiTalk, shinmaiPreview, tanboPreview, tanboState, renderPaddy, paddyArt, paddyHint, paddyTap, riceShow, riceFill, get tanboView(){return tanboView;}, sayTest:say, focusRange, seedOK, recipeOK, hsay, bubbleHTML, TSUKIMI, hotDry, returnBigCan, spOf, spKeys, spEmpty, HOT_AT, get bigCanCarry(){return bigCanCarry;}, get wxQueue(){return wxQueue;}, weatherScenes, askScene, askLeft, renderAsk, compostTap, ASK_MAX, COMPOST_MAX, place, moveTo, moveShada, shadaCanDown, shadaCarry, shadaMode, afterAction, returnCan, shadaSelfWater, get canDownScene(){return canDownScene;}, rollBig, spawnBug, startRain, yearReview, yearReviewScene, yearSnap, yearLines, openZukan, openDiary, dayStr, get sheetKind(){return sheetKind;}, get bg(){return bg;}, bgWait, set forceWait(v){forceWait=v;}, gyojiPat, GYOJI_LEAD, birthdayNight, get gyojiStep(){return gyojiStep;}, rollWeather, pickPre, gyojiNightDue, nightOn, nightOff, nightOuting, fwLaunch, senkoOn, HANABI, hangCan, hangScene, hangMorning, renderShed, shedTap, nextHoshiDish, hoshiReady, morningPlan, morning, GYOJI, GYOJI_SCENE, gyojiDue, gyojiScene, hRoute, hCross, hInB, HTABLE, HSPOT, hmove, get S(){return S;}, get busy(){return busy;}, get hiddenNow(){return hiddenNow;}, get pausedMs(){return pausedMs;}, gnow, shadaAcc, lapBlanket, heightArt, plantArt, pawArt, fishbowlArt, BLANKET, ACC, SONGS, playSong, homeMorning, get sceneDepth(){return sceneDepth;}, pumpTimers, mikanFit, basketPlace, get lastErr(){return lastErr;}, get stall(){return {n:stallN,max:stallMax};}, saveDiag, saveNow, get saveOK(){return saveOK;}, A, homeEvening, pickPre, dishCandidates, makeRequest, get HA(){return HA;}, advance, maybeEvent, renderAll, addHarvest, checkUnlocks, nextMorning, Store, CROPS, RECIPES, UNLOCKS, EVENTS, FRIDGE, rollFridge, rollWeather, placeFrost, weatherScenes, importSave, exportSave, normalize, Snd, GIFTS, planVisit, visitDue, fitVisit, DISH, setPortions, shelterAtShed, restAtHome, placeTreasure, rest, FRUITS, plantTree, plantVine, pickFruit, TREES, treeTap, dessertNight, fruitMorning, renderTree, moveShada, shadaSelfWater, selfWaterTarget, returnCan, playerAction, endDay, plantBasil, pickBasil, pickV, judgeBigDay, giftDetour, basilInFridge, SLOT_MAX, makeRoomFor, seasonSwap, fixup, workLeft, decorShown, closetTalk, openFridge, cuckoo, feedFish, mirrorReflect, strum, playUke, sitRock, seasonalDue, seasonalShow, SEASONAL, SEASONAL_SCENE, setupRoom, REWARD_NIGHT, DECOR, REWARDS, rewardSetup, LOOP, LOOP_SCENE, lapNext, lapReward, lapReady, lapPreview, renderLooks, showLook, bringOut, tugGame, tugRope, paintArt, LOOK_ART, lookN, lookV, nextReward, dueReward, renderNagomi, openNagomi, rewardCard, sweetsNight, updatePhoto, get SW(){return {n:S.swN,day:S.swDay,can:S.canOut};},
     visit:async()=>{ if(busy) return false; busy=true; renderButtons(); S.oji={sy:Math.floor((S.day-1)/SEASON_DAYS),day:S.day,at:S.clock,done:false}; await visitScene(); busy=false; renderButtons(); return true; },
     force:async id=>{ if(busy) return false; busy=true; renderButtons(); S.sinceEvent=9; const r=await maybeEvent(false,id); await checkUnlocks(); busy=false; renderButtons(); return r; } };
 }
