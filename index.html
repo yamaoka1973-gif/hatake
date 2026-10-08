@@ -1237,7 +1237,7 @@ h1 .en{display:block;font-size:.7em;font-weight:400;font-style:italic;color:#8a9
 <div class="game" id="game">
   <div class="head">
     <h1>えりとしゃだはるの ちいさな畑<span class="en" id="titleEn">— Days on a Tiny Garden —</span></h1>
-    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.58.4</span></span>
+    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.58.5</span></span>
   </div>
 
   <div class="hud">
@@ -7508,7 +7508,7 @@ const HSPOT={
   /* v1.32.0：はと時計・かがみの下（たなの前）、金魚ばちの窓べ（しゃだはる君は左、ほまれくんは右） */
   clockD:{x:64,y:296}, mirrorD:{x:62,y:296}, fishD:{x:244,y:252}, fishH:{x:300,y:242},
   /* v1.33.0：ウクレレを取る場所（窓の右の下）、歌のときの しゃだはる君、ゆりいす（すわる＝顔のまんなか）、足もと */
-  ukeH:{x:316,y:254}, songD:{x:266,y:270}, chairSit:{x:314,y:250}, chairFeet:{x:298,y:302}, chairWatch:{x:256,y:290}   /* v1.34.2：ゆりいすは右はし。ほまれくんは左（食卓のうしろ）から見る */
+  ukeH:{x:316,y:254}, ukeBack:{x:262,y:254}, songD:{x:266,y:270}, chairSit:{x:314,y:250}, chairFeet:{x:298,y:302}, chairWatch:{x:256,y:290}   /* v1.34.2：ゆりいすは右はし。ほまれくんは左（食卓のうしろ）から見る */
 };
 const HBODY={
   /* えり：おうちの服（チャコールのTシャツに、白いワイドパンツ） */
@@ -8237,7 +8237,8 @@ const REWARD_NIGHT={
   async ukulele(E,D,H){
     hsay(H,'そうだ。ウクレレ、出してきたんだ。');
     await hp(1200);
-    await hmove(H,HSPOT.ukeH); hhold(H,['i-ukulele']);
+    await hmove(H,HSPOT.ukeBack); hhold(H,['i-ukulele']);   /* v1.58.5（依頼者「ウクレレがしゃだはる君に隠れてしまうので、弾く位置をほまれくんの真後ろに」）：前は ukeH（316,254）＝食卓の しゃだはる君（316,288）の 真うしろで、ウクレレが ぜんぶ かくれていた → 自分の席（262,276）の 真うしろへ 一歩 さがって 弾く。
+       ほかの ウクレレの場面（ほまれくんの歌・新しい曲）は しゃだはる君が songD（左）へ 来るので ukeH の まま */
     await hp(500);
     hmood(E,'happy',1800);
     hsay(E,'わあ、ひさしぶりに聞きたいな。',{mood:'happy'});
