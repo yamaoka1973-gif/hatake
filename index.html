@@ -447,17 +447,15 @@ h1 .en{display:block;font-size:.7em;font-weight:400;font-style:italic;color:#8a9
 
 /* 下のパネル */
 .panel{margin-top:10px;display:grid;gap:8px}
-.held{display:none;align-items:center;gap:8px;border:1px solid #a8b394;background:#eef2e7;border-radius:14px;padding:6px 8px 6px 14px;font-size:14px}
+.held{display:none;align-items:center;gap:8px;border:1px solid #a8b394;background:#eef2e7;border-radius:14px;padding:4px 5px 4px 12px;font-size:14px}
 .held.on{display:flex}
-/* v1.58.1（依頼者「持っている種／：野菜 絵文字 のように、バーの太さは変えずに、文字を調整して2段で。しまうボタンは消してもよい」）：
-   1段め＝「持っている種」（12px）、2段め＝「：野菜の名前」＋野菜の絵（字の大きさ）。2段で 15＋1＋19＝35 は「かえる」ボタン（36）より低いので、バーの太さは前と同じ 50。
-   2段めが入りきらない（せまい画面・大きい字の設定）ときは fitHeld() が 字を少し小さくして 1行に */
-.held .grow{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:1px}
-#heldLabel{font-size:12px;line-height:15px}
-.heldRow{display:flex;align-items:center;white-space:nowrap;overflow:hidden;line-height:19px}
-.heldRow svg{width:1.36em;height:1.36em;max-width:19px;max-height:19px;flex:none;margin:0 .1em 0 .14em}
-#heldMore{font-weight:700}
-#heldMore.note{font-weight:400;font-size:.86em}
+.held svg{width:26px;height:26px;flex:none}
+/* v1.58.2（依頼者「しまうがなくなったので、もとの1行表示も可能だと思う。かえるボタンも、大きくできるようなら」）：
+   もとの1行（左に野菜の絵・「持っている種：いちご」）。折りかえさない（nowrap）。入りきらないとき（せまい画面・長い名前＋たいひ）は fitHeld() が 字を少し小さくして 1行に。
+   「かえる」は 大きく（字 13→15px・高さ 36→40・幅 61→約73）。バーの上下の あきを 6→4 にして、バーの太さは前と同じ 50 */
+.held .grow{flex:1;min-width:0;white-space:nowrap;overflow:hidden;line-height:20px}
+#heldChange{min-height:40px;padding:0 13px;font-size:15px;border-radius:12px}
+@media (max-width:340px){#heldChange{padding:0 9px;font-size:14px}}   /* とても せまい画面では 少し細く（名前の字が 小さくなりすぎないように） */
 .log{border:1px solid var(--border);border-radius:16px;background:#fff;padding:10px 14px}
 .logTitle{font-size:13px;font-weight:700;margin-bottom:2px}
 .logText{font-size:14px;color:var(--muted);min-height:2.9em}
@@ -1233,7 +1231,7 @@ h1 .en{display:block;font-size:.7em;font-weight:400;font-style:italic;color:#8a9
 <div class="game" id="game">
   <div class="head">
     <h1>えりとしゃだはるの ちいさな畑<span class="en" id="titleEn">— Days on a Tiny Garden —</span></h1>
-    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.58.1</span></span>
+    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.58.2</span></span>
   </div>
 
   <div class="hud">
@@ -1659,7 +1657,8 @@ h1 .en{display:block;font-size:.7em;font-weight:400;font-style:italic;color:#8a9
 
   <div class="panel">
     <div class="held" id="held">
-      <span class="grow"><span id="heldLabel">持っている種</span><span class="heldRow" id="heldRow">：<strong id="heldName"></strong><svg aria-hidden="true"><use id="heldIcon" href="#c-ichigo"/></svg><span id="heldMore"></span></span></span>
+      <svg aria-hidden="true"><use id="heldIcon" href="#c-ichigo"/></svg>
+      <span class="grow" id="heldRow"><span id="heldLabel">持っている種：</span><strong id="heldName"></strong></span>
       <button class="btn small" id="heldChange" type="button">かえる</button>
     </div>
     <div class="log">
@@ -2765,23 +2764,24 @@ function renderHeld(){
   if(seed || S.compostHeld){   /* v1.40.0：たいひを持っているときも札を出す */
     h.classList.add('on');
     $('#heldIcon').setAttribute('href',seed?'#c-'+S.held:'#i-compost');
-    $('#heldLabel').textContent=seed?'持っている種':'持っているもの';   /* v1.58.1：2段に（「：」は 2段めの はじめ） */
-    $('#heldName').textContent=seed?CROPS[S.held].name:'たいひ';   /* 名前のすぐあとに 絵（たいひだけのときは たいひの絵） */
-    const more=$('#heldMore'); more.textContent=S.compostHeld?(seed?'＋たいひ':'（次の種まきで使う）'):''; more.className=seed?'':'note';
+    $('#heldLabel').textContent=seed?'持っている種：':'持っているもの：';
+    $('#heldName').textContent=(seed?CROPS[S.held].name:'')+(S.compostHeld?(seed?'＋たいひ':'たいひ'):'');   /* v1.58.2：もとの1行。たいひだけのときの「（次の種まきで使う）」は 1行に入らないので はずした（たいひを持ったときの できごと欄に 同じ説明が出る） */
     fitHeld();
   }else h.classList.remove('on');
 }
-/* v1.58.1：札の2段め（：野菜の名前＋絵）が 入りきらないときは、字を少し小さくして 1行に（バーの太さを かえない）。
-   ふつうの字の大きさなら 幅320 でも 14px のまま入る。同じ中身・同じ幅なら はかりなおさない */
+/* v1.58.1・v1.58.2：札の字（持っている種：○○）が 1行に 入りきらないときは、字を少し小さくして 1行に（バーの太さを かえない）。
+   同じ中身・同じ幅なら はかりなおさない */
 var heldSig='';
 function fitHeld(){
   const row=$('#heldRow'); if(!row) return;
   const sig=row.textContent+'|'+$('#heldIcon').getAttribute('href')+'|'+innerWidth;
   if(sig===heldSig) return;
-  row.style.fontSize='';
+  const lab=$('#heldLabel'); row.style.fontSize=''; lab.style.display='';
   if(!row.offsetWidth){ heldSig=''; return; }   /* 札が かくれているあいだは はかれない（つぎに出たときに） */
   heldSig=sig;
-  for(let fs=14; row.scrollWidth>row.clientWidth+.5 && fs>10; ){ fs-=.5; row.style.fontSize=fs+'px'; }
+  const fit=min=>{ for(let fs=14; row.scrollWidth>row.clientWidth+.5 && fs>min; ){ fs-=.5; row.style.fontSize=fs+'px'; } };
+  fit(10);
+  if(row.scrollWidth>row.clientWidth+.5){ lab.style.display='none'; row.style.fontSize=''; fit(9); }   /* v1.58.2：10px でも入らない とても せまい画面（幅320 で スナップえんどう＋たいひ など）だけ「持っている種：」を はぶく（左の絵で 分かる） */
 }
 window.addEventListener('resize',fitHeld);
 /* しゃだはる君に おねがい（v1.40.0。依頼者が了解ずみ）：畑の右上の札。押すと、彼が かわいたマスを近いほうから3つまで 水やり（時間は進まない）。1日 ASK_MAX 回。
