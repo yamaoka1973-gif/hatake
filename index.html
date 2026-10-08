@@ -314,17 +314,18 @@ h1 .en{display:block;font-size:.7em;font-weight:400;font-style:italic;color:#8a9
 .actor.shada.bigCan .can{width:27px;height:27px;right:-15px;top:46%;transform:rotate(-8deg)}   /* v1.41.0：3代目のじょうろを運ぶあいだ（見本 C） */
 .actor .can svg{width:100%;height:100%;display:block}
 /* しゃだはる君に おねがい（v1.40.0）：畑の右上の札 */
-.askChip{position:absolute;right:8px;top:8px;z-index:190;display:none;align-items:center;gap:4px;min-height:30px;border:1px solid var(--border);background:rgba(255,255,255,.92);border-radius:16px;padding:2px 9px 2px 4px;font:inherit;font-size:12px;line-height:1.2;color:var(--muted);cursor:pointer}
+.askChip{position:absolute;left:8px;bottom:8px;z-index:190;transition:opacity .25s;display:none;align-items:center;gap:4px;min-height:30px;border:1px solid var(--border);background:rgba(255,255,255,.92);border-radius:16px;padding:2px 9px 2px 4px;font:inherit;font-size:12px;line-height:1.2;color:var(--muted);cursor:pointer}
 .askChip.on{display:flex}
 .askChip .mini{width:24px;height:24px}
 .askChip b{color:var(--text);font-size:14px}
 .askChip[disabled]{opacity:.5;cursor:default}
 .askChip:focus-visible{outline:3px solid rgba(138,154,104,.5);outline-offset:2px}
-@media (hover:hover) and (pointer:fine){.askChip{right:50px}}   /* パソコンでは 右の「›」ボタンと重ならないように */
-/* v1.58.3（依頼者「なごみ度のバーと、おねがいのバーが重なって表示される」）：スマホの幅では、左上の なごみ度のゲージ（240〜310）と 右上の おねがいの札（103）が 1段に入りきらない
-   （幅360 の景色は 344。ゲージの文が「晴れた夜に、ごほうび！」「春になったら、ごほうび！」や 数が3〜4けたのときは 幅412 でも 重なっていた）→ おねがいの札を ゲージの下の段（右はしは そのまま）へ。
-   ゲージと 札が いちばん長くても 1段に入る 幅（481〜。パソコン・タブレット）は 前のまま 1段 */
-@media (max-width:480px){.askChip{top:44px}}
+/* v1.58.4（依頼者「おねがいは画面の左下に表示できますか？」）：おねがいの札は 景色の左下に（どの幅でも）。
+   v1.58.3 までは 右上（なごみ度のゲージと 重なるので スマホでは 2段め）。左下は 景色の下の 土の道で、タップする畑・田んぼ（下はし y400）より下。
+   パソコンの「‹ ›」は 上なので かさならない。
+   外の場面（おじさん・行事・ひとやすみ・朝・できたもの・天気・しゃだはる君の出来事 など＝.vp.locked）のあいだは かくす：おじさんは 左下の道から 歩いてきて 札の右よこ（幅360で x97〜155）に立つ・
+   ベンチの前の ひとやすみは 下の ござ（y402）に すわる ので。場面のあいだは どのみち 押せない（busy）。場面が おわれば また出る */
+.vp.locked .askChip.on{opacity:0;pointer-events:none}
 /* たいひ箱（v1.40.0）：中身の量で3段階 */
 #d-compost .h1,#d-compost .h2,#d-compost .h3{display:none}
 #d-compost[data-n="1"] .h1,#d-compost[data-n="2"] .h2,#d-compost[data-n="3"] .h3{display:inline}
@@ -1236,7 +1237,7 @@ h1 .en{display:block;font-size:.7em;font-weight:400;font-style:italic;color:#8a9
 <div class="game" id="game">
   <div class="head">
     <h1>えりとしゃだはるの ちいさな畑<span class="en" id="titleEn">— Days on a Tiny Garden —</span></h1>
-    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.58.3</span></span>
+    <span class="headR"><button class="sndBtn" id="sndBtn" type="button" aria-label="音"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.6L12 6v12l-4.4-3.5H4z" fill="currentColor"/><g class="waves" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14.6 9.6q1.7 2.4 0 4.8"/><path class="w2" d="M17.2 7.6q3.2 4.4 0 8.8"/></g><g class="note"><path d="M20.6 9.2V2.8q2.2.5 2.5 2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="19" cy="9.3" rx="1.9" ry="1.45" transform="rotate(-20 19 9.3)" fill="currentColor"/></g><path class="slash" d="M15.2 9.6l5 5M20.2 9.6l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><span class="ver">v1.58.4</span></span>
   </div>
 
   <div class="hud">
